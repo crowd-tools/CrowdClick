@@ -1,4 +1,6 @@
 from django.db import models
+import datetime
+
 from . import managers
 
 
@@ -7,7 +9,7 @@ class Advertisement(models.Model):
     title = models.CharField("Title", max_length=35)
     description = models.TextField("Description", max_length=100)
     reward_per_click = models.FloatField("Reward per click")
-    time_duration = models.DurationField("Time duration")
+    time_duration = models.DurationField("Time duration", default=datetime.timedelta(days=7))
 
     objects = managers.AdvertisementManager()
 
