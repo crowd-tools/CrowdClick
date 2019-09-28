@@ -25,7 +25,7 @@ class Question(models.Model):
     question_type = models.CharField(max_length=2, choices=QUESTION_TYPES)
 
     def __str__(self):
-        return "title='%s', question_type='%s'" % (self.title, self.question_type)
+        return "Question(%s, title=%s)" % (self.title, self.question_type)
 
 
 class Answer(models.Model):
@@ -33,4 +33,4 @@ class Answer(models.Model):
     title = models.CharField(max_length=50)
 
     def __str__(self):
-        return "id='%s', title='%s'" % (self.pk, self.title)
+        return "Answer(%s, title=%s)" % (self.pk, self.title)

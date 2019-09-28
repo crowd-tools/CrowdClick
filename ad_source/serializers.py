@@ -1,15 +1,16 @@
 from rest_framework import serializers
 
-from .models import Advertisement, Question
+from . import fields, models
 
 
 class AdvertisementSerializer(serializers.HyperlinkedModelSerializer):
 
-    questions = serializers.StringRelatedField(many=True)
+    questions = fields.AdvertisementQuestionRelatedField(many=True)
 
     class Meta:
-        model = Advertisement
+        model = models.Advertisement
         fields = [
+            'id',
             'website_link',
             'title',
             'description',
@@ -20,12 +21,13 @@ class AdvertisementSerializer(serializers.HyperlinkedModelSerializer):
         ]
 
 
-class QuestionSerializer(serializers.ModelSerializer):
-    answers = serializers.StringRelatedField(many=True)
+class QuestionSerializer(serializers.HyperlinkedModelSerializer):
+    answers = fields.QuestionAnswerRelatedField(many=True)
 
     class Meta:
-        model = Question
+        model = models.Question
         fields = [
+            'id',
             'title',
             'question_type',
 
