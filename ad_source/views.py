@@ -2,10 +2,6 @@ from django.http import HttpResponse
 from django.views.generic.base import TemplateView
 
 
-def landing_page(request):
-    return HttpResponse("Hello, world. You're at the polls index.")
-
-
 class HomeView(TemplateView):
     template_name = "home/index.html"
 
@@ -14,4 +10,9 @@ class HomeView(TemplateView):
         return kwargs
 
 
+class AboutView(TemplateView):
+    template_name = "home/about.html"
+
+
 home = HomeView.as_view()
+about = AboutView.as_view()

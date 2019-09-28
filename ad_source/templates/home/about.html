@@ -1,0 +1,36 @@
+{% extends "home/base.html" %}
+{% load static %}
+
+
+{% block title %}About{% endblock title %}
+
+{% block content %}
+    <div class="row">
+        <div class="col" style="padding: 5em">
+            <h3>How to become a publisher</h3>
+            <ol>
+                <li>Place your website URL, page title & page description</li>
+                <li>Set reward per click</li>
+                <li>Set time duration to stay on your site</li>
+                <li>Place multiple choice question</li>
+            </ol>
+        </div>
+        <div class="col">
+            <img src="{% static "img/about_publisher.jpeg" %}" alt="Publisher image">
+        </div>
+    </div>
+    <div class="row">
+        <div class="col">
+            <img src="{% static "img/about_user.jpeg" %}" alt="Publisher image">
+        </div>
+        <div class="col" style="padding: 5em">
+            <h3>How to become a user</h3>
+            <ol>
+                <li>Click website</li>
+                <li>Stay on for a time duration count down</li>
+                <li>Answer multiple choice question</li>
+                <li>Receive ETH as the reward!</li>
+            </ol>
+        </div>
+    </div>
+{% endblock %}
