@@ -37,15 +37,18 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'ad_source',
+
     'rest_framework',
+    'web3auth.apps.Web3AuthConfig',
+
+    'ad_source',
 ]
 
 MIDDLEWARE = [
-    'django.middleware.security.SecurityMiddleware',
+    # 'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
-    'django.middleware.csrf.CsrfViewMiddleware',
+    # 'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
@@ -73,6 +76,11 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'crowdclick.wsgi.application'
 
+AUTHENTICATION_BACKENDS = [
+    'django.contrib.auth.backends.ModelBackend',
+    'web3auth.backend.Web3Backend'
+]
+
 # Rest Framework https://www.django-rest-framework.org/
 REST_FRAMEWORK = {
     # Use Django's standard `django.contrib.auth` permissions,
@@ -82,7 +90,17 @@ REST_FRAMEWORK = {
     ],
     'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.PageNumberPagination',
     'PAGE_SIZE': 10,
+    # 'DEFAULT_AUTHENTICATION_CLASSES': (
+    #     'rest_framework.authentication.SessionAuthentication',
+    #     # 'rest_framework.authentication.BasicAuthentication'
+    # ),
 }
+
+
+# Web3
+WEB3AUTH_USER_ADDRESS_FIELD = 'username'
+WEB3AUTH_USER_SIGNUP_FIELDS = ['email', ]
+LOGIN_REDIRECT_URL = '/'
 
 # Database
 # https://docs.djangoproject.com/en/2.2/ref/settings/#databases
