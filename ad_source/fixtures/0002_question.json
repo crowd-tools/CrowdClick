@@ -1,0 +1,11 @@
+[
+  {
+    "model": "ad_source.question",
+    "pk": 1,
+    "fields": {
+      "ad": 1,
+      "title": "Was it good?",
+      "question_type": "RA"
+    }
+  }
+]

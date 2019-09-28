@@ -1,0 +1,18 @@
+[
+  {
+    "model": "ad_source.answer",
+    "pk": 1,
+    "fields": {
+      "title": "Good",
+      "question": 1
+    }
+  },
+  {
+    "model": "ad_source.answer",
+    "pk": 2,
+    "fields": {
+      "title": "Bad",
+      "question": 1
+    }
+  }
+]
