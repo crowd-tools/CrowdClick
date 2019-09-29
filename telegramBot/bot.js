@@ -3,9 +3,12 @@ const Telegraf = require("telegraf");
 const Markup = require("telegraf/markup");
 const Extra = require("telegraf/extra");
 const fs = require("fs");
+const Wallet = require("ethereumjs-wallet");
+const fetch = require("node-fetch");
 
 
 const TOKEN = process.env.TELEGRAM_TOKEN_API;
+const BASE_URL = process.env.BACK_END_API;
 
 const bot = new Telegraf(TOKEN);
 
@@ -14,6 +17,13 @@ let websitesArr = ["https://docs.matic.network"]
 
 let adsQuestions = [];
 let currentQuestionIndex = 0;
+
+const fetch_api = async() => {
+    const response = await fetch(BASE_URL);
+    const data = await response.json();
+    console.log(data)
+    return data
+}
 
 const fetch_questions = () => {
     adsQuestions = JSON.parse(fs.readFileSync("questions.json", "utf-8"))
@@ -24,6 +34,15 @@ const fetch_questions = () => {
 //     return
 // }
 //move it to helper.js file
+
+const createKeyPair = (ctx) => {
+    const wallet = Wallet.generate();
+    let keysObj = {};
+    keysObj.public_key = wallet.getAddressString();
+    keysObj.private_key = wallet.getPrivateKeyString();
+    // const go_to_metamask = Markup.urlButton("You can now access metamask with your private key", "https://www.myetherwallet.com/access-my-wallet")
+    ctx.reply("your public key is " + keysObj.public_key + " and your private key is: " + keysObj.private_key)
+}
 
 const showQuestion = async (ctx) => {
     await fetch_questions();
@@ -46,8 +65,9 @@ bot.start((ctx) => ctx.reply(`Welcome to Crowdclick, ${ctx.from.first_name}!
 `,
 
     Markup.inlineKeyboard([
-        // [Markup.callbackButton("Visit website", "fetch_website"),
-        [Markup.urlButton('Visit website', websitesArr[0])],
+        [Markup.callbackButton("Create wallet", "create_wallet")],
+        [Markup.callbackButton("Visit website", "fetch_website")],
+        // [Markup.urlButton('Visit website', websitesArr[0])],
         [Markup.callbackButton("Show my ads", "show_ads")],
         [Markup.callbackButton("Balance", "show_balance")],
         [Markup.callbackButton("Account", "open_account")],
@@ -60,8 +80,12 @@ bot.start((ctx) => ctx.reply(`Welcome to Crowdclick, ${ctx.from.first_name}!
 bot.on("callback_query", (ctx) => {
     const action = ctx.update.callback_query.data;
     switch (action) {
+        case "create_wallet":
+            createKeyPair(ctx) 
+            break           
         case "fetch_website":
             ctx.reply("Open website etc. etc. etc.")
+            fetch_api()
             console.log("it's working");
             break
         case "show_ads":
@@ -81,7 +105,6 @@ bot.on("callback_query", (ctx) => {
             //perhaps call another action here as a callback etc. 
             // fetch_questions()
             showQuestion(ctx)
-
             console.log("questions consolelog")
             break
     }

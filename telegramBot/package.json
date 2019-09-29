@@ -10,6 +10,8 @@
   "license": "ISC",
   "dependencies": {
     "dotenv": "^8.1.0",
-    "telegraf": "^3.32.0"
+    "telegraf": "^3.32.0",
+    "ethereumjs-wallet": "^0.6.3",
+    "node-fetch": "^2.6.0"
   }
 }
