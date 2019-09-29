@@ -5,10 +5,26 @@
     <meta charset="UTF-8">
     <title>Advertising Matrix</title>
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css"
-    integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+        integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
 </head>
 
 <body>
+
+    <div class="d-flex flex-column flex-md-row align-items-center p-3 px-md-4 mb-3 bg-white border-bottom shadow-sm">
+        <h5 class="my-0 mr-md-auto font-weight-normal"><a href="/">CrowdClick</a></h5>
+        <nav class="my-2 my-md-0 mr-md-3">
+            <a class="p-2 text-dark" href="{% url "publish" %}">Publish</a>
+            <a class="p-2 text-dark" href="{% url "advertisement" %}">Advertisement</a>
+            <a class="p-2 text-dark" href="{% url "advertising_matrix" %}">Advertising Matrix</a>
+            <a class="p-2 text-dark" href="{% url "about" %}">About</a>
+            {% if user.is_authenticated %}
+            <a class="p-2 text-dark" href="{% url "logout" %}">{{ user.username }}</a>
+            {% else %}
+            <a class="p-2 text-dark" href="{% url "web3auth_signup" %}">Sign up</a>
+            <a class="p-2 text-dark" href="{% url "sign_in" %}">Sign in</a>
+            {% endif %}
+        </nav>
+    </div>
 
     <div class="container-fluid">
         <div class="row">

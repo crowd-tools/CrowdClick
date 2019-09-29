@@ -155,34 +155,34 @@ loginBtn.addEventListener('click', async () => {
 // console.log(web3.eth.accounts)
 
 
-const iframeEl = document.getElementById("ads");
-console.log("iframeel", iframeEl)
+// const iframeEl = document.getElementById("ads");
+// console.log("iframeel", iframeEl)
 
-let startDate;
-let elapsedTime = 0;
+// let startDate;
+// let elapsedTime = 0;
 
-const focus = function () {
-    startDate = new Date();
-};
+// const focus = function () {
+//     startDate = new Date();
+// };
 
-const blur = function () {
-    const endDate = new Date();
-    const spentTime = endDate.getTime() - startDate.getTime();
-    elapsedTime += spentTime;
-};
+// const blur = function () {
+//     const endDate = new Date();
+//     const spentTime = endDate.getTime() - startDate.getTime();
+//     elapsedTime += spentTime;
+// };
 
-const beforeunload = function () {
-    const endDate = new Date();
-    const spentTime = endDate.getTime() - startDate.getTime();
-    elapsedTime += spentTime;
+// const beforeunload = function () {
+//     const endDate = new Date();
+//     const spentTime = endDate.getTime() - startDate.getTime();
+//     elapsedTime += spentTime;
 
 
-};
+// };
 
-console.log(elapsedTime)
+// console.log(elapsedTime)
 
-iframeEl.addEventListener('focus', focus);
-iframeEl.addEventListener('blur', blur);
-iframeEl.addEventListener('beforeunload', beforeunload);
+// iframeEl.addEventListener('focus', focus);
+// iframeEl.addEventListener('blur', blur);
+// iframeEl.addEventListener('beforeunload', beforeunload);
 
-console.log(document.getElementById("hello"))
+// console.log(document.getElementById("hello"))
