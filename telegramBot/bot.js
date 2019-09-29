@@ -10,6 +10,7 @@ const axios = require("axios");
 
 const TOKEN = process.env.TELEGRAM_TOKEN_API;
 const BASE_URL = process.env.BACK_END_API;
+const IFRAME_URL = process.env.IFRAME_API;
 
 const bot = new Telegraf(TOKEN);
 
@@ -65,14 +66,15 @@ const showQuestion = async (ctx) => {
 
 bot.start(async(ctx) => {
     let arrData = await fetch_api();
+    console.log(`${IFRAME_URL}${arrData.results[0].id}`)   
 
-    ctx.reply(`Welcome to Crowdclick, ${ctx.from.first_name}!`,
-    
+    ctx.reply(`Welcome to Crowdclick, ${ctx.from.first_name}!`,    
 
     Markup.inlineKeyboard([
         [Markup.callbackButton("Create wallet", "create_wallet")],
         // [Markup.callbackButton("Visit website", "fetch_website")],
         [Markup.urlButton('Visit website', arrData.results[0].website_link)],
+        // [Markup.urlButton('Visit website', `${IFRAME_URL}${arrData.results[0].id}`)],
         [Markup.callbackButton("Show my ads", "show_ads")],
         [Markup.callbackButton("Balance", "show_balance")],
         [Markup.callbackButton("Account", "open_account")],
