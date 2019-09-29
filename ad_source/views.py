@@ -49,8 +49,18 @@ class AdvertisementView(TemplateView):
         return kwargs
 
 
+class EarnView(TemplateView):
+    template_name = "home/earn.html"
+
+    def get_context_data(self, **kwargs):
+        kwargs = super().get_context_data(**kwargs)
+        kwargs["ad"] = models.Advertisement.objects.get(pk=kwargs.get("ad_id"))
+        return kwargs
+
+
 home = HomeView.as_view()
 about = AboutView.as_view()
 publish = PublishView.as_view()
 advertisement = AdvertisementView.as_view()
 logout = LogoutView.as_view()
+earn = EarnView.as_view()

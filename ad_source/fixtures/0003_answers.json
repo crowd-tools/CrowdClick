@@ -14,5 +14,21 @@
       "title": "Bad",
       "question": 1
     }
+  },
+  {
+    "model": "ad_source.answer",
+    "pk": 3,
+    "fields": {
+      "title": "Fast",
+      "question": 2
+    }
+  },
+  {
+    "model": "ad_source.answer",
+    "pk": 4,
+    "fields": {
+      "title": "Slow",
+      "question": 2
+    }
   }
 ]
