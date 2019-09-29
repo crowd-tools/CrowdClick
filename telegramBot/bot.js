@@ -5,6 +5,7 @@ const Extra = require("telegraf/extra");
 const fs = require("fs");
 const Wallet = require("ethereumjs-wallet");
 const fetch = require("node-fetch");
+const axios = require("axios");
 
 
 const TOKEN = process.env.TELEGRAM_TOKEN_API;
@@ -45,6 +46,7 @@ const createKeyPair = (ctx) => {
 }
 
 const showQuestion = async (ctx) => {
+    
     await fetch_questions();
     console.log(adsQuestions[currentQuestionIndex].question)
     ctx.reply(
@@ -77,7 +79,7 @@ bot.start((ctx) => ctx.reply(`Welcome to Crowdclick, ${ctx.from.first_name}!
 ));
 
 
-bot.on("callback_query", (ctx) => {
+bot.on("callback_query", async(ctx) => {
     const action = ctx.update.callback_query.data;
     switch (action) {
         case "create_wallet":
@@ -97,13 +99,19 @@ bot.on("callback_query", (ctx) => {
             console.log("this is your crypto balance, consolelog")
             break
         case "open_account":
+            fetch_api()
+            const arr = await fetch_api();
+            console.log("second console.log", arr.results[0].questions)
+            console.log("THIS IS ARR", arr)
+            
             ctx.reply("open the account")
             console.log("this is your account")
             break
         case "show_questions":
-            // ctx.reply("here are all the questions")
-            //perhaps call another action here as a callback etc. 
-            // fetch_questions()
+            // let adsQuestions = [];
+            // ads
+
+          
             showQuestion(ctx)
             console.log("questions consolelog")
             break
