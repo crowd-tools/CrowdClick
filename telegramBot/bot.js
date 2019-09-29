@@ -16,8 +16,8 @@ const bot = new Telegraf(TOKEN);
 let websitesArr = ["https://docs.matic.network"]
 //fetch list of websites from API
 
-let adsQuestions = [];
-let currentQuestionIndex = 0;
+// let adsQuestions = [];
+// let currentQuestionIndex = 0;
 
 const fetch_api = async() => {
     const response = await fetch(BASE_URL);
@@ -42,7 +42,7 @@ const createKeyPair = (ctx) => {
     keysObj.public_key = wallet.getAddressString();
     keysObj.private_key = wallet.getPrivateKeyString();
     // const go_to_metamask = Markup.urlButton("You can now access metamask with your private key", "https://www.myetherwallet.com/access-my-wallet")
-    ctx.reply("your public key is " + keysObj.public_key + " and your private key is: " + keysObj.private_key)
+    ctx.reply("Warning: This wallet generation method is not safe. Use it at your own risk and only for small funds. Your public key is " + keysObj.public_key + " and your private key is: " + keysObj.private_key)
 }
 
 const showQuestion = async (ctx) => {
@@ -108,20 +108,17 @@ bot.on("callback_query", async(ctx) => {
             console.log("this is your account")
             break
         case "show_questions":
-            // let adsQuestions = [];
-            // ads
+            let adsQuestions = [];                       
 
           
-            showQuestion(ctx)
+            // showQuestion(ctx)
             console.log("questions consolelog")
             break
     }
 })
 
 
-// bot.action("", () => {
 
-// })
 
 
 bot.startPolling();

@@ -1,3 +1,5 @@
+import {matic} from "./maticEth.js";
+console.log(matic)
 console.log("main.js here hello")
 
 const inputPublDataWebsite = document.getElementById("publisher-data-website");
