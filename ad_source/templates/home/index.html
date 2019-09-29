@@ -5,34 +5,57 @@
 {% block title %}Home{% endblock title %}
 
 {% block content %}
-<div class="container-fluid">
-    <div class="row">
-        <div class="col">
-            <div class="row">
-                <div class="container" style="padding: 5em;">
-                    <h2>Click. Answer. Earn</h2>
-                    <h3>Go on interesting sites, click to answer & earn ETH</h3>
-                    <button type="button" id="login-button" class="btn btn-primary">Login</button>
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col">
+                <div class="row">
+                    <div class="container" style="padding: 5em;">
+                        <h1>Click. Answer. Earn</h1>
+                        <h5>Go on interesting sites, click to answer & earn ETH</h5>
+                        <button type="button" id="login-button" class="btn btn-success">Earn ETH</button>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="container" style="padding: 5em;">
+                        <h5>Publish your site, set a reward & ask a question. Get traffic and first impression
+                            feedback.</h5>
+                        <button type="button" class="btn btn-primary" onclick="window.location.href = '/publish';">Get
+                            Answers
+                        </button>
+                    </div>
                 </div>
             </div>
-            <div class="row">
-                <div class="container" style="padding: 5em;">
-                    <h3>Publish your site, set a reward & ask a question. Get traffic and first impression
-                        feedback</h3>
-                    <button type="button" class="btn btn-primary">Telegram Bot</button>
-                </div>
+            <div class="col">
+                <img src="{% static "img/landing_image.png" %}" alt="Landing image" style="max-width: 100%">
             </div>
-        </div>
-        <div class="col">
-            <img src="{% static "img/landing_image.png" %}" alt="Landing image" style="max-width: 100%">
         </div>
     </div>
-</div>
 
-<div class="container-fluid">
-    <div class="row">
-        <div class="col">
-            <div class="row">
+    <div class="container-fluid" style="padding: 5em">
+        <div class="row">
+            <div class="col">
+                <div class="container" style="padding: 5em;">
+                    <h2>Become a publisher:</h2>
+                    <ol>
+                        <li>Place your website URL, page title & description.</li>
+                        <li>Set reward per click</li>
+                        <li>Set time duration to stay on your site</li>
+                        <li>Place multiple choise question</li>
+                    </ol>
+                    <button class="btn btn-primary" onclick="window.location.href = '/publish';">Get answers</button>
+                </div>
+            </div>
+            <div class="col">
+                <div class="image-column-third">
+                    <img src="{% static "img/700x500.png" %}"/>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="container-fluid" style="padding: 5em">
+        <div class="row">
+            <div class="col">
                 <div class="container" style="padding: 5em;">
                     <h2>Become a user: </h2>
                     <ol>
@@ -46,48 +69,10 @@
             </div>
             <div class="col">
                 <div class="image-column-third">
-                    <img src="" />
+                    <img src="{% static "img/700x500.png" %}"/>
                 </div>
             </div>
         </div>
     </div>
-</div>
-
-<div class="container-fluid">
-    <div class="row">
-        <div class="col">
-            <div class="row">
-                <div class="container" style="padding: 5em">
-                    <h2>Publishers</h2>
-                    <ul class="list-group">
-                        <input id="publisher-data-website" class="form-control form-control-lg" type="text"
-                            placeholder="Add your website to our advertisement queue" style="margin-bottom:0.2em">
-                        <input id="publisher-data-reward" class="form-control form-control-lg" type="text"
-                            placeholder="Propose a reward per click" style="margin-bottom:0.2em">
-                        <input id="publisher-data-time" class="form-control form-control-lg" type="text"
-                            placeholder="Set how long a user should spend on your website" style="margin-bottom:0.2em">
-                    </ul>
-                    <button class="btn btn-success" id="forward-publisher" style="margin-bottom:1em">Proceed</button>
-                    <div class="row">
-                        <div class="col-md-10">
-                            <input id="publisher-data-quiz" class="form-control form-control-lg" type="text"
-                                placeholder="Receive a user feedback with your own customized quiz"
-                                style="margin-bottom:0.2em">
-                        </div>
-                        <div class="col-md-2">
-                            <button class="btn btn-success" id="add-question">Add</button>
-                        </div>
-                    </div>
-                    <button class="btn btn-success" id="forward-quiz">Forward quiz</button>
-                </div>
-            </div>
-        </div>
-    </div>
-</div>
-
-
-
-
-
 
 {% endblock content %}
