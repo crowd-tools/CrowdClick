@@ -69,9 +69,14 @@ class EarnView(TemplateView):
         return HttpResponseRedirect((reverse('advertisement')))
 
 
+class SignIn(TemplateView):
+    template_name = "home/signin.html"
+
+
 home = HomeView.as_view()
 about = AboutView.as_view()
 publish = PublishView.as_view()
 advertisement = AdvertisementView.as_view()
 logout = LogoutView.as_view()
 earn = EarnView.as_view()
+sign_in = SignIn.as_view()
