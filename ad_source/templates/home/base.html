@@ -19,9 +19,10 @@
         <h5 class="my-0 mr-md-auto font-weight-normal"><a href="/">CrowdClick</a></h5>
         <nav class="my-2 my-md-0 mr-md-3">
             <a class="p-2 text-dark" href="{% url "publish" %}">Publish</a>
+            <a class="p-2 text-dark" href="{% url "advertisement" %}">Advertisement</a>
             <a class="p-2 text-dark" href="{% url "about" %}">About</a>
             {% if user.is_authenticated %}
-                {{ user.username }}
+            <a class="p-2 text-dark" href="{% url "logout" %}">{{ user.username }}</a>
             {% else %}
                 <a class="p-2 text-dark" href="{% url "web3auth_signup" %}">Sign up</a>
             {% endif %}
@@ -40,7 +41,7 @@
         integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM"
         crossorigin="anonymous"></script>
     <script>
-        const loginBtn = document.getElementById("login-button")
+        const loginBtn = document.getElementById("login-button");
 
             loginBtn.addEventListener('click', async () => {
                 if (window.ethereum) {
