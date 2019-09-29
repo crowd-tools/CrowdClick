@@ -155,7 +155,8 @@ loginBtn.addEventListener('click', async () => {
 // console.log(web3.eth.accounts)
 
 
-const iframeEl = document.getElementById("ads-iframe");
+const iframeEl = document.getElementById("ads");
+console.log("iframeel", iframeEl)
 
 let startDate;
 let elapsedTime = 0;
@@ -183,3 +184,5 @@ console.log(elapsedTime)
 iframeEl.addEventListener('focus', focus);
 iframeEl.addEventListener('blur', blur);
 iframeEl.addEventListener('beforeunload', beforeunload);
+
+console.log(document.getElementById("hello"))
