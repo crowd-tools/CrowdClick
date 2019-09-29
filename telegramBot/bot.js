@@ -14,7 +14,7 @@ const IFRAME_URL = process.env.IFRAME_API;
 
 const bot = new Telegraf(TOKEN);
 
-let websitesArr = ["https://docs.matic.network"]
+// let websitesArr = ["https://docs.matic.network"]
 //fetch list of websites from API
 
 // let adsQuestions = [];
@@ -71,14 +71,14 @@ bot.start(async(ctx) => {
     ctx.reply(`Welcome to Crowdclick, ${ctx.from.first_name}!`,    
 
     Markup.inlineKeyboard([
-        [Markup.callbackButton("Create wallet", "create_wallet")],
+        [Markup.callbackButton("Create wallet", "create_wallet"),
         // [Markup.callbackButton("Visit website", "fetch_website")],
-        [Markup.urlButton('Visit website', arrData.results[0].website_link)],
-        // [Markup.urlButton('Visit website', `${IFRAME_URL}${arrData.results[0].id}`)],
-        [Markup.callbackButton("Show my ads", "show_ads")],
-        [Markup.callbackButton("Balance", "show_balance")],
-        [Markup.callbackButton("Account", "open_account")],
-        [Markup.callbackButton("Answer questions", "show_questions")]
+        // Markup.urlButton('Visit website', arrData.results[0].website_link)],
+        Markup.urlButton('Visit website', `${IFRAME_URL}${arrData.results[0].id}`)],
+        [Markup.callbackButton("Show my ads", "show_ads"),
+        Markup.callbackButton("Balance", "show_balance")],
+        [Markup.callbackButton("Account", "open_account"),
+        Markup.callbackButton("Answer questions", "show_questions")]
 
     ]).extra()
 )});
