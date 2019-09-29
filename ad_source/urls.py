@@ -12,6 +12,7 @@ urlpatterns = [
     path('logout', views.logout, name='logout'),
     path('sign_in', views.sign_in, name='sign_in'),
     path('advertisement', views.advertisement, name="advertisement"),
+    path('advertising_matrix', views.advertising_matrix, name="advertising_matrix"),
     path('earn/<int:ad_id>', views.earn, name="earn"),
     path('about', views.about, name='about'),
     path('publish', views.publish, name='publish'),

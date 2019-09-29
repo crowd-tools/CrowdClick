@@ -73,6 +73,10 @@ class SignIn(TemplateView):
     template_name = "home/signin.html"
 
 
+class AdvertisementMatrix(TemplateView):
+    template_name = "home/advertising_matrix.html"
+
+
 home = HomeView.as_view()
 about = AboutView.as_view()
 publish = PublishView.as_view()
@@ -80,3 +84,4 @@ advertisement = AdvertisementView.as_view()
 logout = LogoutView.as_view()
 earn = EarnView.as_view()
 sign_in = SignIn.as_view()
+advertising_matrix = AdvertisementMatrix.as_view()
