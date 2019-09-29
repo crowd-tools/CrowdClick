@@ -27,29 +27,36 @@
     </div>
 
     <div class="container-fluid">
-        <div class="row">
-            <div class="col">
-                <div class="row">
-                    <div class="container" style="padding: 5em">
-                        <h2>Publishers</h2>
-                        <ul class="list-group">
-                            <input id="publisher-data" class="form-control form-control-lg" type="text"
-                                placeholder="Add your website to our advertisement queue" style="margin-bottom:0.2em">
-                            <input id="publisher-data" class="form-control form-control-lg" type="text"
-                                placeholder="Propose a reward per click" style="margin-bottom:0.2em">
-                            <input id="publisher-data" class="form-control form-control-lg" type="text"
-                                placeholder="Set how long a user should spend on your website"
-                                style="margin-bottom:0.2em">
-                            <input id="publisher-data" class="form-control form-control-lg" type="text"
-                                placeholder="Received a feedback from your visitors from your own customized questionnaire"
-                                style="margin-bottom:0.2em">
-                        </ul>
-                        <button class="btn btn-success" id="forward-publisher">Proceed</button>
+            <div class="row">
+                <div class="col">
+                    <div class="row">
+                        <div class="container" style="padding: 5em">
+                            <h2>Publishers</h2>
+                            <ul class="list-group">
+                                <input id="publisher-data-website" class="form-control form-control-lg" type="text"
+                                    placeholder="Add your website to our advertisement queue" style="margin-bottom:0.2em">
+                                <input id="publisher-data-reward" class="form-control form-control-lg" type="text"
+                                    placeholder="Propose a reward per click" style="margin-bottom:0.2em">
+                                <input id="publisher-data-time" class="form-control form-control-lg" type="text"
+                                    placeholder="Set how long a user should spend on your website" style="margin-bottom:0.2em">
+                            </ul>
+                            <button class="btn btn-success" id="forward-publisher" style="margin-bottom:1em">Proceed</button>
+                            <div class="row">
+                                <div class="col-md-10">
+                                    <input id="publisher-data-quiz" class="form-control form-control-lg" type="text"
+                                        placeholder="Receive a user feedback with your own customized quiz"
+                                        style="margin-bottom:0.2em">
+                                </div>
+                                <div class="col-md-2">
+                                    <button class="btn btn-success" id="add-question">Add</button>
+                                </div>
+                            </div>
+                            <button class="btn btn-success" id="forward-quiz">Forward quiz question</button>
+                        </div>
                     </div>
                 </div>
             </div>
         </div>
-    </div>
 
     <script src="../../static/js/advertising.js"></script>
 </body>
