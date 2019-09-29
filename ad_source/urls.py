@@ -10,5 +10,6 @@ router.register(r'question', view_sets.QuestionViewSet)
 urlpatterns = [
     path('', views.home, name='landing_page'),
     path('about', views.about, name='about'),
+    path('publish', views.publish, name='publish'),
     path('api/', include(router.urls)),
 ]
