@@ -63,20 +63,23 @@ const showQuestion = async (ctx) => {
 
 
 
-bot.start((ctx) => ctx.reply(`Welcome to Crowdclick, ${ctx.from.first_name}! 
-`,
+bot.start(async(ctx) => {
+    let arrData = await fetch_api();
+
+    ctx.reply(`Welcome to Crowdclick, ${ctx.from.first_name}!`,
+    
 
     Markup.inlineKeyboard([
         [Markup.callbackButton("Create wallet", "create_wallet")],
-        [Markup.callbackButton("Visit website", "fetch_website")],
-        // [Markup.urlButton('Visit website', websitesArr[0])],
+        // [Markup.callbackButton("Visit website", "fetch_website")],
+        [Markup.urlButton('Visit website', arrData.results[0].website_link)],
         [Markup.callbackButton("Show my ads", "show_ads")],
         [Markup.callbackButton("Balance", "show_balance")],
         [Markup.callbackButton("Account", "open_account")],
         [Markup.callbackButton("Answer questions", "show_questions")]
 
     ]).extra()
-));
+)});
 
 
 bot.on("callback_query", async(ctx) => {
@@ -87,8 +90,15 @@ bot.on("callback_query", async(ctx) => {
             break           
         case "fetch_website":
             ctx.reply("Open website etc. etc. etc.")
-            fetch_api()
-            console.log("it's working");
+            // const arrWeb = await fetch_api();
+            // const website = arrWeb.results[0].website_link;
+            // console.log(website)
+            // console.log("it's working");
+        //     const popup = 
+        //         Markup.urlButton('visit the website', website);
+          
+        //    ctx.reply(Extra.markup(popup))
+
             break
         case "show_ads":
             ctx.reply("show ads etc. etc.");

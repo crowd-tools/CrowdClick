@@ -44,32 +44,32 @@
 
 
     <script>
-        const loginBtn = document.getElementById("login-button");
-        loginBtn.addEventListener('click', async () => {
-            console.log("test")
-            if (window.ethereum) {
-                console.log("windowethereum")
-                console.log(window.web3)
-                console.log("func", new Web3(ethereum))
-                window.web3 = new Web3(ethereum);
-                try {
-                    console.log("it is working, ethereum almost await")
-                    await ethereum.enable();
-                    console.log("ethereum enable")
-                } catch (error) {
+        // const loginBtn = document.getElementById("login-button");
+        // loginBtn.addEventListener('click', async () => {
+        //     console.log("test")
+        //     if (window.ethereum) {
+        //         console.log("windowethereum")
+        //         console.log(window.web3)
+        //         console.log("func", new Web3(ethereum))
+        //         window.web3 = new Web3(ethereum);
+        //         try {
+        //             console.log("it is working, ethereum almost await")
+        //             await ethereum.enable();
+        //             console.log("ethereum enable")
+        //         } catch (error) {
 
-                    console.log(error)
-                }
-            }
-            else if (window.web3) {
-                window.web3 = new Web3(web3.currentProvider);
-                console.log("web3")
-            }
-            else {
-                console.log("wrong")
-                alert('Please install metamask');
-            }
-        });
+        //             console.log(error)
+        //         }
+        //     }
+        //     else if (window.web3) {
+        //         window.web3 = new Web3(web3.currentProvider);
+        //         console.log("web3")
+        //     }
+        //     else {
+        //         console.log("wrong")
+        //         alert('Please install metamask');
+        //     }
+        // });
     </script>
 
     <script type="module" src="{% static "js/main.js" %}"></script>
