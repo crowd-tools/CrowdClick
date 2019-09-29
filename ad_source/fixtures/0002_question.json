@@ -7,5 +7,14 @@
       "title": "Was it good?",
       "question_type": "RA"
     }
+  },
+  {
+    "model": "ad_source.question",
+    "pk": 2,
+    "fields": {
+      "ad": 1,
+      "title": "Was it fast?",
+      "question_type": "RA"
+    }
   }
 ]

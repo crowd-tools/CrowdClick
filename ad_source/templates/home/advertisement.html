@@ -1,0 +1,23 @@
+{% extends "home/base.html" %}
+{% load static %}
+
+
+{% block title %}Advertisements{% endblock title %}
+
+{% block content %}
+    {% for advertisement in advertisements %}
+        <p style="padding:5em;">
+            Title: {{ advertisement.title }} <br>
+            Website: <a href="{{ advertisement.website_link }}">{{ advertisement.website_link }}</a><br>
+
+            Earn: <a href="{% url "earn" advertisement.id %}">Earn</a><br>
+
+            Reward per click: {{ advertisement.reward_per_click }} <br>
+            Time duration: {{ advertisement.time_duration }} <br>
+            Questions: <br>
+            {% for question in advertisement.questions.all %}
+                Title: {{ question.title }} <br>
+            {% endfor %}
+        </p>
+    {% endfor %}
+{% endblock %}

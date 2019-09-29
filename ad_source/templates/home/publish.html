@@ -1,0 +1,27 @@
+{% extends "home/base.html" %}
+{% load static %}
+
+
+{% block title %}Publish{% endblock title %}
+
+{% block content %}
+    <form action="{% url "publish" %}" method="post">
+        <table>
+            {% csrf_token %}
+            {{ form }}
+            <tr>
+                <td>
+                    <select name="question" id="question">
+                        {% for question in questions %}
+                            <option value="{{ question.id }}">{{ question.title }} - ({{ question.answers.count }})</option>
+                        {% endfor %}
+                    </select>
+                </td>
+            </tr>
+            <tr>
+                <td><input type="submit" value="Submit"></td>
+            </tr>
+
+        </table>
+    </form>
+{% endblock %}
