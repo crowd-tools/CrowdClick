@@ -1,6 +1,8 @@
 from django.contrib.auth import views as auth_views
+from django.http import HttpResponseRedirect
 from django.views.generic import FormView
 from django.views.generic.base import TemplateView
+from django.urls import reverse
 
 from . import forms, models
 
@@ -24,7 +26,7 @@ class AboutView(TemplateView):
 class PublishView(FormView):
     template_name = "home/publish.html"
     form_class = forms.AdvertisementForm
-    success_url = "."
+    success_url = "/advertisement"
 
     def get_context_data(self, **kwargs):
         kwargs = super().get_context_data(**kwargs)
@@ -56,6 +58,15 @@ class EarnView(TemplateView):
         kwargs = super().get_context_data(**kwargs)
         kwargs["ad"] = models.Advertisement.objects.get(pk=kwargs.get("ad_id"))
         return kwargs
+
+    def post(self, request, **kwargs):
+        for key, value in request.POST.items():
+            if key.startswith('question_'):
+                _, q_id = key.split('_')
+                question = models.Question.objects.get(pk=q_id)
+                answer = models.Answer.objects.get(pk=value)
+                print("Question: %s, Answer %s" % (question.id, answer.id))  # TODO store result to database?
+        return HttpResponseRedirect((reverse('advertisement')))
 
 
 home = HomeView.as_view()
