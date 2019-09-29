@@ -2,6 +2,7 @@ import {matic} from "./maticEth.js";
 console.log(matic)
 console.log("main.js here hello")
 
+
 const inputPublDataWebsite = document.getElementById("publisher-data-website");
 const inputPublDataReward = document.getElementById("publisher-data-reward");
 const inputPublDataTime = document.getElementById("publisher-data-time");
@@ -55,4 +56,31 @@ addQuestionBtn.addEventListener("click", () => {
 forwardQuizBtn.addEventListener("click", () => {
     forwardQuiz()
 })
+
+// const loginBtn = document.getElementById("login-button");
+
+// loginBtn.addEventListener('click', async () => {
+//     console.log("test")
+//     if (window.ethereum) {
+//         console.log("windowethereum")
+//         console.log(window.web3)
+//         console.log("func", new Web3(ethereum))
+//         window.web3 = new Web3(ethereum);
+//         try {
+//             await ethereum.enable();
+//             console.log("ethereum enable")
+//         } catch (error) {
+
+//             console.log(error)
+//         }
+//     }
+//     else if (window.web3) {
+//         window.web3 = new Web3(web3.currentProvider);
+//         console.log("web3")
+//     }
+//     else {
+//         console.log("wrong")
+//         alert('Please install metamask');
+//     }
+// });
 

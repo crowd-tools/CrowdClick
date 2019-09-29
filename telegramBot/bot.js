@@ -80,7 +80,7 @@ bot.start((ctx) => ctx.reply(`Welcome to Crowdclick, ${ctx.from.first_name}!
 
 
 bot.on("callback_query", async(ctx) => {
-    const action = ctx.update.callback_query.data;
+    let action = ctx.update.callback_query.data;
     switch (action) {
         case "create_wallet":
             createKeyPair(ctx) 

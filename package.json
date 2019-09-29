@@ -1,0 +1,23 @@
+{
+  "name": "crowdclick",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "dependencies": {},
+  "devDependencies": {
+    "web3": "^1.2.1"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/SukiCZ/CrowdClick.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/SukiCZ/CrowdClick/issues"
+  },
+  "homepage": "https://github.com/SukiCZ/CrowdClick#readme"
+}
