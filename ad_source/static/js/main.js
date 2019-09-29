@@ -110,8 +110,9 @@ loginBtn.addEventListener('click', async () => {
     }
     // Legacy dapp browers (mist)
     else if (window.web3) {
-        window.web3 = new Web3(web3.currentProvider);
-        new Web3(injectedWeb3.currentProvider);
+        // window.web3 = new Web3(web3.currentProvider);
+        // the above was working
+        window.web3 = new Web3(injectedWeb3.currentProvider);
         // window.web3 = new Web3(injectedWeb3.currentProvider);
         // console.log("checking the account")
         // console.log(window.web3)
