@@ -1,77 +1,128 @@
 {% load static %}
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
 
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css"
-          integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+        integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
     <link rel="stylesheet" href="{% static "css/main.css" %}">
     <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"
-            integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo"
-            crossorigin="anonymous"></script>
+        integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo"
+        crossorigin="anonymous"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"
-            integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1"
-            crossorigin="anonymous"></script>
+        integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1"
+        crossorigin="anonymous"></script>
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"
-            integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM"
-            crossorigin="anonymous"></script>
+        integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM"
+        crossorigin="anonymous"></script>
     <title>Sign in</title>
 </head>
+
 <body>
 
-<script src="{% static 'web3auth/js/web3auth.js' %}"></script>
-<div class="d-flex flex-column flex-md-row align-items-center p-3 px-md-4 mb-3 bg-white border-bottom shadow-sm">
-    <h5 class="my-0 mr-md-auto font-weight-normal"><a href="/">CrowdClick</a></h5>
-    <nav class="my-2 my-md-0 mr-md-3">
-        <a class="p-2 text-dark" href="{% url "publish" %}">Publish</a>
-        <a class="p-2 text-dark" href="{% url "advertisement" %}">Advertisement</a>
-        <a class="p-2 text-dark" href="{% url "about" %}">About</a>
-        {% if user.is_authenticated %}
+    <script src="{% static 'web3auth/js/web3auth.js' %}"></script>
+    <div class="d-flex flex-column flex-md-row align-items-center p-3 px-md-4 mb-3 bg-white border-bottom shadow-sm">
+        <h5 class="my-0 mr-md-auto font-weight-normal"><a href="/">CrowdClick</a></h5>
+        <nav class="my-2 my-md-0 mr-md-3">
+            <a class="p-2 text-dark" href="{% url "publish" %}">Publish</a>
+            <a class="p-2 text-dark" href="{% url "advertisement" %}">Advertisement</a>
+            <a class="p-2 text-dark" href="{% url "about" %}">About</a>
+            {% if user.is_authenticated %}
             <a class="p-2 text-dark" href="{% url "logout" %}">{{ user.username }}</a>
-        {% else %}
+            {% else %}
             <a class="p-2 text-dark" href="{% url "web3auth_signup" %}">Sign up</a>
-        {% endif %}
-    </nav>
-</div>
-<div id="content" class="container">
-    <div class="container-fluid">
-        <div class="row">
-            <div class="col">
-                <div class="row">
-                    <div class="container" style="padding: 5em;">
-                        <h1>Click. Answer. Earn</h1>
-                        <h5>Go on interesting sites, click to answer & earn ETH</h5>
-                        <button type="button" class="btn btn-success" onclick="startLogin()">Sign session</button>
+            {% endif %}
+        </nav>
+    </div>
+    <div id="content" class="container">
+        <div class="container-fluid">
+            <div class="row">
+                <div class="col">
+                    <div class="row">
+                        <div class="container" style="padding: 5em;">
+                            <h1>Click. Answer. Earn</h1>
+                            <h5>Go on interesting sites, click to answer & earn ETH</h5>
+                            <button type="button" class="btn btn-success" id="login-button">Sign session</button>
+                        </div>
                     </div>
                 </div>
-            </div>
-            <div class="col">
-                <img src="{% static "img/landing_image.png" %}" alt="Landing image" style="max-width: 100%">
+                <div class="col">
+                    <img src="{% static "img/landing_image.png" %}" alt="Landing image" style="max-width: 100%">
+                </div>
             </div>
         </div>
     </div>
-</div>
-<script>
+    <script>
+        const loginBtn = document.getElementById("login-button");
+        loginBtn.addEventListener('click', async () => {
+            let account;
+            console.log("test")
+            // Modern metamask
+            if (window.ethereum) {
+                // console.log("windowethereum")
+                // console.log(window.web3)
+                // console.log("func", new Web3(ethereum))
+                window.web3 = new Web3(ethereum);
+                try {
+                    console.log("it is working, ethereum almost await")
+                    await window.ethereum.enable();    // popup
 
-    function startLogin() {
-        if (typeof web3 !== 'undefined') {
-            checkWeb3(function (loggedIn) {
-                if (!loggedIn) {
-                    alert("Please unlock your web3 provider (probably, Metamask)")
-                } else {
-                    var login_url = '{% url 'web3auth_login_api' %}';
-                    web3Login(login_url, console.log, console.log, console.log, console.log, console.log, function (resp) {
-                        console.log(resp);
-                        window.location.replace(resp.redirect_url);
-                    });
+
+                    // await window.web3.eth.getAccounts().then(accounts => {
+                    //     console.log("ACCOUNTS HERE", accounts)
+                    //     account = accounts[0];
+                    // })
+                } catch (error) {
+                    console.log(error)
                 }
-            });
-        } else {
-            alert('web3 missing');
-        }
-    }
-</script>
+            }
+            // Legacy dapp browers (mist)
+            else if (window.web3) {
+                window.web3 = new Web3(web3.currentProvider);
+                // the above was working
+                // window.web3 = new Web3(injectedWeb3.currentProvider);
+                // window.web3 = new Web3(injectedWeb3.currentProvider);
+                // console.log("checking the account")
+                // console.log(window.web3)
+                // console.log("account here", window.web3.eth.accounts[0])
+                // console.log(window.web3.eth.getAccounts(console.log()))
+                // console.log("web3")
+            }
+            // No web3, go install it
+            else {
+                console.log("wrong")
+                alert('Please install metamask');
+            }
+
+            console.log("ethereum enable")
+            console.log(window.web3)
+            let accounts = await window.web3.eth.getAccounts(console.log);
+            console.log(window.web3.eth.getAccounts(console.log))
+            console.log(accounts);
+
+            // if(window.web3 !== "undefined") {
+            //     new Web3(injectedWeb3.currentProvider);
+            //     console.log("checking the account")
+            //     console.log(window.web3)
+            //     console.log(window.web3.eth.accounts[0])
+            //     console.log(window.web3.eth.getAccounts(console.log()))
+            //     try {
+            //         await window.web3.eth.getAccounts().then(accounts => {
+            //             account = accounts[0];
+            //         });        
+
+            //     }
+            //     catch(error) {
+            //         console.log(error)
+            //     }
+            // }
+            console.log(account)
+        });
+
+    </script>
 </body>
+
 </html>
