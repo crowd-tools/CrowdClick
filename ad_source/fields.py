@@ -37,7 +37,7 @@ class AdvertisementQuestionRelatedField(serializers.RelatedField, abc.ABC):
         return result
 
     def to_internal_value(self, data):
-        ad = models.Advertisement.objects.all().order_by('-id')[0]
+        ad = models.Task.objects.all().order_by('-id')[0]
         question = models.Question.objects.create(title=data.get("title"), question_type=data.get("type"), ad=ad)
         for answer in data.get("answer", []):
             models.Answer.objects.create(title=answer.get("title"), question=question)

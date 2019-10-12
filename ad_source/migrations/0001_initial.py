@@ -29,7 +29,7 @@ class Migration(migrations.Migration):
                 ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
                 ('title', models.CharField(max_length=50)),
                 ('question_type', models.CharField(choices=[('RA', 'Radio'), ('SE', 'Select')], max_length=2)),
-                ('ad', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='ad_source.Advertisement')),
+                ('ad', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='ad_source.Task')),
             ],
         ),
         migrations.CreateModel(

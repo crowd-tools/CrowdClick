@@ -5,7 +5,7 @@ from . import models
 
 class AdvertisementForm(ModelForm):
     class Meta:
-        model = models.Advertisement
+        model = models.Task
         fields = [
             'website_link',
             'title',

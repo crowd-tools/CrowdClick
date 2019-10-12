@@ -8,7 +8,7 @@ class AdvertisementSerializer(serializers.HyperlinkedModelSerializer):
     questions = fields.AdvertisementQuestionRelatedField(many=True)
 
     class Meta:
-        model = models.Advertisement
+        model = models.Task
         fields = [
             'id',
             'website_link',

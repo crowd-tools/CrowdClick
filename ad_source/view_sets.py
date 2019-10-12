@@ -6,7 +6,7 @@ from . import serializers, models, authentication
 
 class AdvertisementViewSet(viewsets.ModelViewSet):
     authentication_classes = [authentication.CsrfExemptSessionAuthentication, BasicAuthentication]
-    queryset = models.Advertisement.objects.all()
+    queryset = models.Task.objects.all()
     serializer_class = serializers.AdvertisementSerializer
 
 

@@ -47,7 +47,7 @@ class AdvertisementView(TemplateView):
 
     def get_context_data(self, **kwargs):
         kwargs = super().get_context_data(**kwargs)
-        kwargs["advertisements"] = models.Advertisement.objects.all()
+        kwargs["advertisements"] = models.Task.objects.all()
         return kwargs
 
 
@@ -56,7 +56,7 @@ class EarnView(TemplateView):
 
     def get_context_data(self, **kwargs):
         kwargs = super().get_context_data(**kwargs)
-        kwargs["ad"] = models.Advertisement.objects.get(pk=kwargs.get("ad_id"))
+        kwargs["ad"] = models.Task.objects.get(pk=kwargs.get("ad_id"))
         return kwargs
 
     def post(self, request, **kwargs):

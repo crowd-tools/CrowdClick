@@ -4,14 +4,17 @@ import datetime
 from . import managers
 
 
-class Advertisement(models.Model):
+class Task(models.Model):
     website_link = models.URLField("Website Link")
     title = models.CharField("Title", max_length=35)
     description = models.TextField("Description", max_length=100, null=True, blank=True)
     reward_per_click = models.FloatField("Reward per click", default=1)
     time_duration = models.DurationField("Time duration", default=datetime.timedelta(days=7))
 
-    objects = managers.AdvertisementManager()
+    objects = managers.TaskManager()
+
+    class Meta:
+        ordering = ['-reward_per_click']
 
 
 class Question(models.Model):
@@ -22,7 +25,7 @@ class Question(models.Model):
         (SELECT_TYPE, 'Select'),
     )
 
-    ad = models.ForeignKey(Advertisement, related_name="questions", on_delete=models.CASCADE)
+    task = models.ForeignKey(Task, related_name="questions", on_delete=models.CASCADE)
     title = models.CharField(max_length=50)
     question_type = models.CharField(max_length=2, choices=QUESTION_TYPES)
 
