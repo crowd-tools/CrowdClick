@@ -3,7 +3,7 @@ from django.forms import ModelForm
 from . import models
 
 
-class AdvertisementForm(ModelForm):
+class TaskForm(ModelForm):
     class Meta:
         model = models.Task
         fields = [

@@ -3,9 +3,9 @@ from rest_framework import serializers
 from . import fields, models
 
 
-class AdvertisementSerializer(serializers.HyperlinkedModelSerializer):
+class TaskSerializer(serializers.HyperlinkedModelSerializer):
 
-    questions = fields.AdvertisementQuestionRelatedField(many=True)
+    questions = fields.TaskQuestionRelatedField(many=True)
 
     class Meta:
         model = models.Task

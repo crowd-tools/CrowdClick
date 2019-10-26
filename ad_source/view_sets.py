@@ -4,10 +4,10 @@ from rest_framework.authentication import BasicAuthentication
 from . import serializers, models, authentication
 
 
-class AdvertisementViewSet(viewsets.ModelViewSet):
+class TaskViewSet(viewsets.ModelViewSet):
     authentication_classes = [authentication.CsrfExemptSessionAuthentication, BasicAuthentication]
     queryset = models.Task.objects.all()
-    serializer_class = serializers.AdvertisementSerializer
+    serializer_class = serializers.TaskSerializer
 
 
 class QuestionViewSet(viewsets.ModelViewSet):

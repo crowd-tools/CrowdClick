@@ -16,7 +16,7 @@ class QuestionAnswerRelatedField(serializers.RelatedField, abc.ABC):
         }
 
 
-class AdvertisementQuestionRelatedField(serializers.RelatedField, abc.ABC):
+class TaskQuestionRelatedField(serializers.RelatedField, abc.ABC):
     answers = QuestionAnswerRelatedField(many=True)
 
     def get_queryset(self):
