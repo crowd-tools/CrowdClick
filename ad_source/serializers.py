@@ -1,11 +1,38 @@
 from rest_framework import serializers
 
-from . import fields, models
+from . import models
+
+
+class AnswerSerializer(serializers.HyperlinkedModelSerializer):
+
+    class Meta:
+        model = models.Answer
+        fields = [
+            'id',
+            'title',
+            'result_count',
+            'url',
+        ]
+
+
+class QuestionSerializer(serializers.HyperlinkedModelSerializer):
+    answers = AnswerSerializer(many=True)
+
+    class Meta:
+        model = models.Question
+        fields = [
+            'id',
+            'title',
+            'url',
+            'result_count',
+            'answers',
+        ]
 
 
 class TaskSerializer(serializers.HyperlinkedModelSerializer):
 
-    questions = fields.TaskQuestionRelatedField(many=True)
+    # questions = fields.TaskQuestionRelatedField(many=True)
+    questions = QuestionSerializer(many=True)
 
     class Meta:
         model = models.Task
@@ -16,20 +43,5 @@ class TaskSerializer(serializers.HyperlinkedModelSerializer):
             'description',
             'reward_per_click',
             'time_duration',
-
             'questions',
-        ]
-
-
-class QuestionSerializer(serializers.HyperlinkedModelSerializer):
-    answers = fields.QuestionAnswerRelatedField(many=True)
-
-    class Meta:
-        model = models.Question
-        fields = [
-            'id',
-            'title',
-            'question_type',
-
-            'answers',
         ]

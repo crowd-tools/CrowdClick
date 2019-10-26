@@ -4,6 +4,8 @@ from rest_framework import serializers
 
 from . import models
 
+# TODO delete
+
 
 class QuestionAnswerRelatedField(serializers.RelatedField, abc.ABC):
     def get_queryset(self):
@@ -27,6 +29,7 @@ class TaskQuestionRelatedField(serializers.RelatedField, abc.ABC):
             "id": value.id,
             "title": value.title,
             "type": value.question_type,
+            "result_count": value.result_count,
             "answers": []
         }
         for answer in value.answers.all():

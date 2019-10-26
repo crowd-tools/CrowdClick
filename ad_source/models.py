@@ -28,6 +28,7 @@ class Question(models.Model):
     task = models.ForeignKey(Task, related_name="questions", on_delete=models.CASCADE)
     title = models.CharField(max_length=50)
     question_type = models.CharField(max_length=2, choices=QUESTION_TYPES)
+    result_count = models.IntegerField(null=True, blank=True, default=None)
 
     def __str__(self):
         return "Question(%s, title=%s)" % (self.title, self.question_type)
@@ -36,6 +37,7 @@ class Question(models.Model):
 class Answer(models.Model):
     question = models.ForeignKey(Question, related_name="answers", on_delete=models.CASCADE)
     title = models.CharField(max_length=50)
+    result_count = models.IntegerField(null=True, blank=True, default=None)
 
     def __str__(self):
         return "Answer(%s, title=%s)" % (self.pk, self.title)
