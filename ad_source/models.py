@@ -41,3 +41,8 @@ class Answer(models.Model):
 
     def __str__(self):
         return "Answer(%s, title=%s)" % (self.pk, self.title)
+
+
+class Subscribe(models.Model):
+    email = models.EmailField(max_length=150)
+    timestamp = models.DateTimeField(auto_now_add=True)

@@ -7,6 +7,7 @@ router = routers.DefaultRouter()
 router.register(r'task', view_sets.TaskViewSet)
 router.register(r'question', view_sets.QuestionViewSet)
 router.register(r'answer', view_sets.AnswerViewSet)
+router.register(r'subscribe', view_sets.SubscribeViewSet)
 
 urlpatterns = [
     path('', views.home, name='landing_page'),

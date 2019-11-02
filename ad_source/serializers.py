@@ -45,3 +45,11 @@ class TaskSerializer(serializers.HyperlinkedModelSerializer):
             'time_duration',
             'questions',
         ]
+
+class SubscribeSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = models.Subscribe
+        fields = [
+            'email'
+        ]
