@@ -1,5 +1,6 @@
 from rest_framework import viewsets, mixins
 from rest_framework.authentication import BasicAuthentication
+from rest_framework import permissions
 
 from . import serializers, models, authentication
 
@@ -23,3 +24,4 @@ class AnswerViewSet(viewsets.ModelViewSet):
 class SubscribeViewSet(mixins.CreateModelMixin, viewsets.GenericViewSet):
     queryset = models.Subscribe.objects.all()
     serializer_class = serializers.SubscribeSerializer
+    permission_classes = permissions.AllowAny,

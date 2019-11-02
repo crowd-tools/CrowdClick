@@ -46,6 +46,7 @@ class TaskSerializer(serializers.HyperlinkedModelSerializer):
             'questions',
         ]
 
+
 class SubscribeSerializer(serializers.ModelSerializer):
 
     class Meta:
