@@ -4,14 +4,16 @@ from rest_framework import routers
 from . import views, view_sets
 
 router = routers.DefaultRouter()
-router.register(r'ads', view_sets.AdvertisementViewSet)
+router.register(r'task', view_sets.TaskViewSet)
 router.register(r'question', view_sets.QuestionViewSet)
+router.register(r'answer', view_sets.AnswerViewSet)
+router.register(r'subscribe', view_sets.SubscribeViewSet)
 
 urlpatterns = [
     path('', views.home, name='landing_page'),
     path('logout', views.logout, name='logout'),
     path('sign_in', views.sign_in, name='sign_in'),
-    path('advertisement', views.advertisement, name="advertisement"),
+    path('task', views.task, name="task"),
     path('advertising_matrix', views.advertising_matrix, name="advertising_matrix"),
     path('earn/<int:ad_id>', views.earn, name="earn"),
     path('about', views.about, name='about'),

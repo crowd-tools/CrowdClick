@@ -4,14 +4,17 @@ import datetime
 from . import managers
 
 
-class Advertisement(models.Model):
+class Task(models.Model):
     website_link = models.URLField("Website Link")
     title = models.CharField("Title", max_length=35)
     description = models.TextField("Description", max_length=100, null=True, blank=True)
     reward_per_click = models.FloatField("Reward per click", default=1)
-    time_duration = models.DurationField("Time duration", default=datetime.timedelta(days=7))
+    time_duration = models.DurationField("Time duration", default=datetime.timedelta(seconds=30))
 
-    objects = managers.AdvertisementManager()
+    objects = managers.TaskManager()
+
+    class Meta:
+        ordering = ['-reward_per_click']
 
 
 class Question(models.Model):
@@ -22,9 +25,10 @@ class Question(models.Model):
         (SELECT_TYPE, 'Select'),
     )
 
-    ad = models.ForeignKey(Advertisement, related_name="questions", on_delete=models.CASCADE)
+    task = models.ForeignKey(Task, related_name="questions", on_delete=models.CASCADE)
     title = models.CharField(max_length=50)
     question_type = models.CharField(max_length=2, choices=QUESTION_TYPES)
+    result_count = models.IntegerField(null=True, blank=True, default=None)
 
     def __str__(self):
         return "Question(%s, title=%s)" % (self.title, self.question_type)
@@ -33,6 +37,12 @@ class Question(models.Model):
 class Answer(models.Model):
     question = models.ForeignKey(Question, related_name="answers", on_delete=models.CASCADE)
     title = models.CharField(max_length=50)
+    result_count = models.IntegerField(null=True, blank=True, default=None)
 
     def __str__(self):
         return "Answer(%s, title=%s)" % (self.pk, self.title)
+
+
+class Subscribe(models.Model):
+    email = models.EmailField(max_length=150)
+    timestamp = models.DateTimeField(auto_now_add=True)

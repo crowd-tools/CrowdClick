@@ -4,6 +4,8 @@ from rest_framework import serializers
 
 from . import models
 
+# TODO delete
+
 
 class QuestionAnswerRelatedField(serializers.RelatedField, abc.ABC):
     def get_queryset(self):
@@ -16,7 +18,7 @@ class QuestionAnswerRelatedField(serializers.RelatedField, abc.ABC):
         }
 
 
-class AdvertisementQuestionRelatedField(serializers.RelatedField, abc.ABC):
+class TaskQuestionRelatedField(serializers.RelatedField, abc.ABC):
     answers = QuestionAnswerRelatedField(many=True)
 
     def get_queryset(self):
@@ -27,6 +29,7 @@ class AdvertisementQuestionRelatedField(serializers.RelatedField, abc.ABC):
             "id": value.id,
             "title": value.title,
             "type": value.question_type,
+            "result_count": value.result_count,
             "answers": []
         }
         for answer in value.answers.all():
@@ -37,7 +40,7 @@ class AdvertisementQuestionRelatedField(serializers.RelatedField, abc.ABC):
         return result
 
     def to_internal_value(self, data):
-        ad = models.Advertisement.objects.all().order_by('-id')[0]
+        ad = models.Task.objects.all().order_by('-id')[0]
         question = models.Question.objects.create(title=data.get("title"), question_type=data.get("type"), ad=ad)
         for answer in data.get("answer", []):
             models.Answer.objects.create(title=answer.get("title"), question=question)

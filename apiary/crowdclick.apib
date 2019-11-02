@@ -1,0 +1,204 @@
+FORMAT: 1A
+HOST: http://127.0.0.1:8000/api
+
+# CrowdClick
+
+CrowdClick is an API allowing consumers to view tasks, vote in them and earn crypto reward.
+
+## Task Collection [/api/task/]
+
+### List All Tasks [GET]
+
+`result_count` may be `null` when user doesn't own the task or didn't vote yet. Otherwise it shows the results.
+
++ Response 200 (application/json)
+
+        {
+            "count": 1,
+            "next": null,
+            "previous": null,
+            "results": [
+                {
+                    "id": 1,
+                    "title": "Check our site",
+                    "description": "Awesome site. Go check it now and earn crypto",
+                    "website_link": "http://example.com",
+                    "reward_per_click": 0.001,
+                    "time_duration": "00:00:30",
+                    "questions": [
+                        {
+                            "id": 1,
+                            "result_count": null,
+                            "title": "Was it good?",
+                            "url": "/api/task/1/questions/1",
+                            "answers": [
+                                {
+                                    "id": 1,
+                                    "result_count": null,
+                                    "title": "Good",
+                                    "url": "/api/task/1/questions/1/answer/1"
+                                },
+                                {
+                                    "id": 2,
+                                    "result_count": null,
+                                    "title": "Bad",
+                                    "url": "/api/task/1/questions/1/answer/2"
+                                }
+                            ]
+                        }
+                    ]
+                }
+            ]
+        }
+
+
+### Create a new task [POST]
+
++ Request (application/json)
+
+        {
+            "title": "Check our site",
+            "description": "Awesome site. Go check it now and earn crypto",
+            "website_link": "http://example.com",
+            "reward_per_click": 0.001,
+            "time_duration": "00:00:30",
+            "questions": [
+                {
+                    "title": "Was it good?",
+                    "answers": [
+                        {
+                            "title": "Good"
+                        },
+                        {
+                            "title": "Bad"
+                        }
+                    ]
+                }
+            ]
+        }
+
++ Response 201 (application/json)
+
+    + Headers
+
+            Location: /api/task/2
+
+    + Body
+
+            {
+                "id": 2,
+                "title": "Check our site",
+                "description": "Awesome site. Go check it now and earn crypto",
+                "website_link": "http://example.com",
+                "reward_per_click": 0.001,
+                "time_duration": "00:00:30",
+                "questions": [
+                    {
+                        "id": 2,
+                        "result_count": 0,
+                        "title": "Was it good?",
+                        "url": "/api/task/2/questions/2",
+                        "answers": [
+                            {
+                                "id": 3,
+                                "result_count": 0,
+                                "title": "Good",
+                                "url": "/api/task/2/questions/2/answer/3"
+                            },
+                            {
+                                "id": 4,
+                                "result_count": 0,
+                                "title": "Bad",
+                                "url": "/api/task/2/questions/2/answer/4"
+                            }
+                        ]
+                    }
+                ]
+            }
+
+
+## Questions Collection [/api/task/{id}/questions]
+
+### List questions for task [GET]
+
+
++ Response 200 (application/json)
+
+        {
+            "count": 1,
+            "next": null,
+            "previous": null,
+            "results": [
+                {
+                    "id": 1,
+                    "title": "Was it good?",
+                    "result_count": null,
+                    "url": "/api/task/1/questions/1",
+                    "answers": [
+                        {
+                            "id": 1,
+                            "title": "Good",
+                            "result_count": null,
+                            "url": "/api/task/1/questions/1/answer/1"
+                        },
+                        {
+                            "id": 2,
+                            "title": "Bad",
+                            "result_count": null,
+                            "url": "/api/task/1/questions/1/answer/2"
+                        }
+                    ]
+                }
+            ]
+        }
+
+## Answer collection [/api/task/{id}/questions/{id}/answer]
+
+
+### List answers [GET]
+
++ Response 200 (application/json)
+
+        {
+            "count": 1,
+            "next": null,
+            "previous": null,
+            "results": [
+                {
+                    "id": 1,
+                    "title": "Good",
+                    "result_count": null,
+                    "url": "/api/task/1/questions/1/answer/1"
+                },
+                {
+                    "id": 2,
+                    "title": "Bad",
+                    "result_count": null,
+                    "url": "/api/task/1/questions/1/answer/2"
+                }
+            ]
+        }
+
+## Answer detail [/api/task/{id}/questions/{id}/answer/{id}]
+
+### Obtain answer [GET]
+
++ Response 200 (application/json)
+
+        {
+            "id": 1,
+            "title": "Good",
+            "result_count": null,
+            "url": "/api/task/1/questions/1/answer/1"
+        }
+
+### Create answer [POST]
+
++ Response 200 (application/json)
+
+        {
+            "id": 1,
+            "title": "Good",
+            "result_count": 10,
+            "url": "/api/task/1/questions/1/answer/1"
+        }

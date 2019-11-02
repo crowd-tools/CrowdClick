@@ -25,8 +25,8 @@ class AboutView(TemplateView):
 
 class PublishView(FormView):
     template_name = "home/publish.html"
-    form_class = forms.AdvertisementForm
-    success_url = "/advertisement"
+    form_class = forms.TaskForm
+    success_url = "/task"
 
     def get_context_data(self, **kwargs):
         kwargs = super().get_context_data(**kwargs)
@@ -42,12 +42,12 @@ class PublishView(FormView):
         return super().form_valid(form)
 
 
-class AdvertisementView(TemplateView):
-    template_name = "home/advertisement.html"
+class TaskView(TemplateView):
+    template_name = "home/task.html"
 
     def get_context_data(self, **kwargs):
         kwargs = super().get_context_data(**kwargs)
-        kwargs["advertisements"] = models.Advertisement.objects.all()
+        kwargs["tasks"] = models.Task.objects.all()
         return kwargs
 
 
@@ -56,7 +56,7 @@ class EarnView(TemplateView):
 
     def get_context_data(self, **kwargs):
         kwargs = super().get_context_data(**kwargs)
-        kwargs["ad"] = models.Advertisement.objects.get(pk=kwargs.get("ad_id"))
+        kwargs["ad"] = models.Task.objects.get(pk=kwargs.get("ad_id"))
         return kwargs
 
     def post(self, request, **kwargs):
@@ -66,7 +66,7 @@ class EarnView(TemplateView):
                 question = models.Question.objects.get(pk=q_id)
                 answer = models.Answer.objects.get(pk=value)
                 print("Question: %s, Answer %s" % (question.id, answer.id))  # TODO store result to database?
-        return HttpResponseRedirect((reverse('advertisement')))
+        return HttpResponseRedirect((reverse('task')))
 
 
 class SignIn(TemplateView):
@@ -80,7 +80,7 @@ class AdvertisementMatrix(TemplateView):
 home = HomeView.as_view()
 about = AboutView.as_view()
 publish = PublishView.as_view()
-advertisement = AdvertisementView.as_view()
+task = TaskView.as_view()
 logout = LogoutView.as_view()
 earn = EarnView.as_view()
 sign_in = SignIn.as_view()
