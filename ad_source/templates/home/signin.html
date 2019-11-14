@@ -45,7 +45,7 @@
                         <div class="container" style="padding: 5em;">
                             <h1>Click. Answer. Earn</h1>
                             <h5>Go on interesting sites, click to answer & earn ETH</h5>
-                            <button type="button" class="btn btn-success" id="login-button">Sign session</button>
+                            <button type="button" class="btn btn-success" id="login-button" onclick="startLogin()">Sign session</button>
                         </div>
                     </div>
                 </div>
@@ -56,72 +56,25 @@
         </div>
     </div>
     <script>
-        const loginBtn = document.getElementById("login-button");
-        loginBtn.addEventListener('click', async () => {
-            let account;
-            console.log("test")
-            // Modern metamask
-            if (window.ethereum) {
-                // console.log("windowethereum")
-                // console.log(window.web3)
-                // console.log("func", new Web3(ethereum))
-                window.web3 = new Web3(ethereum);
-                try {
-                    console.log("it is working, ethereum almost await")
-                    await window.ethereum.enable();    // popup
+        function startLogin() {
+            if (typeof web3 !== 'undefined') {
+                checkWeb3(function (loggedIn) {
+                    if (!loggedIn) {
+                        alert("Please unlock your web3 provider (probably, Metamask)")
+                    } else {
+                        console.log("foo");
+                        var login_url = '{% url 'web3auth_login_api' %}';
+                        web3Login(login_url, console.log, console.log, console.log, console.log, console.log, function (resp) {
+                            console.log(resp);
+                            window.location.replace(resp.redirect_url);
+                        });
+                    }
+                });
 
-
-                    // await window.web3.eth.getAccounts().then(accounts => {
-                    //     console.log("ACCOUNTS HERE", accounts)
-                    //     account = accounts[0];
-                    // })
-                } catch (error) {
-                    console.log(error)
-                }
+            } else {
+                alert('web3 missing');
             }
-            // Legacy dapp browers (mist)
-            else if (window.web3) {
-                window.web3 = new Web3(web3.currentProvider);
-                // the above was working
-                // window.web3 = new Web3(injectedWeb3.currentProvider);
-                // window.web3 = new Web3(injectedWeb3.currentProvider);
-                // console.log("checking the account")
-                // console.log(window.web3)
-                // console.log("account here", window.web3.eth.accounts[0])
-                // console.log(window.web3.eth.getAccounts(console.log()))
-                // console.log("web3")
-            }
-            // No web3, go install it
-            else {
-                console.log("wrong")
-                alert('Please install metamask');
-            }
-
-            console.log("ethereum enable")
-            console.log(window.web3)
-            let accounts = await window.web3.eth.getAccounts(console.log);
-            console.log(window.web3.eth.getAccounts(console.log))
-            console.log(accounts);
-
-            // if(window.web3 !== "undefined") {
-            //     new Web3(injectedWeb3.currentProvider);
-            //     console.log("checking the account")
-            //     console.log(window.web3)
-            //     console.log(window.web3.eth.accounts[0])
-            //     console.log(window.web3.eth.getAccounts(console.log()))
-            //     try {
-            //         await window.web3.eth.getAccounts().then(accounts => {
-            //             account = accounts[0];
-            //         });        
-
-            //     }
-            //     catch(error) {
-            //         console.log(error)
-            //     }
-            // }
-            console.log(account)
-        });
-
+        }
     </script>
 </body>
 

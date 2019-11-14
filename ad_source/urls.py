@@ -1,5 +1,6 @@
 from django.urls import path, include
 from rest_framework import routers
+from web3auth import urls as web3auth_urls
 
 from . import views, view_sets
 
@@ -8,6 +9,7 @@ router.register(r'task', view_sets.TaskViewSet)
 router.register(r'question', view_sets.QuestionViewSet)
 router.register(r'answer', view_sets.AnswerViewSet)
 router.register(r'subscribe', view_sets.SubscribeViewSet)
+
 
 urlpatterns = [
     path('', views.home, name='landing_page'),
@@ -19,4 +21,5 @@ urlpatterns = [
     path('about', views.about, name='about'),
     path('publish', views.publish, name='publish'),
     path('api/', include(router.urls)),
+    path('', include(web3auth_urls)),
 ]
