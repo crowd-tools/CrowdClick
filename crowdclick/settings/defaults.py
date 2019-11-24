@@ -84,6 +84,8 @@ AUTHENTICATION_BACKENDS = [
     'web3auth.backend.Web3Backend'
 ]
 
+DJANGO_ADMIN_URL = 'admin'
+
 # Rest Framework https://www.django-rest-framework.org/
 REST_FRAMEWORK = {
     # Use Django's standard `django.contrib.auth` permissions,
@@ -111,7 +113,7 @@ LOGIN_REDIRECT_URL = '/'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': os.path.join(BASE_DIR, '../../db.sqlite3'),
+        'NAME': os.path.join(BASE_DIR, '../db.sqlite3'),
     }
 }
 
