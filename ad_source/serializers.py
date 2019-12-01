@@ -33,6 +33,8 @@ class TaskSerializer(serializers.HyperlinkedModelSerializer):
 
     # questions = fields.TaskQuestionRelatedField(many=True)
     questions = QuestionSerializer(many=True)
+    image_thumbnail = serializers.ImageField(read_only=True)
+    image = serializers.ImageField(read_only=True)
 
     class Meta:
         model = models.Task
