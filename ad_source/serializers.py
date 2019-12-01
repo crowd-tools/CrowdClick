@@ -38,10 +38,13 @@ class TaskSerializer(serializers.HyperlinkedModelSerializer):
         model = models.Task
         fields = [
             'id',
-            'website_link',
             'title',
             'description',
+            'image',
+            'image_thumbnail',
+            'website_link',
             'reward_per_click',
+            'spend_daily',
             'time_duration',
             'questions',
         ]
