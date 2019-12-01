@@ -64,7 +64,7 @@ class EarnView(TemplateView):
             if key.startswith('question_'):
                 _, q_id = key.split('_')
                 question = models.Question.objects.get(pk=q_id)
-                answer = models.Answer.objects.get(pk=value)
+                answer = models.Option.objects.get(pk=value)
                 print("Question: %s, Answer %s" % (question.id, answer.id))  # TODO store result to database?
         return HttpResponseRedirect((reverse('task')))
 

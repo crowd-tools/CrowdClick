@@ -2,6 +2,7 @@ db.sqlite3
 .idea
 __pycache__
 node_modules
+assets
 
 crowdclick/settings/local.py
 crowdclick/settings/production.py

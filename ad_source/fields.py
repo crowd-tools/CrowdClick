@@ -9,7 +9,7 @@ from . import models
 
 class QuestionAnswerRelatedField(serializers.RelatedField, abc.ABC):
     def get_queryset(self):
-        return models.Answer.objects.all()
+        return models.Option.objects.all()
 
     def to_representation(self, value):
         return {
@@ -43,5 +43,5 @@ class TaskQuestionRelatedField(serializers.RelatedField, abc.ABC):
         ad = models.Task.objects.all().order_by('-id')[0]
         question = models.Question.objects.create(title=data.get("title"), question_type=data.get("type"), ad=ad)
         for answer in data.get("answer", []):
-            models.Answer.objects.create(title=answer.get("title"), question=question)
+            models.Option.objects.create(title=answer.get("title"), question=question)
         return question

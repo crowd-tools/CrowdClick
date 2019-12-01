@@ -6,7 +6,7 @@ from . import models
 class AnswerSerializer(serializers.HyperlinkedModelSerializer):
 
     class Meta:
-        model = models.Answer
+        model = models.Option
         fields = [
             'id',
             'title',

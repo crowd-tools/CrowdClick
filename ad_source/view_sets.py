@@ -17,7 +17,7 @@ class QuestionViewSet(viewsets.ModelViewSet):
 
 
 class AnswerViewSet(viewsets.ModelViewSet):
-    queryset = models.Answer.objects.all()
+    queryset = models.Option.objects.all()
     serializer_class = serializers.AnswerSerializer
 
 

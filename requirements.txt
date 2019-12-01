@@ -1,4 +1,8 @@
-Django==2.2.5
+Django==2.2.7
 djangorestframework==3.10.3
 django-web3-auth==0.1.0
 rlp==1.0.1
+Pillow==6.2.1
+requests==2.22.0
+python-memcached==1.59
+django-imagekit==4.0.2
