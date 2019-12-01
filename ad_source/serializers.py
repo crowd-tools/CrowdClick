@@ -46,6 +46,7 @@ class TaskSerializer(serializers.HyperlinkedModelSerializer):
             'image_thumbnail',
             'website_link',
             'reward_per_click',
+            'reward_usd_per_click',
             'spend_daily',
             'time_duration',
             'questions',
