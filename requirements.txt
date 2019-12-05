@@ -1,4 +1,4 @@
-Django==2.2.7
+Django==2.2.8
 djangorestframework==3.10.3
 django-web3-auth==0.1.0
 rlp==1.0.1
