@@ -3,7 +3,7 @@ from rest_framework import serializers
 from . import models
 
 
-class AnswerSerializer(serializers.HyperlinkedModelSerializer):
+class OptionSerializer(serializers.HyperlinkedModelSerializer):
 
     class Meta:
         model = models.Option
@@ -16,7 +16,7 @@ class AnswerSerializer(serializers.HyperlinkedModelSerializer):
 
 
 class QuestionSerializer(serializers.HyperlinkedModelSerializer):
-    answers = AnswerSerializer(many=True)
+    options = OptionSerializer(many=True)
 
     class Meta:
         model = models.Question
@@ -25,7 +25,7 @@ class QuestionSerializer(serializers.HyperlinkedModelSerializer):
             'title',
             'url',
             'result_count',
-            'answers',
+            'options',
         ]
 
 

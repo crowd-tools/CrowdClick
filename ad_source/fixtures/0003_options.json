@@ -1,6 +1,6 @@
 [
   {
-    "model": "ad_source.answer",
+    "model": "ad_source.option",
     "pk": 1,
     "fields": {
       "title": "Good",
@@ -8,7 +8,7 @@
     }
   },
   {
-    "model": "ad_source.answer",
+    "model": "ad_source.option",
     "pk": 2,
     "fields": {
       "title": "Bad",
@@ -16,7 +16,7 @@
     }
   },
   {
-    "model": "ad_source.answer",
+    "model": "ad_source.option",
     "pk": 3,
     "fields": {
       "title": "Fast",
@@ -24,7 +24,7 @@
     }
   },
   {
-    "model": "ad_source.answer",
+    "model": "ad_source.option",
     "pk": 4,
     "fields": {
       "title": "Slow",

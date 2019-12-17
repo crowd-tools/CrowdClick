@@ -16,9 +16,9 @@ class QuestionViewSet(viewsets.ModelViewSet):
     serializer_class = serializers.QuestionSerializer
 
 
-class AnswerViewSet(viewsets.ModelViewSet):
+class OptionViewSet(viewsets.ModelViewSet):
     queryset = models.Option.objects.all()
-    serializer_class = serializers.AnswerSerializer
+    serializer_class = serializers.OptionSerializer
 
 
 class SubscribeViewSet(mixins.CreateModelMixin, viewsets.GenericViewSet):
