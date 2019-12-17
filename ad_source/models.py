@@ -32,7 +32,8 @@ class Task(models.Model):
     @property
     def reward_usd_per_click(self):
         eth_to_usd = cache.get(FETCH_ETH_PRICE_CACHE_KEY)
-        return self.reward_per_click * D(str(eth_to_usd))
+        if eth_to_usd:
+            return self.reward_per_click * D(str(eth_to_usd))
 
 
 class Question(models.Model):
