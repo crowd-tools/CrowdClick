@@ -12,11 +12,13 @@ from .management.commands.fetch_eth_price import CACHE_KEY as FETCH_ETH_PRICE_CA
 
 class Task(models.Model):
     title = models.CharField("Title", max_length=100)
-    image = models.ImageField("Image", upload_to="assets/task_image", default="placeholder.png")
-    image_thumbnail = ImageSpecField(source='image', processors=[ResizeToFill(150, 150)], format='JPEG', options={'quality': 60})
     description = models.TextField("Description", max_length=100)
     website_link = models.URLField("Website Link")
     reward_per_click = models.DecimalField("Reward per click", max_digits=9, decimal_places=3)  # ETH but shown as USD
+    image = models.ImageField("Image", upload_to="assets/task_image", default="placeholder.png")
+    image_thumbnail = ImageSpecField(
+        source='image', processors=[ResizeToFill(150, 150)], format='JPEG', options={'quality': 60}
+    )
 
     spend_daily = models.DecimalField("Max budget to spend per day", max_digits=9, decimal_places=3)
     time_duration = models.DurationField("Time duration", default=datetime.timedelta(seconds=30))
