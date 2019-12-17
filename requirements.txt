@@ -7,3 +7,4 @@ requests==2.22.0
 python-memcached==1.59
 django-imagekit==4.0.2
 sentry-sdk==0.13.4
+flake8==3.7.9
