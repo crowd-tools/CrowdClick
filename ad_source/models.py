@@ -3,6 +3,7 @@ from decimal import Decimal as D
 
 from django.core.cache import cache
 from django.db import models
+from django.utils import timezone
 from imagekit.models import ImageSpecField
 from imagekit.processors import ResizeToFill
 
@@ -22,7 +23,7 @@ class Task(models.Model):
 
     spend_daily = models.DecimalField("Max budget to spend per day", max_digits=9, decimal_places=3)
     time_duration = models.DurationField("Time duration", default=datetime.timedelta(seconds=30))
-    created = models.DateTimeField(auto_created=True)  # No show
+    created = models.DateTimeField(default=timezone.now)  # No show
 
     objects = managers.TaskManager()
 
