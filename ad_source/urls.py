@@ -6,6 +6,7 @@ from . import view_sets
 
 router = routers.DefaultRouter()
 router.register(r'task', view_sets.TaskViewSet)
+router.register(r'task/(?P<task_id>\d+)/answer', view_sets.TaskViewSet)
 router.register(r'question', view_sets.QuestionViewSet)
 router.register(r'option', view_sets.OptionViewSet)
 router.register(r'subscribe', view_sets.SubscribeViewSet)

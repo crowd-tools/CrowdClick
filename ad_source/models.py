@@ -1,6 +1,7 @@
 import datetime
 from decimal import Decimal as D
 
+from django.contrib.auth.models import User
 from django.core.cache import cache
 from django.db import models
 from django.utils import timezone
@@ -60,7 +61,23 @@ class Option(models.Model):
     result_count = models.IntegerField(null=True, blank=True, default=None)
 
     def __str__(self):
-        return "Answer(%s, title=%s)" % (self.pk, self.title)
+        return "Option(%s, title=%s)" % (self.pk, self.title)
+
+
+class SelectedOption(models.Model):
+    option = models.ForeignKey(Option, on_delete=models.CASCADE)
+
+
+class AnsweredQuestion(models.Model):
+    question = models.ForeignKey(Question, on_delete=models.CASCADE)
+    selected_option = models.ManyToManyField(SelectedOption, related_name='answered_questions')
+
+
+class Answer(models.Model):
+    task = models.ForeignKey(Task, related_name='answers', on_delete=models.CASCADE)
+    answered_questions = models.ManyToManyField(AnsweredQuestion, related_name='answers')
+    user = models.ForeignKey(User, related_name='answers', on_delete=models.CASCADE)
+    timestamp = models.DateTimeField(auto_now_add=True)
 
 
 class Subscribe(models.Model):
