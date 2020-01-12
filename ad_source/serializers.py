@@ -2,7 +2,7 @@ from rest_auth.serializers import UserDetailsSerializer
 from rest_framework import serializers
 
 from . import models
-from .models import SelectedOption, AnsweredQuestion, Answer
+from .models import SelectedOption, AnsweredQuestion, Answer, Task, Option, Question
 
 
 class OptionSerializer(serializers.HyperlinkedModelSerializer):
@@ -35,6 +35,15 @@ class TaskSerializer(serializers.HyperlinkedModelSerializer):
     image_thumbnail = serializers.ImageField(read_only=True)
     image = serializers.ImageField(read_only=True)
     user = UserDetailsSerializer(read_only=True)
+
+    def create(self, validated_data):
+        questions = validated_data.pop('questions')
+        task = Task.objects.create(**validated_data)
+        for question in questions:
+            q = Question.objects.create(title=question['title'], task=task)
+            for option in question['options']:
+                Option.objects.create(title=option['title'], question=q)
+        return task
 
     class Meta:
         model = models.Task
