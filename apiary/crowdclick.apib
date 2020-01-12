@@ -14,41 +14,66 @@ CrowdClick is an API allowing consumers to view tasks, vote in them and earn cry
 + Response 200 (application/json)
 
         {
-            "count": 1,
-            "next": null,
-            "previous": null,
-            "results": [
+          "count": 1,
+          "next": null,
+          "previous": null,
+          "results": [
+            {
+              "id": 1,
+              "title": "Check our site",
+              "description": "Awesome site. Go check",
+              "user": {
+                "pk": 1,
+                "username": "admin",
+                "email": "",
+                "first_name": "",
+                "last_name": ""
+              },
+              "image": "http://localhost:8000/api/task/placeholder.png",
+              "image_thumbnail": "http://localhost:8000/api/task/CACHE/images/placeholder/0ffb6f88d8f4ccf0431db0468e2b96b0.jpg",
+              "website_link": "http://example.com",
+              "reward_per_click": "1.000",
+              "reward_usd_per_click": null,
+              "spend_daily": "50.000",
+              "time_duration": "00:00:30",
+              "questions": [
                 {
-                    "id": 1,
-                    "title": "Check our site",
-                    "description": "Awesome site. Go check it now and earn crypto",
-                    "website_link": "http://example.com",
-                    "reward_per_click": 0.001,
-                    "time_duration": "00:00:30",
-                    "questions": [
-                        {
-                            "id": 1,
-                            "result_count": null,
-                            "title": "Was it good?",
-                            "url": "/api/task/1/questions/1",
-                            "answers": [
-                                {
-                                    "id": 1,
-                                    "result_count": null,
-                                    "title": "Good",
-                                    "url": "/api/task/1/questions/1/answer/1"
-                                },
-                                {
-                                    "id": 2,
-                                    "result_count": null,
-                                    "title": "Bad",
-                                    "url": "/api/task/1/questions/1/answer/2"
-                                }
-                            ]
-                        }
-                    ]
+                  "id": 1,
+                  "title": "Was it good?",
+                  "url": "http://localhost:8000/api/question/1/",
+                  "options": [
+                    {
+                      "id": 1,
+                      "title": "Good",
+                      "url": "http://localhost:8000/api/option/1/"
+                    },
+                    {
+                      "id": 2,
+                      "title": "Bad",
+                      "url": "http://localhost:8000/api/option/2/"
+                    }
+                  ]
+                },
+                {
+                  "id": 2,
+                  "title": "Was it fast?",
+                  "url": "http://localhost:8000/api/question/2/",
+                  "options": [
+                    {
+                      "id": 3,
+                      "title": "Fast",
+                      "url": "http://localhost:8000/api/option/3/"
+                    },
+                    {
+                      "id": 4,
+                      "title": "Slow",
+                      "url": "http://localhost:8000/api/option/4/"
+                    }
+                  ]
                 }
-            ]
+              ]
+            }
+          ]
         }
 
 
@@ -62,10 +87,11 @@ CrowdClick is an API allowing consumers to view tasks, vote in them and earn cry
             "website_link": "http://example.com",
             "reward_per_click": 0.001,
             "time_duration": "00:00:30",
+            "spend_daily": 1,
             "questions": [
                 {
                     "title": "Was it good?",
-                    "answers": [
+                    "options": [
                         {
                             "title": "Good"
                         },
@@ -79,37 +105,41 @@ CrowdClick is an API allowing consumers to view tasks, vote in them and earn cry
 
 + Response 201 (application/json)
 
-    + Headers
-
-            Location: /api/task/2
-
     + Body
 
             {
                 "id": 2,
                 "title": "Check our site",
                 "description": "Awesome site. Go check it now and earn crypto",
+                "user": {
+                    "pk": 1,
+                    "username": "admin",
+                    "email": "",
+                    "first_name": "",
+                    "last_name": ""
+                },
+                "image": "http://localhost:8000/api/task/placeholder.png",
+                "image_thumbnail": "http://localhost:8000/api/task/CACHE/images/placeholder/0ffb6f88d8f4ccf0431db0468e2b96b0.jpg",
                 "website_link": "http://example.com",
-                "reward_per_click": 0.001,
+                "reward_per_click": "0.001",
+                "reward_usd_per_click": null,
+                "spend_daily": "1.000",
                 "time_duration": "00:00:30",
                 "questions": [
                     {
-                        "id": 2,
-                        "result_count": 0,
+                        "id": 3,
                         "title": "Was it good?",
-                        "url": "/api/task/2/questions/2",
-                        "answers": [
+                        "url": "http://localhost:8000/api/question/3/",
+                        "options": [
                             {
-                                "id": 3,
-                                "result_count": 0,
+                                "id": 5,
                                 "title": "Good",
-                                "url": "/api/task/2/questions/2/answer/3"
+                                "url": "http://localhost:8000/api/option/5/"
                             },
                             {
-                                "id": 4,
-                                "result_count": 0,
+                                "id": 6,
                                 "title": "Bad",
-                                "url": "/api/task/2/questions/2/answer/4"
+                                "url": "http://localhost:8000/api/option/6/"
                             }
                         ]
                     }
@@ -117,88 +147,115 @@ CrowdClick is an API allowing consumers to view tasks, vote in them and earn cry
             }
 
 
-## Questions Collection [/api/task/{id}/questions]
+## Answer Collection [/api/task/{id}/answer]
 
-### List questions for task [GET]
+### Create answer for task [POST]
 
-
-+ Response 200 (application/json)
++ Request (application/json)
 
         {
-            "count": 1,
-            "next": null,
-            "previous": null,
-            "results": [
+            "questions": [
                 {
                     "id": 1,
-                    "title": "Was it good?",
-                    "result_count": null,
-                    "url": "/api/task/1/questions/1",
-                    "answers": [
+                    "options": [
                         {
-                            "id": 1,
-                            "title": "Good",
-                            "result_count": null,
-                            "url": "/api/task/1/questions/1/answer/1"
-                        },
+                            "id": 1
+                        }
+                    ]
+                },
+                {
+                    "id": 2,
+                    "options": [
                         {
-                            "id": 2,
-                            "title": "Bad",
-                            "result_count": null,
-                            "url": "/api/task/1/questions/1/answer/2"
+                            "id": 3
                         }
                     ]
                 }
             ]
         }
 
-## Answer collection [/api/task/{id}/questions/{id}/answer]
-
-
-### List answers [GET]
-
 + Response 200 (application/json)
 
         {
-            "count": 1,
-            "next": null,
-            "previous": null,
-            "results": [
+            "task": {
+                "id": 1,
+                "title": "Check our site",
+                "description": "Awesome site. Go check",
+                "user": {
+                    "pk": 1,
+                    "username": "admin",
+                    "email": "",
+                    "first_name": "",
+                    "last_name": ""
+                },
+                "image": "http://localhost:8000/api/task/1/answer/placeholder.png",
+                "image_thumbnail": "http://localhost:8000/api/task/1/answer/CACHE/images/placeholder/0ffb6f88d8f4ccf0431db0468e2b96b0.jpg",
+                "website_link": "http://example.com",
+                "reward_per_click": "1.000",
+                "reward_usd_per_click": null,
+                "spend_daily": "50.000",
+                "time_duration": "00:00:30",
+                "questions": [
+                    {
+                        "id": 1,
+                        "title": "Was it good?",
+                        "url": "http://localhost:8000/api/question/1/",
+                        "options": [
+                            {
+                                "id": 1,
+                                "title": "Good",
+                                "url": "http://localhost:8000/api/option/1/"
+                            },
+                            {
+                                "id": 2,
+                                "title": "Bad",
+                                "url": "http://localhost:8000/api/option/2/"
+                            }
+                        ]
+                    },
+                    {
+                        "id": 2,
+                        "title": "Was it fast?",
+                        "url": "http://localhost:8000/api/question/2/",
+                        "options": [
+                            {
+                                "id": 3,
+                                "title": "Fast",
+                                "url": "http://localhost:8000/api/option/3/"
+                            },
+                            {
+                                "id": 4,
+                                "title": "Slow",
+                                "url": "http://localhost:8000/api/option/4/"
+                            }
+                        ]
+                    }
+                ]
+            },
+            "user": {
+                "pk": 1,
+                "username": "admin",
+                "email": "",
+                "first_name": "",
+                "last_name": ""
+            },
+            "timestamp": "2020-01-12T12:15:30.616093Z",
+            "questions": [
                 {
-                    "id": 1,
-                    "title": "Good",
-                    "result_count": null,
-                    "url": "/api/task/1/questions/1/answer/1"
+                    "id": 14,
+                    "options": [
+                        {
+                            "id": 15
+                        }
+                    ]
                 },
                 {
-                    "id": 2,
-                    "title": "Bad",
-                    "result_count": null,
-                    "url": "/api/task/1/questions/1/answer/2"
+                    "id": 15,
+                    "options": [
+                        {
+                            "id": 16
+                        }
+                    ]
                 }
             ]
-        }
-
-## Answer detail [/api/task/{id}/questions/{id}/answer/{id}]
-
-### Obtain answer [GET]
-
-+ Response 200 (application/json)
-
-        {
-            "id": 1,
-            "title": "Good",
-            "result_count": null,
-            "url": "/api/task/1/questions/1/answer/1"
-        }
-
-### Create answer [POST]
-
-+ Response 200 (application/json)
-
-        {
-            "id": 1,
-            "title": "Good",
-            "result_count": 10,
-            "url": "/api/task/1/questions/1/answer/1"
         }
