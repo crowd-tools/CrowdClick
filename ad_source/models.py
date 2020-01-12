@@ -25,6 +25,7 @@ class Task(models.Model):
     spend_daily = models.DecimalField("Max budget to spend per day", max_digits=9, decimal_places=3)
     time_duration = models.DurationField("Time duration", default=datetime.timedelta(seconds=30))
     created = models.DateTimeField(default=timezone.now)  # No show
+    user = models.ForeignKey(User, related_name='tasks', on_delete=models.DO_NOTHING)
 
     objects = managers.TaskManager()
 
@@ -49,7 +50,6 @@ class Question(models.Model):
     task = models.ForeignKey(Task, related_name="questions", on_delete=models.CASCADE)
     title = models.CharField(max_length=100)
     question_type = models.CharField(max_length=2, choices=QUESTION_TYPES, default=SELECT_TYPE)
-    result_count = models.IntegerField(null=True, blank=True, default=None)
 
     def __str__(self):
         return "Question(%s, title=%s)" % (self.title, self.question_type)
@@ -58,7 +58,6 @@ class Question(models.Model):
 class Option(models.Model):
     question = models.ForeignKey(Question, related_name="options", on_delete=models.CASCADE)
     title = models.CharField(max_length=100)
-    result_count = models.IntegerField(null=True, blank=True, default=None)
 
     def __str__(self):
         return "Option(%s, title=%s)" % (self.pk, self.title)

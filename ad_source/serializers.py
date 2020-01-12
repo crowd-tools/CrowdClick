@@ -12,7 +12,6 @@ class OptionSerializer(serializers.HyperlinkedModelSerializer):
         fields = [
             'id',
             'title',
-            'result_count',
             'url',
         ]
 
@@ -26,17 +25,16 @@ class QuestionSerializer(serializers.HyperlinkedModelSerializer):
             'id',
             'title',
             'url',
-            'result_count',
             'options',
         ]
 
 
 class TaskSerializer(serializers.HyperlinkedModelSerializer):
 
-    # questions = fields.TaskQuestionRelatedField(many=True)
     questions = QuestionSerializer(many=True)
     image_thumbnail = serializers.ImageField(read_only=True)
     image = serializers.ImageField(read_only=True)
+    user = UserDetailsSerializer(read_only=True)
 
     class Meta:
         model = models.Task
@@ -44,6 +42,7 @@ class TaskSerializer(serializers.HyperlinkedModelSerializer):
             'id',
             'title',
             'description',
+            'user',
             'image',
             'image_thumbnail',
             'website_link',
@@ -52,6 +51,28 @@ class TaskSerializer(serializers.HyperlinkedModelSerializer):
             'spend_daily',
             'time_duration',
             'questions',
+        ]
+
+
+class TaskDashboardSerializer(TaskSerializer):
+    answers_result_count = serializers.IntegerField(read_only=True)
+
+    class Meta:
+        model = models.Task
+        fields = [
+            'id',
+            'title',
+            'description',
+            'user',
+            'image',
+            'image_thumbnail',
+            'website_link',
+            'reward_per_click',
+            'reward_usd_per_click',
+            'spend_daily',
+            'time_duration',
+            'questions',
+            'answers_result_count',
         ]
 
 

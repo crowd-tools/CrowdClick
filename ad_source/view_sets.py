@@ -46,6 +46,13 @@ class TaskViewSet(viewsets.ModelViewSet):
         else:
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
+    @action(methods=['get'], detail=False, permission_classes=[permissions.IsAuthenticated],
+            url_path='dashboard', url_name='task_dashboard', serializer_class=serializers.TaskDashboardSerializer)
+    def dashboard(self, request):
+        tasks = models.Task.objects.dashboard(user=request.user)
+        serializer = serializers.TaskDashboardSerializer(instance=tasks, context={'request': request}, many=True)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+
 
 class QuestionViewSet(viewsets.ModelViewSet):
     queryset = models.Question.objects.all()
