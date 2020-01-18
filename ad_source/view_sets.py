@@ -22,6 +22,9 @@ class TaskViewSet(viewsets.ModelViewSet):
     queryset = models.Task.objects.all()
     serializer_class = serializers.TaskSerializer
 
+    def get_queryset(self):
+        return models.Task.objects.active(user=self.request.user)
+
     @action(methods=['post'], detail=True, permission_classes=[permissions.IsAuthenticated],
             url_path='answer', url_name='task_answer', serializer_class=serializers.AnswerSerializer)
     def answer(self, request, pk=None):
