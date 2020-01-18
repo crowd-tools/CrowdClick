@@ -1,4 +1,4 @@
-Django==2.2.8
+Django==2.2.9
 django-rest-auth==0.9.5
 djangorestframework==3.11.0
 django-web3-auth==0.1
