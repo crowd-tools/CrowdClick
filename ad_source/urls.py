@@ -1,7 +1,6 @@
 from django.conf import settings
 from django.urls import path, include
 from rest_framework import routers
-from web3auth import urls as web3auth_urls
 
 from . import view_sets
 
@@ -20,5 +19,5 @@ router.register(r'subscribe', view_sets.SubscribeViewSet)
 
 urlpatterns = [
     path('api/', include(router.urls)),
-    path('', include(web3auth_urls)),
+    path(r'api/auth', view_sets.auth_view, name='auth_view'),
 ]

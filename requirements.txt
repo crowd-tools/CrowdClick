@@ -1,3 +1,5 @@
+web3==5.4.0
+ethereum==2.3.2
 Django==2.2.9
 django-rest-auth==0.9.5
 djangorestframework==3.11.0

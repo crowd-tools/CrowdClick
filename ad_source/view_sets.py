@@ -1,12 +1,19 @@
+import random
+
+import ethereum.utils
+import sha3
+from django.conf import settings
+from django.contrib.auth import login
+from django.contrib.auth.models import User
 from django.core.exceptions import ObjectDoesNotExist
 from django.http import HttpResponseNotFound, HttpResponseBadRequest
 from rest_framework import permissions, status
 from rest_framework import viewsets, mixins
 from rest_framework.authentication import BasicAuthentication
-from rest_framework.decorators import action
+from rest_framework.decorators import action, api_view, permission_classes
 from rest_framework.response import Response
 
-from . import serializers, models, authentication
+from . import serializers, models, authentication, utils
 from .models import Task
 
 
@@ -81,3 +88,63 @@ class SubscribeViewSet(mixins.CreateModelMixin, viewsets.GenericViewSet):
     queryset = models.Subscribe.objects.all()
     serializer_class = serializers.SubscribeSerializer
     permission_classes = permissions.AllowAny,
+
+
+@api_view(['GET', 'POST'])
+@permission_classes([])
+def auth_view(request):
+    """
+    This view handle all authentication-related logic
+    """
+    response_data = {}
+    if request.method == 'GET':
+        # Obtain authentication information - `is_authenticated`, `username`, `nonce`
+        response_data.update({'is_authenticated': request.user.is_authenticated})
+        if request.user.is_authenticated:
+            response_data.update({'username': request.user.username})
+        else:
+            nonce = ''.join(random.choice(settings.AUTH_NONCE_CHOICES) for _ in range(settings.AUTH_NONCE_LENGTH))
+            response_data.update({'nonce': nonce})
+            request.session['login_nonce'] = nonce
+    elif request.method == 'POST':
+        # Authenticate user by signed `nonce` == `user_signature` and verify against `user_address`
+        login_nonce = request.session.pop('login_nonce', None)
+        if not login_nonce:
+            return Response(
+                data={"login_nonce": "Session id doesn't have a `login_nonce`"},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+        else:
+            user_address = request.data.get('user_address')
+            if not user_address:
+                return Response(
+                    data={"user_address": "Request doesn't have a `user_address`"},
+                    status=status.HTTP_400_BAD_REQUEST,
+                )
+
+            user_signature = request.data.get('user_signature')
+            if not user_signature:
+                return Response(
+                    data={"user_signature": "Request doesn't have a `user_signature`"},
+                    status=status.HTTP_400_BAD_REQUEST,
+                )
+            # Start the sign-up process
+            buffered_hashed_msg = ethereum.utils.sha3(login_nonce)
+            vrs = utils.sig_to_vrs(user_signature)
+            recovered_addr = '0x' + sha3.keccak_256(
+                ethereum.utils.ecrecover_to_pub(buffered_hashed_msg, *vrs)
+            ).hexdigest()[24:]
+            if recovered_addr == user_address:
+                user, created = User.objects.get_or_create(
+                    username=recovered_addr,
+                )
+                login(request, user, backend="django.contrib.auth.backends.ModelBackend")
+                response_data.update({'is_authenticated': request.user.is_authenticated})
+                response_data.update({'username': request.user.username})
+                response_data.update({'created': created})
+            else:
+                return Response(
+                    data={"user_signature": "User signature doesn't match `user_address`"},
+                    status=status.HTTP_400_BAD_REQUEST,
+                )
+    return Response(data=response_data, status=status.HTTP_200_OK)
