@@ -5,7 +5,7 @@ from rest_framework.test import APITestCase
 from ...models import Subscribe
 
 
-class SubscribeTests(APITestCase):
+class TestSubscribeView(APITestCase):
     def setUp(self):
         self.url = reverse('subscribe-list')
 
