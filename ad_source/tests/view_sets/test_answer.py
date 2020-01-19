@@ -31,9 +31,10 @@ class TestAnswerView(APITestCase):
         self.assertEqual(response.data['user']['username'], 'admin')
 
     def test_create_answer_task_id_not_int(self):
+        self.client.login(username='admin', password='admin')
         url = reverse('task_view-task_answer', kwargs={'pk': "foo"})
         response = self.client.post(url, data=self.ANSWER_DATA)
-        self.assertEqual(response.status_code, 403)
+        self.assertEqual(response.status_code, 400)
 
     def test_create_answer_task_doesnt_exist(self):
         self.client.login(username='admin', password='admin')
