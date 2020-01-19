@@ -1,5 +1,7 @@
 # CrowdClick
 
+[![Build Status](https://travis-ci.com/CrowdClick/CrowdClick.svg?branch=master)](https://travis-ci.com/CrowdClick/CrowdClick)
+
 Backend of affordable solution that combines traffic and quantitative data to the advertiser
 through a crowd-sourcing click to view reward model
 
