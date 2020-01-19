@@ -2,7 +2,7 @@ from django.urls import reverse
 from rest_framework import status
 from rest_framework.test import APITestCase
 
-from .models import Subscribe
+from ...models import Subscribe
 
 
 class SubscribeTests(APITestCase):
