@@ -1,6 +1,7 @@
 # CrowdClick
 
 [![Build Status](https://travis-ci.com/CrowdClick/CrowdClick.svg?branch=master)](https://travis-ci.com/CrowdClick/CrowdClick)
+[![codecov](https://codecov.io/gh/CrowdClick/CrowdClick/branch/master/graph/badge.svg)](https://codecov.io/gh/CrowdClick/CrowdClick)
 
 Backend of affordable solution that combines traffic and quantitative data to the advertiser
 through a crowd-sourcing click to view reward model
