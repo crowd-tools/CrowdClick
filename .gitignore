@@ -4,5 +4,9 @@ __pycache__
 node_modules
 assets
 
+# Settings
 crowdclick/settings/local.py
 crowdclick/settings/production.py
+
+# Coverage
+.coverage
