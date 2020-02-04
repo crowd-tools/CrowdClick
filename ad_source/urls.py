@@ -19,5 +19,6 @@ router.register(r'subscribe', view_sets.SubscribeViewSet)
 
 urlpatterns = [
     path('api/', include(router.urls)),
-    path(r'api/auth', view_sets.auth_view, name='auth_view'),
+    path(r'api/auth/', view_sets.auth_view, name='auth_view'),
+    path(r'api/auth/logout/', view_sets.Logout.as_view(), name='logout_view'),
 ]

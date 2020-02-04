@@ -3,12 +3,12 @@ import random
 import ethereum.utils
 import sha3
 from django.conf import settings
-from django.contrib.auth import login
+from django.contrib.auth import login, logout
 from django.contrib.auth.models import User
 from django.core.exceptions import ObjectDoesNotExist
 from django.http import HttpResponseNotFound, HttpResponseBadRequest
 from rest_framework import permissions, status
-from rest_framework import viewsets, mixins
+from rest_framework import viewsets, mixins, views
 from rest_framework.authentication import BasicAuthentication
 from rest_framework.decorators import action, api_view, permission_classes
 from rest_framework.response import Response
@@ -151,3 +151,11 @@ def auth_view(request):
                     status=status.HTTP_400_BAD_REQUEST,
                 )
     return Response(data=response_data, status=status.HTTP_200_OK)
+
+
+class Logout(views.APIView):
+    def get(self, request):
+        if not request.user.is_authenticated:
+            return Response(status=status.HTTP_403_FORBIDDEN)
+        logout(request)
+        return Response(status=status.HTTP_200_OK)
