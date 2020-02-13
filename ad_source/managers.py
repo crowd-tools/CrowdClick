@@ -11,8 +11,7 @@ class TaskManager(models.Manager):
     def active(self, user):
         # XXX Extend SQL property `is_active` - we can spend from user account + didn't exceeded `spend_daily`
         filters = {}
-        if not user.is_superuser:
-            filters.update({"is_active": True})
+        filters.update({"is_active": True})
         return self.get_queryset().filter(**filters)
 
     # Publisher
