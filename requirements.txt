@@ -11,3 +11,4 @@ requests==2.22.0
 python-memcached==1.59
 sentry-sdk==0.13.5
 flake8==3.7.9
+responses==0.10.9

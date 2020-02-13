@@ -1,5 +1,6 @@
 from django.urls import reverse
 from rest_framework.test import APITestCase
+import responses
 
 
 class TestTaskView(APITestCase):
@@ -21,6 +22,16 @@ class TestTaskView(APITestCase):
             }
         ]
     }
+    OG_DATA = """
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta property="og:image" content="http://ogp.me/logo.png">
+  </head>
+  <body>
+  </body>
+</html>
+"""
 
     def setUp(self):
         self.url = reverse('task_view-list')
@@ -34,13 +45,16 @@ class TestTaskView(APITestCase):
         self.client.login(username='admin', password='admin')
         response = self.client.get(self.url)
         self.assertEqual(response.status_code, 200)
-        self.assertEqual(response.data['count'], 2)
+        self.assertEqual(response.data['count'], 1)
 
     def test_create_task_anon(self):
         response = self.client.post(self.url, data=self.TASK_DATA)
         self.assertEqual(response.status_code, 403)
 
+    @responses.activate
     def test_create_task_admin(self):
+        responses.add(responses.GET, 'http://example.com',
+                      body=self.OG_DATA, status=200)
         self.client.login(username='admin', password='admin')
         response = self.client.post(self.url, data=self.TASK_DATA)
         self.assertEqual(response.status_code, 201)
