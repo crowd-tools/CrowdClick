@@ -1,12 +1,12 @@
 import datetime
 from decimal import Decimal as D
 
+from django.conf import settings
 from django.contrib.auth.models import User
 from django.core.cache import cache
 from django.db import models
 from django.utils import timezone
-from imagekit.models import ImageSpecField
-from imagekit.processors import ResizeToFill
+from opengraph import OpenGraph
 
 from . import managers
 from .management.commands.fetch_eth_price import CACHE_KEY as FETCH_ETH_PRICE_CACHE_KEY
@@ -17,11 +17,7 @@ class Task(models.Model):
     description = models.TextField("Description", max_length=100)
     website_link = models.URLField("Website Link")
     reward_per_click = models.DecimalField("Reward per click", max_digits=9, decimal_places=3)  # ETH but shown as USD
-    image = models.ImageField("Image", upload_to="assets/task_image", default="placeholder.png")
-    image_thumbnail = ImageSpecField(
-        source='image', processors=[ResizeToFill(150, 150)], format='JPEG', options={'quality': 60}
-    )
-
+    og_image_link = models.CharField("OpenGraph Image Path", max_length=200, blank=True)
     spend_daily = models.DecimalField("Max budget to spend per day", max_digits=9, decimal_places=3)
     time_duration = models.DurationField("Time duration", default=datetime.timedelta(seconds=30))
     created = models.DateTimeField(default=timezone.now)  # No show
@@ -38,6 +34,16 @@ class Task(models.Model):
         eth_to_usd = cache.get(FETCH_ETH_PRICE_CACHE_KEY)
         if eth_to_usd:
             return self.reward_per_click * D(str(eth_to_usd))
+
+    def save(self, **kwargs):
+        if not self.og_image_link:
+            # Setup Open Graph Image if needed
+            og = OpenGraph(url=self.website_link)
+            try:
+                self.og_image_link = og.image
+            except AttributeError:
+                self.og_image_link = settings.DEFAULT_IMAGE_TASK_PATH
+        super().save(kwargs)
 
 
 class Question(models.Model):

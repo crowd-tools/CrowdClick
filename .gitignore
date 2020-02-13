@@ -2,7 +2,7 @@ db.sqlite3
 .idea
 __pycache__
 node_modules
-assets
+static
 
 # Settings
 crowdclick/settings/local.py

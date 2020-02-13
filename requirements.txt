@@ -1,3 +1,4 @@
+python-opengraph==0.0.2
 web3==5.4.0
 ethereum==2.3.2
 Django==2.2.9
@@ -8,6 +9,5 @@ rlp==1.2.0
 Pillow==6.2.1
 requests==2.22.0
 python-memcached==1.59
-django-imagekit==4.0.2
 sentry-sdk==0.13.5
 flake8==3.7.9

@@ -163,6 +163,14 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/2.2/howto/static-files/
 
-STATIC_URL = '/static/'
-MEDIA_ROOT = 'assets/task_image'
+MEDIA_ROOT = 'assets/'
 LOGOUT_REDIRECT_URL = '/'
+DEFAULT_IMAGE_TASK_PATH = '/assets/placeholder.png'
+
+
+STATIC_URL = '/backend_static/'
+STATIC_ROOT = 'static'
+
+STATICFILES_DIRS = [
+    os.path.join(BASE_DIR, "static"),
+]

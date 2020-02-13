@@ -32,8 +32,7 @@ class QuestionSerializer(serializers.HyperlinkedModelSerializer):
 class TaskSerializer(serializers.HyperlinkedModelSerializer):
 
     questions = QuestionSerializer(many=True)
-    image_thumbnail = serializers.ImageField(read_only=True)
-    image = serializers.ImageField(read_only=True)
+    og_image_link = serializers.URLField(read_only=True)
     user = UserDetailsSerializer(read_only=True)
 
     def create(self, validated_data):
@@ -52,8 +51,7 @@ class TaskSerializer(serializers.HyperlinkedModelSerializer):
             'title',
             'description',
             'user',
-            'image',
-            'image_thumbnail',
+            'og_image_link',
             'website_link',
             'reward_per_click',
             'reward_usd_per_click',
