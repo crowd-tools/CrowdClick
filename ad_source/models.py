@@ -1,12 +1,13 @@
 import datetime
 from decimal import Decimal as D
+import requests
 
 from django.conf import settings
 from django.contrib.auth.models import User
 from django.core.cache import cache
 from django.db import models
 from django.utils import timezone
-from opengraph import OpenGraph
+from .open_graph import CustomOpenGraph
 
 from . import managers
 from .management.commands.fetch_eth_price import CACHE_KEY as FETCH_ETH_PRICE_CACHE_KEY
@@ -38,7 +39,8 @@ class Task(models.Model):
     def save(self, **kwargs):
         if not self.og_image_link:
             # Setup Open Graph Image if needed
-            og = OpenGraph(url=self.website_link)
+            response = requests.get(self.website_link)
+            og = CustomOpenGraph(url=self.website_link, html=response.text)
             try:
                 self.og_image_link = og.image
             except AttributeError:
