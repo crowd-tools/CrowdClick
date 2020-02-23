@@ -39,13 +39,13 @@ class TestTaskView(APITestCase):
     def test_list_task(self):
         response = self.client.get(self.url)
         self.assertEqual(response.status_code, 200)
-        self.assertEqual(response.data['count'], 1)
+        self.assertEqual(response.data['count'], 2)
 
     def test_list_task_admin(self):
         self.client.login(username='admin', password='admin')
         response = self.client.get(self.url)
         self.assertEqual(response.status_code, 200)
-        self.assertEqual(response.data['count'], 1)
+        self.assertEqual(response.data['count'], 2)
 
     def test_create_task_anon(self):
         response = self.client.post(self.url, data=self.TASK_DATA)
