@@ -21,7 +21,7 @@ class Task(models.Model):
     spend_daily = models.DecimalField("Max budget to spend per day", max_digits=9, decimal_places=3)
     time_duration = models.DurationField("Time duration", default=datetime.timedelta(seconds=30))
     created = models.DateTimeField(default=timezone.now)  # No show
-    is_active = models.BooleanField(default=False)
+    is_active = models.BooleanField(default=True)
     user = models.ForeignKey(User, related_name='tasks', on_delete=models.DO_NOTHING)
 
     objects = managers.TaskManager()
