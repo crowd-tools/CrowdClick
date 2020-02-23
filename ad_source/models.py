@@ -2,7 +2,6 @@ import datetime
 from decimal import Decimal as D
 import requests
 
-from django.conf import settings
 from django.contrib.auth.models import User
 from django.core.cache import cache
 from django.db import models
@@ -18,7 +17,7 @@ class Task(models.Model):
     description = models.TextField("Description", max_length=100)
     website_link = models.URLField("Website Link")
     reward_per_click = models.DecimalField("Reward per click", max_digits=9, decimal_places=3)  # ETH but shown as USD
-    og_image_link = models.CharField("OpenGraph Image Path", max_length=200, blank=True)
+    og_image_link = models.URLField("OpenGraph Image Path", max_length=200, blank=True, null=True)
     spend_daily = models.DecimalField("Max budget to spend per day", max_digits=9, decimal_places=3)
     time_duration = models.DurationField("Time duration", default=datetime.timedelta(seconds=30))
     created = models.DateTimeField(default=timezone.now)  # No show
@@ -44,7 +43,7 @@ class Task(models.Model):
             try:
                 self.og_image_link = og.image
             except AttributeError:
-                self.og_image_link = settings.DEFAULT_IMAGE_TASK_PATH
+                pass  # Keep empty
         super().save(kwargs)
 
 

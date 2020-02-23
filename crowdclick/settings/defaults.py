@@ -39,10 +39,6 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
 
     'rest_framework',
-    'web3auth.apps.Web3AuthConfig',
-
-    # 'rest_framework.authtoken',
-    # 'rest_auth',
 
     'ad_source',
 ]
@@ -164,8 +160,6 @@ USE_TZ = True
 
 MEDIA_ROOT = 'assets/'
 LOGOUT_REDIRECT_URL = '/'
-DEFAULT_IMAGE_TASK_PATH = '/assets/placeholder.png'
-
 
 STATIC_URL = '/backend_static/'
 STATIC_ROOT = 'static'

@@ -13,7 +13,7 @@ class TestTaskModel(TestCase):
         self.admin_user = User.objects.get(username="admin")
 
     @responses.activate
-    def test_save_two_tasks_with_second_missing_og_data(self):
+    def test_save_two_tasks_with_second_missing_og_data_is_none(self):
         default_task_kwargs = {
             'title': 'Foo Bar',
             'description': 'This is Foo Bar',
@@ -58,4 +58,4 @@ class TestTaskModel(TestCase):
             website_link='http://fizz.bazz/',
         )
         self.assertEqual(first_task.og_image_link, "http://ogp.me/logo.png")
-        self.assertEqual(second_task.og_image_link, "/assets/placeholder.png")
+        self.assertEqual(second_task.og_image_link, None)
