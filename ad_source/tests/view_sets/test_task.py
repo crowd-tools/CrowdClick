@@ -28,8 +28,14 @@ class TestTaskView(APITestCase):
   <head>
     <meta property="og:image" content="http://ogp.me/logo.png">
   </head>
-  <body>
-  </body>
+  <body></body>
+</html>
+"""
+    OG_DATA_2 = """
+<!DOCTYPE html>
+<html>
+  <head></head>
+  <body></body>
 </html>
 """
 
@@ -59,3 +65,16 @@ class TestTaskView(APITestCase):
         response = self.client.post(self.url, data=self.TASK_DATA)
         self.assertEqual(response.status_code, 201)
         self.assertEqual(response.data['id'], 3)
+
+    @responses.activate
+    def test_create_task_admin_with_second_missing_og_data_is_none(self):
+        responses.add(responses.GET, 'http://example.com',
+                      body=self.OG_DATA, status=200)
+        responses.add(responses.GET, 'http://example.com',
+                      body=self.OG_DATA_2, status=200)
+        self.client.login(username='admin', password='admin')
+        self.client.post(self.url, data=self.TASK_DATA)
+        response = self.client.post(self.url, data=self.TASK_DATA)
+        self.assertEqual(response.status_code, 201)
+        data = response.json()
+        self.assertIsNone(data['og_image_link'])

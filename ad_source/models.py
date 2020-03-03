@@ -8,7 +8,6 @@ from django.utils import timezone
 
 from . import managers
 from .management.commands.fetch_eth_price import CACHE_KEY as FETCH_ETH_PRICE_CACHE_KEY
-from .open_graph import OpenGraph
 
 
 class Task(models.Model):
@@ -33,13 +32,6 @@ class Task(models.Model):
         eth_to_usd = cache.get(FETCH_ETH_PRICE_CACHE_KEY)
         if eth_to_usd:
             return self.reward_per_click * D(str(eth_to_usd))
-
-    def save(self, **kwargs):
-        if not self.og_image_link:
-            # Setup Open Graph Image if needed
-            og = OpenGraph(url=self.website_link)
-            self.og_image_link = og.image
-        super().save(kwargs)
 
 
 class Question(models.Model):

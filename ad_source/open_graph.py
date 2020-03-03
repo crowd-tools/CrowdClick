@@ -5,10 +5,12 @@ from bs4 import BeautifulSoup
 
 
 class OpenGraph(object):
+    X_FRAME_OPTIONS = None  # None, `deny` or `sameorigin`
 
-    def __init__(self, url):
+    def __init__(self, url=None):
         self.og_data = {}
-        content = self._fetch(url)
+        content, allow_iframe_option = self._fetch(url)
+        self.X_FRAME_OPTIONS = allow_iframe_option
         self._parse(content)
 
     def __contains__(self, item):
@@ -23,9 +25,13 @@ class OpenGraph(object):
     def __str__(self):
         return self.__repr__()
 
-    def _fetch(self, url):
+    def _fetch(self, url) -> tuple:
+        """
+        :param url: URL to fetch
+        :return: 'Response body' and 'X-Frame-Options' header
+        """
         response = requests.get(url, allow_redirects=True)
-        return response.text
+        return response.text, response.headers.get('X-Frame-Options', '').lower()
 
     def _parse(self, html):
         doc = BeautifulSoup(html, features="html.parser")
@@ -33,4 +39,4 @@ class OpenGraph(object):
 
         for og in ogs:
             if og.has_attr('content'):
-                self.og_data[og['property'][3:].lower()] = og['content']
+                self.og_data[og['property'][3:]] = og['content']  # TODO lower
