@@ -7,6 +7,7 @@ from bs4 import BeautifulSoup
 class OpenGraph(object):
     ILEGAL_FRAME_OPTIONS = frozenset(['deny', 'sameorigin'])
     X_FRAME_OPTIONS = None  # None, `deny`, `sameorigin` or `allow-from X`
+    RESOLVED_URL = None
 
     def __init__(self, url=None):
         self.og_data = {}
@@ -32,6 +33,7 @@ class OpenGraph(object):
         :return: 'Response body' and 'X-Frame-Options' header
         """
         response = requests.get(url, allow_redirects=True)
+        self.RESOLVED_URL = response.url
         x_frame_options = response.headers.get('X-Frame-Options', '').lower()
         if x_frame_options in self.ILEGAL_FRAME_OPTIONS or x_frame_options.startswith('allow-from'):
             # XXX Allow-from <us>

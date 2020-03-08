@@ -65,7 +65,7 @@ class TestTaskView(APITestCase):
         response = self.client.post(self.url, data=self.TASK_DATA)
         data = response.json()
         self.assertEqual(response.status_code, 201)
-        self.assertEqual(data['website_link'], 'http://example.com')
+        self.assertEqual(data['website_link'], 'http://example.com/')
         self.assertEqual(data['id'], 3)
 
     @responses.activate
@@ -79,5 +79,5 @@ class TestTaskView(APITestCase):
         response = self.client.post(self.url, data=self.TASK_DATA)
         self.assertEqual(response.status_code, 201)
         data = response.json()
-        self.assertEqual(data['website_link'], 'http://example.com')
+        self.assertEqual(data['website_link'], 'http://example.com/')
         self.assertIsNone(data['og_image_link'])

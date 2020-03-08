@@ -58,6 +58,7 @@ class TaskSerializer(serializers.HyperlinkedModelSerializer):
                 raise serializers.ValidationError(f'Website has strict X-Frame-Options: {og.X_FRAME_OPTIONS}')
             attrs.update({
                 'og_image_link': og.image,
+                'website_link': og.RESOLVED_URL or website_link
             })
         return super().validate(attrs)
 
