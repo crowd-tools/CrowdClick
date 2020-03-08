@@ -4,6 +4,7 @@ from rest_framework import serializers
 from . import models
 from .models import SelectedOption, AnsweredQuestion, Answer, Task, Option, Question
 from .open_graph import OpenGraph
+from .utils import convert_url
 
 
 class OptionSerializer(serializers.HyperlinkedModelSerializer):
@@ -45,9 +46,13 @@ class TaskSerializer(serializers.HyperlinkedModelSerializer):
                 Option.objects.create(title=option['title'], question=q)
         return task
 
+    def validate_website_link(self, website_link):
+        return convert_url(website_link)
+
     def validate(self, attrs):
-        if attrs.get('website_link'):
-            og = OpenGraph(url=attrs.get('website_link'))
+        website_link = attrs.get('website_link')
+        if website_link:
+            og = OpenGraph(url=website_link)
             if og.X_FRAME_OPTIONS:
                 # Website doesn't allow us to be viewed
                 raise serializers.ValidationError(f'Website has strict X-Frame-Options: {og.X_FRAME_OPTIONS}')

@@ -3,6 +3,7 @@ from decimal import Decimal as D
 
 from django.contrib.auth.models import User
 from django.core.cache import cache
+from django.core import validators
 from django.db import models
 from django.utils import timezone
 
@@ -13,7 +14,7 @@ from .management.commands.fetch_eth_price import CACHE_KEY as FETCH_ETH_PRICE_CA
 class Task(models.Model):
     title = models.CharField("Title", max_length=100)
     description = models.TextField("Description", max_length=100)
-    website_link = models.URLField("Website Link")
+    website_link = models.CharField("Website Link", max_length=200, validators=[validators.URLValidator])
     reward_per_click = models.DecimalField("Reward per click", max_digits=9, decimal_places=3)  # ETH but shown as USD
     og_image_link = models.URLField("OpenGraph Image Path", max_length=200, blank=True, null=True)
     spend_daily = models.DecimalField("Max budget to spend per day", max_digits=9, decimal_places=3)

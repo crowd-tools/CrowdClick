@@ -8,7 +8,7 @@ class TestTaskView(APITestCase):
     TASK_DATA = {
         "title": "Check our site",
         "description": "Awesome site. Go check it now and earn crypto",
-        "website_link": "http://example.com",
+        "website_link": "example.com",
         "reward_per_click": 0.001,
         "time_duration": "00:00:30",
         "spend_daily": 1,
@@ -63,8 +63,10 @@ class TestTaskView(APITestCase):
                       body=self.OG_DATA, status=200)
         self.client.login(username='admin', password='admin')
         response = self.client.post(self.url, data=self.TASK_DATA)
+        data = response.json()
         self.assertEqual(response.status_code, 201)
-        self.assertEqual(response.data['id'], 3)
+        self.assertEqual(data['website_link'], 'http://example.com')
+        self.assertEqual(data['id'], 3)
 
     @responses.activate
     def test_create_task_admin_with_second_missing_og_data_is_none(self):
@@ -77,4 +79,5 @@ class TestTaskView(APITestCase):
         response = self.client.post(self.url, data=self.TASK_DATA)
         self.assertEqual(response.status_code, 201)
         data = response.json()
+        self.assertEqual(data['website_link'], 'http://example.com')
         self.assertIsNone(data['og_image_link'])
