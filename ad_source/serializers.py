@@ -1,3 +1,6 @@
+import logging
+
+import requests.exceptions
 from rest_auth.serializers import UserDetailsSerializer
 from rest_framework import serializers
 
@@ -5,6 +8,8 @@ from . import models
 from .models import SelectedOption, AnsweredQuestion, Answer, Task, Option, Question
 from .open_graph import OpenGraph
 from .utils import convert_url
+
+L = logging.getLogger(__name__)
 
 
 class OptionSerializer(serializers.HyperlinkedModelSerializer):
@@ -52,7 +57,11 @@ class TaskSerializer(serializers.HyperlinkedModelSerializer):
     def validate(self, attrs):
         website_link = attrs.get('website_link')
         if website_link:
-            og = OpenGraph(url=website_link)
+            try:
+                og = OpenGraph(url=website_link)
+            except requests.exceptions.ConnectionError as e:
+                L.warning(e)
+                raise serializers.ValidationError({'website_link': f'Connection error for {website_link}'})
             if og.X_FRAME_OPTIONS:
                 # Website doesn't allow us to be viewed
                 raise serializers.ValidationError(f'Website has strict X-Frame-Options: {og.X_FRAME_OPTIONS}')
