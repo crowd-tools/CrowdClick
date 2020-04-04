@@ -6,7 +6,7 @@ from django.conf import settings
 from django.contrib.auth import login, logout
 from django.contrib.auth.models import User
 from django.core.exceptions import ObjectDoesNotExist
-from django.http import HttpResponseNotFound, HttpResponseBadRequest
+from django.http import HttpResponseNotFound, HttpResponseBadRequest, HttpResponseForbidden
 from rest_framework import permissions, status
 from rest_framework import viewsets, mixins, views
 from rest_framework.authentication import BasicAuthentication
@@ -25,9 +25,11 @@ class TaskViewSet(viewsets.ModelViewSet):
     def get_queryset(self):
         return models.Task.objects.active(user=self.request.user)
 
-    @action(methods=['post'], detail=True, permission_classes=[permissions.IsAuthenticated],
-            url_path='answer', url_name='task_answer', serializer_class=serializers.AnswerSerializer)
+    @action(methods=['post'], detail=True, url_path='answer',
+            url_name='task_answer', serializer_class=serializers.AnswerSerializer)
     def answer(self, request, pk=None):
+        if not bool(request.user and request.user.is_authenticated):
+            return HttpResponseForbidden(content=b"User is not authenticated")
         try:
             task_id = int(pk)
         except ValueError:
@@ -56,9 +58,11 @@ class TaskViewSet(viewsets.ModelViewSet):
         else:
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-    @action(methods=['get'], detail=False, permission_classes=[permissions.IsAuthenticated],
-            url_path='dashboard', url_name='task_dashboard', serializer_class=serializers.TaskDashboardSerializer)
+    @action(methods=['get'], detail=False, url_path='dashboard',
+            url_name='task_dashboard', serializer_class=serializers.TaskDashboardSerializer)
     def dashboard(self, request):
+        if not bool(request.user and request.user.is_authenticated):
+            return HttpResponseForbidden(content=b"User is not authenticated")
         tasks = models.Task.objects.dashboard(user=request.user)
         serializer = serializers.TaskDashboardSerializer(instance=tasks, context={'request': request}, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
