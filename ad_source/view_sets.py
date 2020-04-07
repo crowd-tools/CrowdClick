@@ -5,6 +5,7 @@ import sha3
 from django.conf import settings
 from django.contrib.auth import login, logout
 from django.contrib.auth.models import User
+from django.core.cache import cache
 from django.core.exceptions import ObjectDoesNotExist
 from django.http import HttpResponseNotFound, HttpResponseBadRequest, HttpResponseForbidden
 from rest_framework import permissions, status
@@ -14,6 +15,7 @@ from rest_framework.decorators import action, api_view, permission_classes
 from rest_framework.response import Response
 
 from . import serializers, models, authentication, utils
+from .management.commands.fetch_eth_price import CACHE_KEY
 from .models import Task
 
 
@@ -95,6 +97,13 @@ class SubscribeViewSet(mixins.CreateModelMixin, viewsets.GenericViewSet):
     queryset = models.Subscribe.objects.all()
     serializer_class = serializers.SubscribeSerializer
     permission_classes = permissions.AllowAny,
+
+
+class ETHMemCacheViewSet(mixins.ListModelMixin, viewsets.ViewSet):
+
+    def list(self, request, *args, **kwargs):
+        cache_dict = cache.get(CACHE_KEY, {})
+        return Response(cache_dict)
 
 
 @api_view(['GET', 'POST'])
