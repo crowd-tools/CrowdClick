@@ -15,17 +15,8 @@ class OpenGraph(object):
         self.X_FRAME_OPTIONS = allow_iframe_option
         self._parse(content)
 
-    def __contains__(self, item):
-        return item in self.og_data
-
     def __getattr__(self, name):
         return self.og_data.get(name)
-
-    def __repr__(self):
-        return self.og_data.__str__()
-
-    def __str__(self):
-        return self.__repr__()
 
     def _fetch(self, url) -> tuple:
         """

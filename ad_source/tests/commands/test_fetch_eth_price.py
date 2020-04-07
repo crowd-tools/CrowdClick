@@ -9,6 +9,12 @@ from ad_source.management.commands.fetch_eth_price import CACHE_KEY
 
 
 class CommandsTestCase(TestCase):
+    @mock.patch("ad_source.management.commands.fetch_eth_price.cache.get")
+    def test_print(self, mock_get):
+        mock_get.return_value = {"eth_prices": {}}
+        call_command('fetch_eth_price', '--print')
+        mock_get.assert_called_once_with(CACHE_KEY)
+
     @mock.patch("ad_source.management.commands.fetch_eth_price.cache.get", lambda x:  {"eth_prices": {}})
     @mock.patch("ad_source.management.commands.fetch_eth_price.cache.delete")
     def test_drop(self, mock_delete):

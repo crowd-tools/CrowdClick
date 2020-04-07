@@ -1,4 +1,5 @@
 import datetime
+import logging
 
 import requests
 from django.core.cache import cache
@@ -6,6 +7,8 @@ from django.core.management.base import BaseCommand
 
 URL = 'https://min-api.cryptocompare.com/data/price?fsym={from_symbol}&tsyms={to_symbol}'
 CACHE_KEY = 'ETH-PRICES'
+
+Logger = logging.getLogger(__name__)
 
 
 class Command(BaseCommand):
@@ -22,14 +25,14 @@ class Command(BaseCommand):
     def handle(self, *args, **options):
         # Print
         if options.get('print'):
-            print(cache.get(CACHE_KEY))
+            Logger.warning(cache.get(CACHE_KEY))
             return
         # Drop
         if options.get('drop'):
             value = cache.get(CACHE_KEY)
             if value:
                 cache.delete(CACHE_KEY)
-                print(f"Dropped: {value}")
+                Logger.warning(f"Dropped: {value}")
             return
         # Fetch
         # https://min-api.cryptocompare.com/data/price?fsym=ETH&tsyms=USD
