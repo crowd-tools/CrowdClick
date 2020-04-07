@@ -1,0 +1,5 @@
+-r requirements.txt
+flake8==3.7.9
+codecov==2.0.22
+coverage==5.0.4
+responses==0.10.12
