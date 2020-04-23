@@ -41,6 +41,7 @@ class TaskSerializer(serializers.HyperlinkedModelSerializer):
     questions = QuestionSerializer(many=True)
     og_image_link = serializers.URLField(read_only=True)
     user = UserDetailsSerializer(read_only=True)
+    warning_message = serializers.SerializerMethodField(read_only=True)
 
     def create(self, validated_data):
         questions = validated_data.pop('questions')
@@ -58,18 +59,24 @@ class TaskSerializer(serializers.HyperlinkedModelSerializer):
         website_link = attrs.get('website_link')
         if website_link:
             try:
-                og = OpenGraph(url=website_link)
+                self._og = OpenGraph(url=website_link)
             except requests.exceptions.ConnectionError as e:
                 L.warning(e)
                 raise serializers.ValidationError({'website_link': f'Connection error for {website_link}'})
-            if og.X_FRAME_OPTIONS:
-                # Website doesn't allow us to be viewed
-                raise serializers.ValidationError(f'Website has strict X-Frame-Options: {og.X_FRAME_OPTIONS}')
             attrs.update({
-                'og_image_link': og.image,
-                'website_link': og.RESOLVED_URL or website_link
+                'og_image_link': self._og.image,
+                'website_link': self._og.RESOLVED_URL or website_link
             })
         return super().validate(attrs)
+
+    def get_warning_message(self, obj):
+        warning_msg = ''
+        if hasattr(self, '_og'):  # from validate only
+            og = self._og
+            if og.X_FRAME_OPTIONS:
+                # Website doesn't allow us to be viewed
+                warning_msg = f'Website has strict X-Frame-Options: {og.X_FRAME_OPTIONS}'
+        return warning_msg
 
     class Meta:
         model = models.Task
@@ -85,6 +92,7 @@ class TaskSerializer(serializers.HyperlinkedModelSerializer):
             'spend_daily',
             'time_duration',
             'questions',
+            'warning_message',
         ]
 
 
