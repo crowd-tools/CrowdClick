@@ -1,8 +1,8 @@
 # CrowdClick
 
-[![contributions](https://img.shields.io/badge/contributions-welcome-brightgreen)](https://github.com/CrowdClick/CrowdClick/pulls)
-[![Build Status](https://travis-ci.com/CrowdClick/CrowdClick.svg?branch=master)](https://travis-ci.com/CrowdClick/CrowdClick)
-[![codecov](https://codecov.io/gh/CrowdClick/CrowdClick/branch/master/graph/badge.svg)](https://codecov.io/gh/CrowdClick/CrowdClick)
+[![contributions](https://img.shields.io/badge/contributions-welcome-brightgreen)](https://github.com/crowd-tools/CrowdClick/pulls)
+[![Build Status](https://travis-ci.com/crowd-tools/CrowdClick.svg?branch=master)](https://travis-ci.com/crowd-tools/CrowdClick)
+[![codecov](https://codecov.io/gh/crowd-tools/CrowdClick/branch/master/graph/badge.svg)](https://codecov.io/gh/crowd-tools/CrowdClick)
 [![apiary](https://img.shields.io/badge/apiary-doc-blue)](https://crowdclick.docs.apiary.io/)
 
 Backend of affordable solution that combines traffic and quantitative data to the advertiser
