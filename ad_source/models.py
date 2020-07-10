@@ -61,7 +61,7 @@ class Option(models.Model):
     title = models.CharField(max_length=100)
 
     def __str__(self):
-        return "Option(%s, title=%s)" % (self.pk, self.title)
+        return f"Option({self.title}"
 
 
 class SelectedOption(models.Model):
@@ -85,6 +85,13 @@ class Answer(models.Model):
 
     def __str__(self):
         return f'Answer({self.task}, user={self.user})'
+
+
+class TempAnswer(models.Model):
+    user = models.ForeignKey(User, related_name='temp_answers', on_delete=models.PROTECT)
+    task = models.ForeignKey(Task, related_name='temp_answers', on_delete=models.PROTECT)
+    selected_options = models.ManyToManyField(Option, related_name='temp_answers')
+    timestamp = models.DateTimeField(auto_now_add=True)
 
 
 class Subscribe(models.Model):
