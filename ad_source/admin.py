@@ -13,10 +13,10 @@ class TaskAdmin(admin.ModelAdmin):
     list_display = ('title', 'description')
 
 
-@admin.register(models.TempAnswer)
+@admin.register(models.Answer)
 class AnswerAdmin(admin.ModelAdmin):
     list_display = ('user', 'task', 'timestamp')
     readonly_fields = ('answered_questions', 'task')
 
-    def answered_questions(self, obj: models.TempAnswer):
+    def answered_questions(self, obj: models.Answer):
         return ';'.join(obj.selected_options.values_list('question__title', flat=True))

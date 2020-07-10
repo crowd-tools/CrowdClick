@@ -64,34 +64,14 @@ class Option(models.Model):
         return f"Option({self.title}"
 
 
-class SelectedOption(models.Model):
-    option = models.ForeignKey(Option, on_delete=models.CASCADE)
-
-
-class AnsweredQuestion(models.Model):
-    question = models.ForeignKey(Question, related_name='answered_questions', on_delete=models.CASCADE)
-    selected_option = models.ManyToManyField(SelectedOption, related_name='answered_questions')
-
-    def __str__(self):
-        options = ', '.join(self.selected_option.values_list('option__title', flat=True))
-        return f"AnsweredQuestion({self.question}, {options})"
-
-
 class Answer(models.Model):
-    task = models.ForeignKey(Task, related_name='answers', on_delete=models.CASCADE)
-    answered_questions = models.ManyToManyField(AnsweredQuestion, related_name='answers')
-    user = models.ForeignKey(User, related_name='answers', on_delete=models.CASCADE)
-    timestamp = models.DateTimeField(auto_now_add=True)
-
-    def __str__(self):
-        return f'Answer({self.task}, user={self.user})'
-
-
-class TempAnswer(models.Model):
     user = models.ForeignKey(User, related_name='temp_answers', on_delete=models.PROTECT)
     task = models.ForeignKey(Task, related_name='temp_answers', on_delete=models.PROTECT)
     selected_options = models.ManyToManyField(Option, related_name='temp_answers')
     timestamp = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f'Answer({self.task}, user={self.user})'
 
 
 class Subscribe(models.Model):
