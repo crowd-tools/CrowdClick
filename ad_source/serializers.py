@@ -12,6 +12,7 @@ L = logging.getLogger(__name__)
 
 
 class OptionSerializer(serializers.HyperlinkedModelSerializer):
+    answer_count = serializers.IntegerField(read_only=True)
 
     class Meta:
         model = models.Option
@@ -19,6 +20,7 @@ class OptionSerializer(serializers.HyperlinkedModelSerializer):
             'id',
             'title',
             'url',
+            'answer_count',
         ]
 
 
@@ -36,7 +38,6 @@ class QuestionSerializer(serializers.HyperlinkedModelSerializer):
 
 
 class TaskSerializer(serializers.HyperlinkedModelSerializer):
-
     questions = QuestionSerializer(many=True)
     og_image_link = serializers.URLField(read_only=True)
     user = UserDetailsSerializer(read_only=True)
@@ -95,36 +96,6 @@ class TaskSerializer(serializers.HyperlinkedModelSerializer):
         ]
 
 
-class TaskDashboardSerializer(TaskSerializer):
-    answers_result_count = serializers.IntegerField(read_only=True)
-
-    class Meta:
-        model = models.Task
-        fields = [
-            'id',
-            'title',
-            'description',
-            'user',
-            'og_image_link',
-            'website_link',
-            'reward_per_click',
-            'reward_usd_per_click',
-            'spend_daily',
-            'time_duration',
-            'questions',
-            'answers_result_count',
-        ]
-
-
-class SubscribeSerializer(serializers.ModelSerializer):
-
-    class Meta:
-        model = models.Subscribe
-        fields = [
-            'email'
-        ]
-
-
 class SelectedOptionSerializer(serializers.HyperlinkedModelSerializer):
     id = serializers.IntegerField()
     title = serializers.CharField(read_only=True)
@@ -151,7 +122,6 @@ class AnsweredQuestionSerializer(serializers.HyperlinkedModelSerializer):
 
 class AnswerSerializer(serializers.HyperlinkedModelSerializer):
     user = UserDetailsSerializer(read_only=True)
-    task = TaskSerializer(read_only=True)
     questions = AnsweredQuestionSerializer(many=True, source='answered_questions')
     selected_options = OptionSerializer(many=True, read_only=True)
     timestamp = serializers.DateTimeField(read_only=True, allow_null=True)
@@ -160,7 +130,6 @@ class AnswerSerializer(serializers.HyperlinkedModelSerializer):
         model = models.Answer
         fields = [
             'user',
-            'task',
             'selected_options',
             'questions',
             'timestamp',
@@ -177,3 +146,34 @@ class AnswerSerializer(serializers.HyperlinkedModelSerializer):
         )
         answer.selected_options.set(selected_options)
         return answer
+
+
+class TaskDashboardSerializer(TaskSerializer):
+    answers_result_count = serializers.IntegerField(read_only=True)
+    answers = AnswerSerializer(many=True)
+
+    class Meta:
+        model = models.Task
+        fields = [
+            'id',
+            'title',
+            'description',
+            'user',
+            'og_image_link',
+            'website_link',
+            'reward_per_click',
+            'reward_usd_per_click',
+            'spend_daily',
+            'time_duration',
+            'questions',
+            'answers_result_count',
+            'answers',
+        ]
+
+
+class SubscribeSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = models.Subscribe
+        fields = [
+            'email'
+        ]

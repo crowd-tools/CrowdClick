@@ -60,6 +60,8 @@ class Option(models.Model):
     question = models.ForeignKey(Question, related_name="options", on_delete=models.CASCADE)
     title = models.CharField(max_length=100)
 
+    objects = managers.OptionManager()
+
     def __str__(self):
         return f"Option({self.title}"
 

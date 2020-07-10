@@ -20,3 +20,10 @@ class TaskManager(models.Manager):
         return self.get_queryset().filter(user=user).annotate(
             answers_result_count=Count('answers')
         )
+
+
+class OptionManager(models.Manager):
+    def get_queryset(self):
+        qs = super().get_queryset()
+        qs = qs.annotate(answer_count=Count('answers'))
+        return qs
