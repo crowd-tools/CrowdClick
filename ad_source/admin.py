@@ -5,7 +5,7 @@ from . import models
 
 @admin.register(models.Task)
 class TaskAdmin(admin.ModelAdmin):
-    list_display = ('title', 'description')
+    list_display = ('title', 'website_link', 'og_image_link', 'time_duration', 'created', 'is_active', 'user')
 
 
 @admin.register(models.Question)
