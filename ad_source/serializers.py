@@ -5,7 +5,6 @@ from rest_auth.serializers import UserDetailsSerializer
 from rest_framework import serializers
 
 from . import models
-from .models import Task, Option, Question
 from .open_graph import OpenGraph
 from .utils import convert_url
 
@@ -45,11 +44,11 @@ class TaskSerializer(serializers.HyperlinkedModelSerializer):
 
     def create(self, validated_data):
         questions = validated_data.pop('questions')
-        task = Task.objects.create(**validated_data)
+        task = models.Task.objects.create(**validated_data)
         for question in questions:
-            q = Question.objects.create(title=question['title'], task=task)
+            q = models.Question.objects.create(title=question['title'], task=task)
             for option in question['options']:
-                Option.objects.create(title=option['title'], question=q)
+                models.Option.objects.create(title=option['title'], question=q)
         return task
 
     def validate_website_link(self, website_link):
@@ -126,57 +125,55 @@ class SubscribeSerializer(serializers.ModelSerializer):
         ]
 
 
-# class SelectedOptionSerializer(serializers.HyperlinkedModelSerializer):
-#     id = serializers.IntegerField()
-#
-#     class Meta:
-#         model = SelectedOption
-#         fields = [
-#             'id',
-#         ]
-#
-#
-# class AnsweredQuestionSerializer(serializers.HyperlinkedModelSerializer):
-#     id = serializers.IntegerField()
-#     options = SelectedOptionSerializer(many=True, source='selected_option')
-#
-#     class Meta:
-#         model = AnsweredQuestion
-#         fields = [
-#             'id',
-#             'options',
-#         ]
-#
-#
-# class AnswerSerializer(serializers.HyperlinkedModelSerializer):
-#     task = TaskSerializer(read_only=True)
-#     questions = AnsweredQuestionSerializer(many=True, source='answered_questions')
-#     user = UserDetailsSerializer(read_only=True)
-#     timestamp = serializers.DateTimeField(read_only=True, allow_null=True)
-#
-#     def create(self, validated_data):
-#         answered_questions = []
-#         for question in validated_data['answered_questions']:
-#             for option in question['selected_option']:
-#                 selected_option = SelectedOption.objects.create(option_id=option['id'])
-#                 answered_question = AnsweredQuestion.objects.create(
-#                     question_id=question['id'],
-#                     # selected_option=selected_option,
-#                 )
-#                 answered_question.selected_option.set([selected_option])
-#                 answered_questions.append(answered_question)
-#         answer = Answer.objects.create(
-#             task=validated_data['task'],
-#             user=validated_data['user'],
-#         )
-#         answer.answered_questions.set(answered_questions)
-#         return answer
-#
-#     class Meta:
-#         model = models.Answer
-#         fields = [
-#             'task',
-#             'user',
-#             'timestamp',
-#             'questions',
-#         ]
+class SelectedOptionSerializer(serializers.HyperlinkedModelSerializer):
+    id = serializers.IntegerField()
+    title = serializers.CharField(read_only=True)
+
+    class Meta:
+        model = models.Option
+        fields = [
+            'id',
+            'title',
+        ]
+
+
+class AnsweredQuestionSerializer(serializers.HyperlinkedModelSerializer):
+    id = serializers.IntegerField()
+    options = SelectedOptionSerializer(many=True)
+
+    class Meta:
+        model = models.Answer
+        fields = [
+            'id',
+            'options',
+        ]
+
+
+class AnswerSerializer(serializers.HyperlinkedModelSerializer):
+    user = UserDetailsSerializer(read_only=True)
+    task = TaskSerializer(read_only=True)
+    questions = AnsweredQuestionSerializer(many=True, source='answered_questions')
+    selected_options = OptionSerializer(many=True, read_only=True)
+    timestamp = serializers.DateTimeField(read_only=True, allow_null=True)
+
+    class Meta:
+        model = models.Answer
+        fields = [
+            'user',
+            'task',
+            'selected_options',
+            'questions',
+            'timestamp',
+        ]
+
+    def create(self, validated_data):
+        selected_options = []
+        for question in validated_data['answered_questions']:
+            for option in question['options']:
+                selected_options.append(option['id'])
+        answer = models.Answer.objects.create(
+            task=validated_data['task'],
+            user=validated_data['user'],
+        )
+        answer.selected_options.set(selected_options)
+        return answer

@@ -65,13 +65,18 @@ class Option(models.Model):
 
 
 class Answer(models.Model):
-    user = models.ForeignKey(User, related_name='temp_answers', on_delete=models.PROTECT)
-    task = models.ForeignKey(Task, related_name='temp_answers', on_delete=models.PROTECT)
-    selected_options = models.ManyToManyField(Option, related_name='temp_answers')
+    user = models.ForeignKey(User, related_name='answers', on_delete=models.PROTECT)
+    task = models.ForeignKey(Task, related_name='answers', on_delete=models.PROTECT)
+    selected_options = models.ManyToManyField(Option, related_name='answers')
     timestamp = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
         return f'Answer({self.task}, user={self.user})'
+
+    def answered_questions(self):
+        return Question.objects.filter(
+            id__in=self.selected_options.values_list('question', flat=True)
+        )
 
 
 class Subscribe(models.Model):
