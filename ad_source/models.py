@@ -27,6 +27,7 @@ class Task(models.Model):
 
     class Meta:
         ordering = ['-reward_per_click']
+        verbose_name_plural = "    Task"
 
     def __str__(self):
         if self.title:
@@ -52,6 +53,9 @@ class Question(models.Model):
     title = models.CharField(max_length=100)
     question_type = models.CharField(max_length=2, choices=QUESTION_TYPES, default=SELECT_TYPE)
 
+    class Meta:
+        verbose_name_plural = "   Question"
+
     def __str__(self):
         return f"Question({self.title})"
 
@@ -62,8 +66,11 @@ class Option(models.Model):
 
     objects = managers.OptionManager()
 
+    class Meta:
+        verbose_name_plural = "  Option"
+
     def __str__(self):
-        return f"Option({self.title}"
+        return f"Option({self.title})"
 
 
 class Answer(models.Model):
@@ -71,6 +78,9 @@ class Answer(models.Model):
     task = models.ForeignKey(Task, related_name='answers', on_delete=models.PROTECT)
     selected_options = models.ManyToManyField(Option, related_name='answers')
     timestamp = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        verbose_name_plural = " Answer"
 
     def __str__(self):
         return f'Answer({self.task}, user={self.user})'
