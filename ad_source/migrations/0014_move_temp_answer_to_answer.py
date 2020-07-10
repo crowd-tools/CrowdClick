@@ -4,6 +4,9 @@ from django.db import migrations
 
 
 class Migration(migrations.Migration):
+    #  Renaming the 'ad_source_tempanswer' table while in a transaction is not supported
+    #  on SQLite < 3.26 because it would break referential integrity.
+    atomic = False
 
     dependencies = [
         ('ad_source', '0013_create_and_fill_temp_answer'),
