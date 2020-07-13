@@ -145,7 +145,8 @@ def auth_view(request):
                     status=status.HTTP_400_BAD_REQUEST,
                 )
             # Start the sign-up process
-            buffered_hashed_msg = ethereum.utils.sha3(login_nonce)
+            seed = "\x19Ethereum Signed Message:\n" + str(len((login_nonce))) + login_nonce
+            buffered_hashed_msg = ethereum.utils.sha3(seed)
             vrs = utils.sig_to_vrs(user_signature)
             recovered_addr = '0x' + sha3.keccak_256(
                 ethereum.utils.ecrecover_to_pub(buffered_hashed_msg, *vrs)
