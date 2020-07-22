@@ -91,6 +91,19 @@ class Answer(models.Model):
         )
 
 
+class Reward(models.Model):
+    sender = models.ForeignKey(User, related_name='send_rewards', on_delete=models.PROTECT)
+    receiver = models.ForeignKey(User, related_name='received_rewards', on_delete=models.PROTECT)
+    task = models.ForeignKey(Task, related_name='rewards', on_delete=models.PROTECT)
+
+    amount = models.DecimalField(max_digits=27, decimal_places=18)
+
+    timestamp = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        unique_together = ('receiver', 'task')
+
+
 class Subscribe(models.Model):
     email = models.EmailField(max_length=150)
     timestamp = models.DateTimeField(auto_now_add=True)
