@@ -22,5 +22,6 @@ router.register(r'prices/eth', view_sets.ETHMemCacheViewSet, basename='eth_view'
 urlpatterns = [
     path('api/', include(router.urls)),
     path(r'api/auth/', view_sets.auth_view, name='auth_view'),
+    path(r'api/reward/{task_id}', view_sets.reward_for_task, name='reward_view'),
     path(r'api/auth/logout/', view_sets.Logout.as_view(), name='logout_view'),
 ]

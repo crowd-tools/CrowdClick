@@ -1,3 +1,4 @@
+import json
 import random
 
 import ethereum.utils
@@ -7,16 +8,24 @@ from django.contrib.auth import login, logout
 from django.contrib.auth.models import User
 from django.core.cache import cache
 from django.core.exceptions import ObjectDoesNotExist
-from django.http import HttpResponseNotFound, HttpResponseBadRequest, HttpResponseForbidden
+from django.http import HttpResponseNotFound, HttpResponseBadRequest, HttpResponseForbidden, HttpResponseRedirect
+# from django.shortcuts import get_object_or_404
 from rest_framework import permissions, status
 from rest_framework import viewsets, mixins, views
 from rest_framework.authentication import BasicAuthentication
 from rest_framework.decorators import action, api_view, permission_classes
 from rest_framework.response import Response
+from web3 import Web3
 
-from . import serializers, models, authentication, utils
+from . import authentication, contract, models, serializers, utils
 from .management.commands.fetch_eth_price import CACHE_KEY
 from .models import Task
+
+
+w3 = Web3(Web3.HTTPProvider(settings.INFURA_ROPSTEN_ENDPOINT))
+contract_spec = json.loads(contract.abi)
+contract_abi = contract_spec["abi"]
+contract_instance = w3.eth.contract(abi=contract_abi, address=settings.CONTRACT_INSTANCE_ADDRESS)
 
 
 class TaskViewSet(viewsets.ModelViewSet):
@@ -172,3 +181,27 @@ class Logout(views.APIView):
             return Response(status=status.HTTP_403_FORBIDDEN)
         logout(request)
         return Response(status=status.HTTP_200_OK)
+
+
+@api_view(['POST'])
+@permission_classes([permissions.IsAuthenticated])
+def reward_for_task(request, task_id):
+    # task = get_object_or_404(models.Task, pk=task_id)
+    # TODO suki - Create Reward object for task
+    # models.Reward.objects.create_for_task()
+    # TODO riccardo - Call web3 with reward data
+    # transaction = contract_instance.functions.forwardPayPerClickRewards(
+    #     ...
+    # ).buildTransaction({
+    #     'chainId': 3,
+    #     'gas': 320000,
+    #     'gasPrice': w3.toWei('1', 'gwei'),
+    #     'nonce': w3.eth.getTransactionCount(settings.ACCOUNT_OWNER_PUBLIC_KEY)
+    # })
+
+    # txn_signed = w3.eth.account.signTransaction(transaction, private_key=settings.ACCOUNT_OWNER_PRIVATE_KEY)
+    # w3.eth.sendRawTransaction(txn_signed.rawTransaction)  # thx_hash
+
+    return HttpResponseRedirect(
+        redirect_to=f''
+    )
