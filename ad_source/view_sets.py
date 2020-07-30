@@ -10,6 +10,7 @@ from django.core.cache import cache
 from django.core.exceptions import ObjectDoesNotExist
 from django.http import HttpResponseNotFound, HttpResponseBadRequest, HttpResponseForbidden, HttpResponseRedirect
 # from django.shortcuts import get_object_or_404
+from django.shortcuts import get_object_or_404
 from rest_framework import permissions, status
 from rest_framework import viewsets, mixins, views
 from rest_framework.authentication import BasicAuthentication
@@ -82,6 +83,22 @@ class TaskViewSet(viewsets.ModelViewSet):
         serializer = serializers.TaskSerializer(data=request.data, context={'request': request})
         if serializer.is_valid():
             serializer.save(user=request.user)
+            # TODO riccardo - Call web3 with openTask data
+            # transaction = contract_instance.functions.openTask(
+            #     serializer.instance.reward_per_click,  # taskReward
+            #     serializer.instance.user,  # sender
+            #     serializer.instance.id,  # id
+            #     ...
+            # ).buildTransaction({
+            #     'chainId': 3,
+            #     'gas': 320000,
+            #     'gasPrice': w3.toWei('1', 'gwei'),
+            #     'nonce': w3.eth.getTransactionCount(settings.ACCOUNT_OWNER_PUBLIC_KEY)
+            # })
+
+            # txn_signed = w3.eth.account.signTransaction(transaction, private_key=settings.ACCOUNT_OWNER_PRIVATE_KEY)
+            # w3.eth.sendRawTransaction(txn_signed.rawTransaction)  # thx_hash
+
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         else:
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
@@ -186,21 +203,32 @@ class Logout(views.APIView):
 @api_view(['POST'])
 @permission_classes([permissions.IsAuthenticated])
 def reward_for_task(request, task_id):
-    # task = get_object_or_404(models.Task, pk=task_id)
-    # TODO suki - Create Reward object for task
-    # models.Reward.objects.create_for_task()
-    # TODO riccardo - Call web3 with reward data
-    # transaction = contract_instance.functions.forwardPayPerClickRewards(
-    #     ...
-    # ).buildTransaction({
-    #     'chainId': 3,
-    #     'gas': 320000,
-    #     'gasPrice': w3.toWei('1', 'gwei'),
-    #     'nonce': w3.eth.getTransactionCount(settings.ACCOUNT_OWNER_PUBLIC_KEY)
-    # })
+    task = get_object_or_404(models.Task, pk=task_id)
+    reward, created = models.Reward.objects.get_or_create(
+        receiver=request.user,
+        task=task,
+        defaults={
+            'sender': task.user,
+            'amount': task.reward_per_click,
+        }
+    )
+    if created:
+        ...
+        # TODO riccardo - Call web3 with reward data
+        # transaction = contract_instance.functions.forwardPayPerClickRewards(
+        #     reward.sender,  # From
+        #     reward.receiver,  # To
+        #     reward.task,  # Task info
+        #     ...
+        # ).buildTransaction({
+        #     'chainId': 3,
+        #     'gas': 320000,
+        #     'gasPrice': w3.toWei('1', 'gwei'),
+        #     'nonce': w3.eth.getTransactionCount(settings.ACCOUNT_OWNER_PUBLIC_KEY)
+        # })
 
-    # txn_signed = w3.eth.account.signTransaction(transaction, private_key=settings.ACCOUNT_OWNER_PRIVATE_KEY)
-    # w3.eth.sendRawTransaction(txn_signed.rawTransaction)  # thx_hash
+        # txn_signed = w3.eth.account.signTransaction(transaction, private_key=settings.ACCOUNT_OWNER_PRIVATE_KEY)
+        # w3.eth.sendRawTransaction(txn_signed.rawTransaction)  # thx_hash
 
     return HttpResponseRedirect(
         redirect_to=f''
