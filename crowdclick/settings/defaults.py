@@ -105,6 +105,9 @@ AUTH_NONCE_CHOICES = '0123456789abcdef'
 AUTH_NONCE_LENGTH = 32
 LOGIN_REDIRECT_URL = '/'
 
+INFURA_ROPSTEN_ENDPOINT = ''
+CONTRACT_INSTANCE_ADDRESS = ''
+
 # Database
 # https://docs.djangoproject.com/en/2.2/ref/settings/#databases
 

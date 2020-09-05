@@ -1,3 +1,4 @@
+import json
 import random
 
 import ethereum.utils
@@ -7,16 +8,25 @@ from django.contrib.auth import login, logout
 from django.contrib.auth.models import User
 from django.core.cache import cache
 from django.core.exceptions import ObjectDoesNotExist
-from django.http import HttpResponseNotFound, HttpResponseBadRequest, HttpResponseForbidden
+from django.http import HttpResponseNotFound, HttpResponseBadRequest, HttpResponseForbidden, HttpResponseRedirect
+# from django.shortcuts import get_object_or_404
+from django.shortcuts import get_object_or_404
 from rest_framework import permissions, status
 from rest_framework import viewsets, mixins, views
 from rest_framework.authentication import BasicAuthentication
 from rest_framework.decorators import action, api_view, permission_classes
 from rest_framework.response import Response
+from web3 import Web3
 
-from . import serializers, models, authentication, utils
+from . import authentication, contract, models, serializers, utils
 from .management.commands.fetch_eth_price import CACHE_KEY
 from .models import Task
+
+
+w3 = Web3(Web3.HTTPProvider(settings.INFURA_ROPSTEN_ENDPOINT))
+contract_spec = json.loads(contract.abi)
+contract_abi = contract_spec["abi"]
+contract_instance = w3.eth.contract(abi=contract_abi, address=settings.CONTRACT_INSTANCE_ADDRESS)
 
 
 class TaskViewSet(viewsets.ModelViewSet):
@@ -73,6 +83,22 @@ class TaskViewSet(viewsets.ModelViewSet):
         serializer = serializers.TaskSerializer(data=request.data, context={'request': request})
         if serializer.is_valid():
             serializer.save(user=request.user)
+            # TODO riccardo - Call web3 with openTask data
+            # transaction = contract_instance.functions.openTask(
+            #     serializer.instance.reward_per_click,  # taskReward
+            #     serializer.instance.user,  # sender
+            #     serializer.instance.id,  # id
+            #     ...
+            # ).buildTransaction({
+            #     'chainId': 3,
+            #     'gas': 320000,
+            #     'gasPrice': w3.toWei('1', 'gwei'),
+            #     'nonce': w3.eth.getTransactionCount(settings.ACCOUNT_OWNER_PUBLIC_KEY)
+            # })
+
+            # txn_signed = w3.eth.account.signTransaction(transaction, private_key=settings.ACCOUNT_OWNER_PRIVATE_KEY)
+            # w3.eth.sendRawTransaction(txn_signed.rawTransaction)  # thx_hash
+
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         else:
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
@@ -173,3 +199,38 @@ class Logout(views.APIView):
             return Response(status=status.HTTP_403_FORBIDDEN)
         logout(request)
         return Response(status=status.HTTP_200_OK)
+
+
+@api_view(['POST'])
+@permission_classes([permissions.IsAuthenticated])
+def reward_for_task(request, task_id):
+    task = get_object_or_404(models.Task, pk=task_id)
+    reward, created = models.Reward.objects.get_or_create(
+        receiver=request.user,
+        task=task,
+        defaults={
+            'sender': task.user,
+            'amount': task.reward_per_click,
+        }
+    )
+    if created:
+        ...
+        # TODO riccardo - Call web3 with reward data
+        # transaction = contract_instance.functions.forwardPayPerClickRewards(
+        #     reward.sender,  # From
+        #     reward.receiver,  # To
+        #     reward.task,  # Task info
+        #     ...
+        # ).buildTransaction({
+        #     'chainId': 3,
+        #     'gas': 320000,
+        #     'gasPrice': w3.toWei('1', 'gwei'),
+        #     'nonce': w3.eth.getTransactionCount(settings.ACCOUNT_OWNER_PUBLIC_KEY)
+        # })
+
+        # txn_signed = w3.eth.account.signTransaction(transaction, private_key=settings.ACCOUNT_OWNER_PRIVATE_KEY)
+        # w3.eth.sendRawTransaction(txn_signed.rawTransaction)  # thx_hash
+
+    return HttpResponseRedirect(
+        redirect_to=f''
+    )
