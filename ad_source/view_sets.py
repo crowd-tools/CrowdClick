@@ -211,25 +211,24 @@ def reward_for_task(request, task_id):
         defaults={
             'sender': task.user,
             'amount': task.reward_per_click,
+            'url': task.website_link
         }
     )
-    if created:
-        ...
-        # TODO riccardo - Call web3 with reward data
-        # transaction = contract_instance.functions.forwardPayPerClickRewards(
-        #     reward.sender,  # From
-        #     reward.receiver,  # To
-        #     reward.task,  # Task info
-        #     ...
-        # ).buildTransaction({
-        #     'chainId': 3,
-        #     'gas': 320000,
-        #     'gasPrice': w3.toWei('1', 'gwei'),
-        #     'nonce': w3.eth.getTransactionCount(settings.ACCOUNT_OWNER_PUBLIC_KEY)
-        # })
+    if created:       
+        transaction = contract_instance.functions.forwardPayPerClickRewards(
+            reward.sender,  # From
+            reward.receiver,  # To
+            reward.task,  # Task info
+            reward.url #task's website url            
+        ).buildTransaction({
+            'chainId': 3,
+            'gas': 320000,
+            'gasPrice': w3.toWei('1', 'gwei'),
+            'nonce': w3.eth.getTransactionCount(settings.ACCOUNT_OWNER_PUBLIC_KEY)
+        })
 
-        # txn_signed = w3.eth.account.signTransaction(transaction, private_key=settings.ACCOUNT_OWNER_PRIVATE_KEY)
-        # w3.eth.sendRawTransaction(txn_signed.rawTransaction)  # thx_hash
+        txn_signed = w3.eth.account.signTransaction(transaction, private_key=settings.ACCOUNT_OWNER_PRIVATE_KEY)
+        w3.eth.sendRawTransaction(txn_signed.rawTransaction)  # tx_hash
 
     return HttpResponseRedirect(
         redirect_to=f''
