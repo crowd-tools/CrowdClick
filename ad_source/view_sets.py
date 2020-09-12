@@ -216,11 +216,10 @@ class RewardViewSet(viewsets.ModelViewSet):
             }
         )
         if created:
-            transaction = contract_instance.functions.forwardPayPerClickRewards(
-                reward.sender,  # From
-                reward.receiver,  # To
-                reward.task,  # Task info
-                reward.url  # task's website url
+            transaction = contract_instance.functions.forwardRewards(
+                str(reward.sender.username),  # From
+                str(reward.receiver.username),  # To
+                reward.task.website_link  # task's website url
             ).buildTransaction({
                 'chainId': 3,
                 'gas': 320000,
