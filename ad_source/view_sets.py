@@ -9,7 +9,6 @@ from django.contrib.auth.models import User
 from django.core.cache import cache
 from django.core.exceptions import ObjectDoesNotExist
 from django.http import HttpResponseNotFound, HttpResponseBadRequest, HttpResponseForbidden, HttpResponseRedirect
-# from django.shortcuts import get_object_or_404
 from django.shortcuts import get_object_or_404
 from rest_framework import permissions, status
 from rest_framework import viewsets, mixins, views
@@ -201,35 +200,37 @@ class Logout(views.APIView):
         return Response(status=status.HTTP_200_OK)
 
 
-@api_view(['POST'])
-@permission_classes([permissions.IsAuthenticated])
-def reward_for_task(request, task_id):
-    task = get_object_or_404(models.Task, pk=task_id)
-    reward, created = models.Reward.objects.get_or_create(
-        receiver=request.user,
-        task=task,
-        defaults={
-            'sender': task.user,
-            'amount': task.reward_per_click,
-            'url': task.website_link
-        }
-    )
-    if created:       
-        transaction = contract_instance.functions.forwardPayPerClickRewards(
-            reward.sender,  # From
-            reward.receiver,  # To
-            reward.task,  # Task info
-            reward.url #task's website url            
-        ).buildTransaction({
-            'chainId': 3,
-            'gas': 320000,
-            'gasPrice': w3.toWei('1', 'gwei'),
-            'nonce': w3.eth.getTransactionCount(settings.ACCOUNT_OWNER_PUBLIC_KEY)
-        })
+class RewardViewSet(viewsets.ModelViewSet):
+    authentication_classes = [authentication.CsrfExemptSessionAuthentication, BasicAuthentication]
+    queryset = models.Reward.objects.all()
 
-        txn_signed = w3.eth.account.signTransaction(transaction, private_key=settings.ACCOUNT_OWNER_PRIVATE_KEY)
-        w3.eth.sendRawTransaction(txn_signed.rawTransaction)  # tx_hash
+    def create(self, request, *args, **kwargs):
+        task_id = kwargs['task_id']
+        task = get_object_or_404(models.Task, pk=task_id)
+        reward, created = models.Reward.objects.get_or_create(
+            receiver=request.user,
+            task=task,
+            defaults={
+                'sender': task.user,
+                'amount': task.reward_per_click,
+            }
+        )
+        if created:
+            transaction = contract_instance.functions.forwardPayPerClickRewards(
+                reward.sender,  # From
+                reward.receiver,  # To
+                reward.task,  # Task info
+                reward.url  # task's website url
+            ).buildTransaction({
+                'chainId': 3,
+                'gas': 320000,
+                'gasPrice': w3.toWei('1', 'gwei'),
+                'nonce': w3.eth.getTransactionCount(settings.ACCOUNT_OWNER_PUBLIC_KEY)
+            })
 
-    return HttpResponseRedirect(
-        redirect_to=f''
-    )
+            txn_signed = w3.eth.account.signTransaction(transaction, private_key=settings.ACCOUNT_OWNER_PRIVATE_KEY)
+            w3.eth.sendRawTransaction(txn_signed.rawTransaction)  # tx_hash
+
+        return HttpResponseRedirect(
+            redirect_to=f''
+        )
