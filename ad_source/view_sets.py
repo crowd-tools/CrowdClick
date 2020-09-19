@@ -21,8 +21,9 @@ from . import authentication, contract, models, serializers, utils
 from .management.commands.fetch_eth_price import CACHE_KEY
 from .models import Task
 
-
-w3 = Web3(Web3.HTTPProvider(settings.INFURA_ROPSTEN_ENDPOINT))
+print('mumbai endpoint is', settings.MATIC_MUMBAI_ENDPOINT)
+w3 = Web3(Web3.HTTPProvider(settings.MATIC_MUMBAI_ENDPOINT))
+# w3 = Web3(Web3.IPCProvider(settings.MATIC_MUMBAI_ENDPOINT))
 contract_spec = json.loads(contract.abi)
 contract_abi = contract_spec["abi"]
 contract_instance = w3.eth.contract(abi=contract_abi, address=settings.CONTRACT_INSTANCE_ADDRESS)
@@ -215,21 +216,22 @@ class RewardViewSet(viewsets.ModelViewSet):
                 'amount': task.reward_per_click,
             }
         )
+        checksummed_sender = Web3.toChecksumAddress(str(reward.sender.username))
+        checksummed_receiver = Web3.toChecksumAddress(str(reward.receiver.username))
         if created:
             transaction = contract_instance.functions.forwardRewards(
-                str(reward.sender.username),  # From
-                str(reward.receiver.username),  # To
-                reward.task.website_link  # task's website url
+                checksummed_receiver,  # To
+                checksummed_sender,  # From
+                task.website_link  # task's website url
             ).buildTransaction({
-                'chainId': 3,
-                'gas': 320000,
+                'chainId': 80001,
+                'gas': 100000,
                 'gasPrice': w3.toWei('1', 'gwei'),
                 'nonce': w3.eth.getTransactionCount(settings.ACCOUNT_OWNER_PUBLIC_KEY)
             })
-
             txn_signed = w3.eth.account.signTransaction(transaction, private_key=settings.ACCOUNT_OWNER_PRIVATE_KEY)
-            w3.eth.sendRawTransaction(txn_signed.rawTransaction)  # tx_hash
-
-        return HttpResponseRedirect(
-            redirect_to=f''
-        )
+            tx_hash_hex = w3.eth.sendRawTransaction(txn_signed.rawTransaction)  # tx_hash
+            tx_hash = tx_hash_hex.hex()
+            return Response(data=tx_hash, status=status.HTTP_201_CREATED)
+        else:
+            return HttpResponseBadRequest(content='Incorrect web3 parameters')
