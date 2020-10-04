@@ -3,6 +3,7 @@ django-rest-auth==0.9.5
 django-web3-auth==0.1
 Django==2.2.13
 djangorestframework==3.11.0
+drf-yasg==1.17.1
 ethereum==2.3.2
 Pillow==7.1.1
 psycopg2==2.8.5
