@@ -1,3 +1,4 @@
+import json
 import random
 
 import ethereum.utils
@@ -8,15 +9,22 @@ from django.contrib.auth.models import User
 from django.core.cache import cache
 from django.core.exceptions import ObjectDoesNotExist
 from django.http import HttpResponseNotFound, HttpResponseBadRequest, HttpResponseForbidden
+from django.shortcuts import get_object_or_404
 from rest_framework import permissions, status
 from rest_framework import viewsets, mixins, views
 from rest_framework.authentication import BasicAuthentication
 from rest_framework.decorators import action, api_view, permission_classes
 from rest_framework.response import Response
+from web3 import Web3
 
-from . import serializers, models, authentication, utils
+from . import authentication, contract, models, serializers, utils
 from .management.commands.fetch_eth_price import CACHE_KEY
 from .models import Task
+
+w3 = Web3(Web3.HTTPProvider(settings.MATIC_MUMBAI_ENDPOINT))
+contract_spec = json.loads(contract.abi)
+contract_abi = contract_spec["abi"]
+contract_instance = w3.eth.contract(abi=contract_abi, address=settings.CONTRACT_INSTANCE_ADDRESS)
 
 
 class TaskViewSet(viewsets.ModelViewSet):
@@ -173,3 +181,45 @@ class Logout(views.APIView):
             return Response(status=status.HTTP_403_FORBIDDEN)
         logout(request)
         return Response(status=status.HTTP_200_OK)
+
+
+class RewardViewSet(viewsets.ModelViewSet):
+    authentication_classes = [authentication.CsrfExemptSessionAuthentication, BasicAuthentication]
+    queryset = models.Reward.objects.all()
+
+    def create(self, request, *args, **kwargs):
+        task_id = kwargs['task_id']
+        task = get_object_or_404(models.Task, pk=task_id)
+        reward, created = models.Reward.objects.get_or_create(
+            receiver=request.user,
+            task=task,
+            defaults={
+                'sender': task.user,
+                'amount': task.reward_per_click,
+            }
+        )
+        checksummed_sender = Web3.toChecksumAddress(reward.sender.username)
+        checksummed_receiver = Web3.toChecksumAddress(reward.receiver.username)
+        if created:
+            transaction = contract_instance.functions.forwardRewards(
+                checksummed_receiver,  # To
+                checksummed_sender,  # From
+                task.website_link  # task's website url
+            ).buildTransaction({
+                'chainId': 80001,
+                'gas': 100000,
+                'gasPrice': w3.toWei('1', 'gwei'),
+                'nonce': w3.eth.getTransactionCount(settings.ACCOUNT_OWNER_PUBLIC_KEY)
+            })
+            txn_signed = w3.eth.account.signTransaction(transaction, private_key=settings.ACCOUNT_OWNER_PRIVATE_KEY)
+            tx_hash_hex = w3.eth.sendRawTransaction(txn_signed.rawTransaction)  # tx_hash
+            tx_hash = tx_hash_hex.hex()
+            data = {
+                "tx_hash": tx_hash
+            }
+            return Response(data=data, status=status.HTTP_201_CREATED)
+        else:
+            data = {
+                "error": "Reward already created"
+            }
+            return Response(data=data, status=status.HTTP_400_BAD_REQUEST)
