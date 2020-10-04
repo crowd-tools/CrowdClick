@@ -12,7 +12,7 @@ else:
 router = router_class()
 router.register(r'task', view_sets.TaskViewSet,  basename='task_view')
 router.register(r'task/(?P<task_id>\d+)/answer', view_sets.TaskViewSet)
-router.register(r'reward/(?P<task_id>\d+)', view_sets.RewardViewSet, basename='reward_view')
+router.register(r'task/(?P<task_id>\d+)/reward', view_sets.RewardViewSet, basename='reward_view')
 router.register(r'answer', view_sets.AnswerViewSet)
 router.register(r'question', view_sets.QuestionViewSet)
 router.register(r'option', view_sets.OptionViewSet)
