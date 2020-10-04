@@ -8,7 +8,7 @@ from django.contrib.auth import login, logout
 from django.contrib.auth.models import User
 from django.core.cache import cache
 from django.core.exceptions import ObjectDoesNotExist
-from django.http import HttpResponseNotFound, HttpResponseBadRequest, HttpResponseForbidden, HttpResponseRedirect
+from django.http import HttpResponseNotFound, HttpResponseBadRequest, HttpResponseForbidden
 from django.shortcuts import get_object_or_404
 from rest_framework import permissions, status
 from rest_framework import viewsets, mixins, views
@@ -21,9 +21,7 @@ from . import authentication, contract, models, serializers, utils
 from .management.commands.fetch_eth_price import CACHE_KEY
 from .models import Task
 
-print('mumbai endpoint is', settings.MATIC_MUMBAI_ENDPOINT)
 w3 = Web3(Web3.HTTPProvider(settings.MATIC_MUMBAI_ENDPOINT))
-# w3 = Web3(Web3.IPCProvider(settings.MATIC_MUMBAI_ENDPOINT))
 contract_spec = json.loads(contract.abi)
 contract_abi = contract_spec["abi"]
 contract_instance = w3.eth.contract(abi=contract_abi, address=settings.CONTRACT_INSTANCE_ADDRESS)
@@ -83,22 +81,6 @@ class TaskViewSet(viewsets.ModelViewSet):
         serializer = serializers.TaskSerializer(data=request.data, context={'request': request})
         if serializer.is_valid():
             serializer.save(user=request.user)
-            # TODO riccardo - Call web3 with openTask data
-            # transaction = contract_instance.functions.openTask(
-            #     serializer.instance.reward_per_click,  # taskReward
-            #     serializer.instance.user,  # sender
-            #     serializer.instance.id,  # id
-            #     ...
-            # ).buildTransaction({
-            #     'chainId': 3,
-            #     'gas': 320000,
-            #     'gasPrice': w3.toWei('1', 'gwei'),
-            #     'nonce': w3.eth.getTransactionCount(settings.ACCOUNT_OWNER_PUBLIC_KEY)
-            # })
-
-            # txn_signed = w3.eth.account.signTransaction(transaction, private_key=settings.ACCOUNT_OWNER_PRIVATE_KEY)
-            # w3.eth.sendRawTransaction(txn_signed.rawTransaction)  # thx_hash
-
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         else:
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
@@ -232,6 +214,6 @@ class RewardViewSet(viewsets.ModelViewSet):
             txn_signed = w3.eth.account.signTransaction(transaction, private_key=settings.ACCOUNT_OWNER_PRIVATE_KEY)
             tx_hash_hex = w3.eth.sendRawTransaction(txn_signed.rawTransaction)  # tx_hash
             tx_hash = tx_hash_hex.hex()
-            return Response(data=tx_hash, status=status.HTTP_201_CREATED)
+            return Response(data=tx_hash, status=status.HTTP_201_CREATED, content_type='application/json')
         else:
-            return HttpResponseBadRequest(content='Incorrect web3 parameters')
+            return HttpResponseBadRequest(json.dumps(data), content_type='application/json')

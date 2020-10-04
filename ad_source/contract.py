@@ -271,4 +271,4 @@ abi = r'''
     }
   ]
 }
-'''  # TODO riccardo - Insert contract ABI
+'''
