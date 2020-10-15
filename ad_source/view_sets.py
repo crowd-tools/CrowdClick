@@ -225,10 +225,8 @@ class RewardViewSet(viewsets.ModelViewSet):
             return Response(data=data, status=status.HTTP_400_BAD_REQUEST)
 
 
-class ServerConfigViewSet(mixins.ListModelMixin, viewsets.ViewSet):
+class ServerConfigViewSet(mixins.ListModelMixin, viewsets.GenericViewSet):
     def list(self, request, *args, **kwargs):
-        if not request.user.is_authenticated:
-            return Response(status=status.HTTP_403_FORBIDDEN)
         data = {
             'public_key': settings.ACCOUNT_OWNER_PUBLIC_KEY
         }
