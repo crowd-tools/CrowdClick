@@ -18,6 +18,7 @@ router.register(r'question', view_sets.QuestionViewSet)
 router.register(r'option', view_sets.OptionViewSet)
 router.register(r'subscribe', view_sets.SubscribeViewSet)
 router.register(r'prices/eth', view_sets.ETHMemCacheViewSet, basename='eth_view')
+router.register(r'server_config', view_sets.ServerConfigViewSet, basename='server_config')
 
 
 urlpatterns = [

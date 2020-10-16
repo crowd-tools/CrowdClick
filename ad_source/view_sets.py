@@ -223,3 +223,11 @@ class RewardViewSet(viewsets.ModelViewSet):
                 "error": "Reward already created"
             }
             return Response(data=data, status=status.HTTP_400_BAD_REQUEST)
+
+
+class ServerConfigViewSet(mixins.ListModelMixin, viewsets.GenericViewSet):
+    def list(self, request, *args, **kwargs):
+        data = {
+            'public_key': settings.ACCOUNT_OWNER_PUBLIC_KEY
+        }
+        return Response(data)
