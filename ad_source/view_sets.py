@@ -85,7 +85,6 @@ class TaskViewSet(viewsets.ModelViewSet):
         else:
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-
 class QuestionViewSet(viewsets.ModelViewSet):
     queryset = models.Question.objects.all()
     serializer_class = serializers.QuestionSerializer
@@ -181,6 +180,17 @@ class Logout(views.APIView):
             return Response(status=status.HTTP_403_FORBIDDEN)
         logout(request)
         return Response(status=status.HTTP_200_OK)
+
+class UserTasks(views.APIView):
+    queryset = models.Task.objects.all()
+    serializer_class = serializers.TaskSerializer
+    def get(self, request):
+        try:
+            tasks = Task.objects.filter(user=request.user)
+            serializer = serializers.TaskSerializer(instance=tasks, context={'request': request}, many=True)
+            return Response(data=serializer.data, status=status.HTTP_200_OK)
+        except ValueError:
+            return Response(serializer.errors, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 
 class RewardViewSet(viewsets.ModelViewSet):
