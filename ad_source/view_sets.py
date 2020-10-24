@@ -7,11 +7,15 @@ from django.conf import settings
 from django.contrib.auth import login, logout
 from django.contrib.auth.models import User
 from django.core.cache import cache
-from django.core.exceptions import ObjectDoesNotExist
-from django.http import HttpResponseNotFound, HttpResponseBadRequest, HttpResponseForbidden
 from django.shortcuts import get_object_or_404
-from rest_framework import permissions, status
-from rest_framework import viewsets, mixins, views
+from rest_framework import (
+    exceptions,
+    mixins,
+    permissions,
+    status,
+    views,
+    viewsets,
+)
 from rest_framework.authentication import BasicAuthentication
 from rest_framework.decorators import action, api_view, permission_classes
 from rest_framework.response import Response
@@ -33,32 +37,32 @@ class TaskViewSet(viewsets.ModelViewSet):
     serializer_class = serializers.TaskSerializer
 
     def get_queryset(self):
-        return models.Task.objects.active(user=self.request.user)
+        qs = models.Task.objects.active(user=self.request.user)
+        chain = self.request.query_params.get('chain', None)
+        if chain is not None:
+            qs = qs.filter(chain=chain)
+        return qs
 
     @action(methods=['post'], detail=True, url_path='answer',
             url_name='task_answer', serializer_class=serializers.AnswerSerializer)
     def answer(self, request, pk=None):
         if not bool(request.user and request.user.is_authenticated):
-            return HttpResponseForbidden(content=b"User is not authenticated")
+            raise exceptions.NotAuthenticated("User is not authenticated")
         try:
             task_id = int(pk)
         except ValueError:
-            return HttpResponseBadRequest(content=b'Task id %s is not a number' % pk.encode('utf-8'))
+            raise exceptions.ValidationError(f"Task id {pk} is not a number")
         try:
             task = Task.objects.get(pk=task_id)
-        except ObjectDoesNotExist:
-            return HttpResponseNotFound(content=b"Task id %d wasn't found" % task_id)
+        except Task.DoesNotExist:
+            raise exceptions.NotFound(f"Task id {task_id} wasn't found")
         for question in request.data['questions']:
             if question['id'] not in task.questions.values_list('id', flat=True):
-                return HttpResponseNotFound(
-                    content=b"Question id %d wasn't found in task %d" % (question['id'], task_id)
-                )
+                raise exceptions.NotFound(f"Question id {question['id']} wasn't found in task {task_id}")
             for option in question['options']:
                 if option['id'] not in task.questions.filter(id=question['id']).values_list('options', flat=True):
-                    return HttpResponseNotFound(
-                        content=b"Option id %d wasn't found for question %d in task %d" % (
-                            option['id'], question['id'], task_id
-                        )
+                    raise exceptions.NotFound(
+                        f"Option id {option['id']} wasn't found for question {option['id']} in task {task_id}"
                     )
         request.data.update({"task": task, "user": request.user})
         serializer = serializers.AnswerSerializer(data=request.data, context={'request': request})
@@ -72,7 +76,7 @@ class TaskViewSet(viewsets.ModelViewSet):
             url_name='task_dashboard', serializer_class=serializers.TaskDashboardSerializer)
     def dashboard(self, request):
         if not bool(request.user and request.user.is_authenticated):
-            return HttpResponseForbidden(content=b"User is not authenticated")
+            raise exceptions.NotAuthenticated("User is not authenticated")
         tasks = models.Task.objects.dashboard(user=request.user)
         serializer = serializers.TaskDashboardSerializer(instance=tasks, context={'request': request}, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
