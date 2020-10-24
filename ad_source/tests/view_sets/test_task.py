@@ -47,6 +47,11 @@ class TestTaskView(APITestCase):
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.data['count'], 2)
 
+    def test_filter_tasks_by_chain(self):
+        response = self.client.get(self.url, data={"chain": "mumbai"})
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.data['count'], 1)
+
     def test_list_task_admin(self):
         self.client.login(username='admin', password='admin')
         response = self.client.get(self.url)
