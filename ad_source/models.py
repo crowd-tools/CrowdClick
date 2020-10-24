@@ -12,8 +12,16 @@ from .management.commands.fetch_eth_price import CACHE_KEY as FETCH_ETH_PRICE_CA
 
 
 class Task(models.Model):
+    GOERLI = 'goerli'
+    MUMBAI = 'mumbai'
+    CHAIN_CHOICES = (
+        (GOERLI, 'Goerli'),
+        (MUMBAI, 'Mumbai'),
+    )
+
     title = models.CharField("Title", max_length=100)
     description = models.TextField("Description", max_length=100)
+    chain = models.CharField(max_length=15, choices=CHAIN_CHOICES, default=GOERLI)
     website_link = models.CharField("Website Link", max_length=200, validators=[validators.URLValidator])
     reward_per_click = models.DecimalField("Reward per click", max_digits=9, decimal_places=3)  # ETH but shown as USD
     og_image_link = models.URLField("OpenGraph Image Path", max_length=200, blank=True, null=True)
@@ -27,7 +35,7 @@ class Task(models.Model):
 
     class Meta:
         ordering = ['-reward_per_click']
-        verbose_name_plural = "    Task"
+        verbose_name_plural = "Task"
 
     def __str__(self):
         if self.title:
