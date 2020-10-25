@@ -27,6 +27,11 @@ class AnswerAdmin(admin.ModelAdmin):
         return ';'.join(obj.selected_options.values_list('question__title', flat=True))
 
 
+@admin.register(models.Reward)
+class RewardAdmin(admin.ModelAdmin):
+    list_display = ('sender', 'receiver', 'task', 'amount', 'timestamp')
+
+
 @admin.register(models.Subscribe)
 class SubscribeAdmin(admin.ModelAdmin):
     list_display = ('email', 'timestamp')
