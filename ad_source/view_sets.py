@@ -213,7 +213,7 @@ class RewardViewSet(viewsets.ModelViewSet):
                 'gasPrice': w3_provider.web3.toWei('1', 'gwei'),
                 'nonce': w3_provider.web3.eth.getTransactionCount(w3_provider.public_key)
             })
-            txn_signed = w3_provider.web3.eth.account.signTransaction(transaction, private_key=w3_provider.private_key)
+            txn_signed = w3_provider.web3.eth.account.sign_transaction(transaction, private_key=w3_provider.private_key)
             tx_hash_hex = w3_provider.web3.eth.sendRawTransaction(txn_signed.rawTransaction)  # tx_hash
             tx_hash = tx_hash_hex.hex()
             data = {
