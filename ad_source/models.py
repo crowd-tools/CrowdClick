@@ -34,7 +34,6 @@ class Task(models.Model):
     objects = managers.TaskManager()
 
     class Meta:
-        ordering = ['-reward_per_click']
         verbose_name_plural = "Task"
 
     def __str__(self):

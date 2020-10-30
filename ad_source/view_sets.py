@@ -1,4 +1,3 @@
-import json
 import random
 
 import ethereum.utils
@@ -21,14 +20,11 @@ from rest_framework.decorators import action, api_view, permission_classes
 from rest_framework.response import Response
 from web3 import Web3
 
-from . import authentication, contract, models, serializers, utils
+from . import authentication, models, serializers, utils, web3_providers
 from .management.commands.fetch_eth_price import CACHE_KEY
 from .models import Task
 
-w3 = Web3(Web3.HTTPProvider(settings.MATIC_MUMBAI_ENDPOINT))
-contract_spec = json.loads(contract.abi)
-contract_abi = contract_spec["abi"]
-contract_instance = w3.eth.contract(abi=contract_abi, address=settings.CONTRACT_INSTANCE_ADDRESS)
+web3_storage = web3_providers.Web3ProviderStorage()
 
 
 class TaskViewSet(viewsets.ModelViewSet):
@@ -202,21 +198,23 @@ class RewardViewSet(viewsets.ModelViewSet):
                 'amount': task.reward_per_click,
             }
         )
-        checksummed_sender = Web3.toChecksumAddress(reward.sender.username)
-        checksummed_receiver = Web3.toChecksumAddress(reward.receiver.username)
         if created:
-            transaction = contract_instance.functions.forwardRewards(
+            checksummed_sender = Web3.toChecksumAddress(reward.sender.username)
+            checksummed_receiver = Web3.toChecksumAddress(reward.receiver.username)
+
+            w3_provider: web3_providers.Web3Provider = web3_storage[task.chain]
+            transaction = w3_provider.contract.functions.forwardRewards(
                 checksummed_receiver,  # To
                 checksummed_sender,  # From
                 task.website_link  # task's website url
             ).buildTransaction({
                 'chainId': 80001,
                 'gas': 100000,
-                'gasPrice': w3.toWei('1', 'gwei'),
-                'nonce': w3.eth.getTransactionCount(settings.ACCOUNT_OWNER_PUBLIC_KEY)
+                'gasPrice': w3_provider.web3.toWei('1', 'gwei'),
+                'nonce': w3_provider.web3.eth.getTransactionCount(w3_provider.public_key)
             })
-            txn_signed = w3.eth.account.signTransaction(transaction, private_key=settings.ACCOUNT_OWNER_PRIVATE_KEY)
-            tx_hash_hex = w3.eth.sendRawTransaction(txn_signed.rawTransaction)  # tx_hash
+            txn_signed = w3_provider.web3.eth.account.sign_transaction(transaction, private_key=w3_provider.private_key)
+            tx_hash_hex = w3_provider.web3.eth.sendRawTransaction(txn_signed.rawTransaction)  # tx_hash
             tx_hash = tx_hash_hex.hex()
             data = {
                 "tx_hash": tx_hash
