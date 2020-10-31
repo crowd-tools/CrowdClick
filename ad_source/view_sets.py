@@ -183,6 +183,16 @@ class Logout(views.APIView):
         return Response(status=status.HTTP_200_OK)
 
 
+class UserTasks(views.APIView):
+    queryset = models.Task.objects.all()
+    serializer_class = serializers.TaskSerializer
+
+    def get(self, request):
+        tasks = Task.objects.filter(user=request.user)
+        serializer = serializers.TaskSerializer(instance=tasks, context={'request': request}, many=True)
+        return Response(data=serializer.data, status=status.HTTP_200_OK)
+
+
 class RewardViewSet(viewsets.ModelViewSet):
     authentication_classes = [authentication.CsrfExemptSessionAuthentication, BasicAuthentication]
     queryset = models.Reward.objects.all()
