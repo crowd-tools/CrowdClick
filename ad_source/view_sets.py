@@ -218,7 +218,7 @@ class RewardViewSet(viewsets.ModelViewSet):
                 checksummed_sender,  # From
                 task.website_link  # task's website url
             ).buildTransaction({
-                'chainId': 80001,
+                'chainId': w3_provider.chain_id,
                 'gas': 100000,
                 'gasPrice': w3_provider.web3.toWei('1', 'gwei'),
                 'nonce': w3_provider.web3.eth.getTransactionCount(w3_provider.public_key)
