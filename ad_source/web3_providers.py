@@ -28,7 +28,7 @@ class Web3ProviderStorage(dict):
         if settings.TEST:
             provider = Web3(Web3.EthereumTesterProvider())
         else:
-            provider = Web3(Web3.HTTPProvider(config['endpoint']))
+            provider = Web3(Web3.HTTPProvider(config.endpoint))
 
         contract_spec = json.loads(contract.abi)
         contract_abi = contract_spec["abi"]
