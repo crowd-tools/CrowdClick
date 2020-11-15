@@ -10,17 +10,21 @@ from web3.types import ENS
 
 from . import contract
 
+if typing.TYPE_CHECKING:
+    from crowdclick.settings.defaults import web3_config_namedtuple
+
 
 class Web3Provider(typing.NamedTuple):
     web3: Web3
     contract: Contract
+    chain_id: int
     public_key: typing.Union[Address, ChecksumAddress, ENS]
     private_key: str
 
 
 class Web3ProviderStorage(dict):
     def __missing__(self, key):
-        config: settings.web3_config_namedtuple = settings.WEB3_CONFIG[key]
+        config: web3_config_namedtuple = settings.WEB3_CONFIG[key]
 
         if key not in settings.WEB3_CONFIG:
             raise ImproperlyConfigured(f"Requested Web3 provider {key} but \
@@ -36,6 +40,7 @@ class Web3ProviderStorage(dict):
         w3_provider = Web3Provider(
             web3=provider,
             contract=contract_instance,
+            chain_id=config.chain_id,
             public_key=config.public_key,
             private_key=config.private_key,
         )
