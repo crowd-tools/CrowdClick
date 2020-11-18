@@ -219,7 +219,7 @@ class RewardViewSet(viewsets.ModelViewSet):
                 task.website_link  # task's website url
             ).buildTransaction({
                 'chainId': w3_provider.chain_id,
-                'gas': 100000,
+                'gas': 2000000,
                 'gasPrice': w3_provider.web3.toWei('1', 'gwei'),
                 'nonce': w3_provider.web3.eth.getTransactionCount(w3_provider.public_key)
             })

@@ -115,14 +115,14 @@ web3_config_namedtuple = namedtuple('Web3_Config', [
 WEB3_CONFIG = {
     'mumbai': web3_config_namedtuple(
         endpoint='https://rpc-mumbai.matic.today',
-        contract_address='0xA3d2C3F78652B93311363bBDEc3d16867F6D5C29',
+        contract_address='0x81c4DCbBc60762923e4Ba3320e52f1E4201b989F',
         chain_id=80001,
         public_key='0xDd2179e8D8755f810CdAe4a474F7c53F371FbB6A',
         private_key='a' * 64,
     ),
     'goerli': web3_config_namedtuple(
         endpoint='https://goerli.infura.io/v3/' + 'a' * 32,
-        contract_address='0xA3d2C3F78652B93311363bBDEc3d16867F6D5C29',
+        contract_address='0xC0499652EAb163462d3f4d4EEB2FE30fd181e6db',
         chain_id=5,
         public_key='0xDd2179e8D8755f810CdAe4a474F7c53F371FbB6A',
         private_key='a' * 64,
