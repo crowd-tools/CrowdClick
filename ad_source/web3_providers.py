@@ -20,6 +20,7 @@ class Web3Provider(typing.NamedTuple):
     chain_id: int
     public_key: typing.Union[Address, ChecksumAddress, ENS]
     private_key: str
+    default_gas_fee: int
 
 
 class Web3ProviderStorage(dict):
@@ -43,6 +44,7 @@ class Web3ProviderStorage(dict):
             chain_id=config.chain_id,
             public_key=config.public_key,
             private_key=config.private_key,
+            default_gas_fee=config.default_gas_fee
         )
         self[key] = w3_provider
         return w3_provider

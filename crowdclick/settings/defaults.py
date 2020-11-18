@@ -110,7 +110,7 @@ AUTH_NONCE_LENGTH = 32
 LOGIN_REDIRECT_URL = '/'
 
 web3_config_namedtuple = namedtuple('Web3_Config', [
-    'endpoint', 'contract_address', 'chain_id', 'public_key', 'private_key'
+    'endpoint', 'contract_address', 'chain_id', 'public_key', 'private_key', 'default_gas_fee'
 ])
 WEB3_CONFIG = {
     'mumbai': web3_config_namedtuple(
@@ -119,6 +119,7 @@ WEB3_CONFIG = {
         chain_id=80001,
         public_key='0xDd2179e8D8755f810CdAe4a474F7c53F371FbB6A',
         private_key='a' * 64,
+        default_gas_fee=100000,
     ),
     'goerli': web3_config_namedtuple(
         endpoint='https://goerli.infura.io/v3/' + 'a' * 32,
@@ -126,6 +127,7 @@ WEB3_CONFIG = {
         chain_id=5,
         public_key='0xDd2179e8D8755f810CdAe4a474F7c53F371FbB6A',
         private_key='a' * 64,
+        default_gas_fee=2000000,
     )
 }
 
