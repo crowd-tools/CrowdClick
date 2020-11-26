@@ -61,15 +61,6 @@ class TaskViewSet(viewsets.ModelViewSet):
         else:
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-    @action(methods=['get'], detail=False, url_path='dashboard',
-            url_name='task_dashboard', serializer_class=serializers.TaskDashboardSerializer)
-    def dashboard(self, request):
-        if not bool(request.user and request.user.is_authenticated):
-            raise exceptions.NotAuthenticated("User is not authenticated")
-        tasks = models.Task.objects.dashboard(user=request.user)
-        serializer = serializers.TaskDashboardSerializer(instance=tasks, context={'request': request}, many=True)
-        return Response(serializer.data, status=status.HTTP_200_OK)
-
     def create(self, request, *args, **kwargs):
         serializer = serializers.TaskSerializer(data=request.data, context={'request': request})
         if serializer.is_valid():
@@ -77,6 +68,15 @@ class TaskViewSet(viewsets.ModelViewSet):
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         else:
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+class TaskDashboardViewSet(viewsets.ModelViewSet):
+    serializer_class = serializers.TaskDashboardSerializer
+    permission_classes = [permissions.IsAuthenticated]
+    filterset_class = filters.TaskFilter
+
+    def get_queryset(self):
+        return models.Task.objects.dashboard(user=self.request.user)
 
 
 class QuestionViewSet(viewsets.ModelViewSet):
