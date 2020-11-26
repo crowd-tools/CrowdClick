@@ -9,6 +9,7 @@ class TestTaskView(APITestCase):
         "title": "Check our site",
         "description": "Awesome site. Go check it now and earn crypto",
         "website_link": "does_not_exist.com",
+        "contract_address": "0xdeadc0dedeadc0de",
         "reward_per_click": 0.001,
         "time_duration": "00:00:30",
         "spend_daily": 1,

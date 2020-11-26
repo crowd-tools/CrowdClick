@@ -10,7 +10,7 @@ else:
     router_class = routers.SimpleRouter
 
 router = router_class()
-router.register(r'task/dashboard', view_sets.TaskDashboardViewSet,  basename='task_view-task_dashboard')
+router.register(r'task/dashboard', view_sets.TaskDashboardViewSet,  basename='task_dashboard')
 router.register(r'task', view_sets.TaskViewSet,  basename='task_view')
 router.register(r'task/(?P<task_id>\d+)/answer', view_sets.TaskViewSet)
 router.register(r'task/(?P<task_id>\d+)/reward', view_sets.RewardViewSet, basename='reward_view')

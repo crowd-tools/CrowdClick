@@ -41,7 +41,6 @@ class TaskSerializer(serializers.HyperlinkedModelSerializer):
     questions = QuestionSerializer(many=True)
     og_image_link = serializers.URLField(read_only=True)
     user = UserDetailsSerializer(read_only=True)
-    warning_message = serializers.SerializerMethodField(read_only=True)
 
     def create(self, validated_data):
         questions = validated_data.pop('questions')
@@ -59,28 +58,23 @@ class TaskSerializer(serializers.HyperlinkedModelSerializer):
         website_link = attrs.get('website_link')
         if website_link:
             try:
-                self._og = OpenGraph(url=website_link)  # noqa
+                og = OpenGraph(url=website_link)
             except requests.exceptions.ConnectionError as e:
                 L.warning(e)
                 raise serializers.ValidationError({'website_link': f'Connection error for {website_link}'})
-            if self._og.response.status_code != status.HTTP_200_OK:
-                message = f'Website {website_link} responded with status code: {self._og.response.status_code}'
+            if og.response.status_code != status.HTTP_200_OK:
+                message = f'Website {website_link} responded with status code: {og.response.status_code}'
                 L.warning(message)
                 raise serializers.ValidationError({'website_link': f'{message}. Has to be 200'})
             attrs.update({
-                'og_image_link': self._og.image,
-                'website_link': self._og.RESOLVED_URL or website_link
+                'og_image_link': og.image,
+                'website_link': og.RESOLVED_URL or website_link,
             })
-        return super().validate(attrs)
-
-    def get_warning_message(self, obj):
-        warning_msg = ''
-        if hasattr(self, '_og'):  # from validate only
-            og = self._og
             if og.X_FRAME_OPTIONS:
-                # Website doesn't allow us to be viewed
-                warning_msg = f'Website has strict X-Frame-Options: {og.X_FRAME_OPTIONS}'
-        return warning_msg
+                attrs.update({
+                    'warning_message': f'Website has strict X-Frame-Options: {og.X_FRAME_OPTIONS}',
+                })
+        return super().validate(attrs)
 
     class Meta:
         model = models.Task
@@ -92,6 +86,7 @@ class TaskSerializer(serializers.HyperlinkedModelSerializer):
             'user',
             'og_image_link',
             'website_link',
+            'contract_address',
             'reward_per_click',
             'reward_usd_per_click',
             'spend_daily',
