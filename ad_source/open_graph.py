@@ -23,13 +23,13 @@ class OpenGraph(object):
         :param url: URL to fetch
         :return: 'Response body' and 'X-Frame-Options' header
         """
-        response = requests.get(url, allow_redirects=True)
-        self.RESOLVED_URL = response.url
-        x_frame_options = response.headers.get('X-Frame-Options', '').lower()
+        self.response = requests.get(url, allow_redirects=True)
+        self.RESOLVED_URL = self.response.url
+        x_frame_options = self.response.headers.get('X-Frame-Options', '').lower()
         if x_frame_options in self.ILEGAL_FRAME_OPTIONS or x_frame_options.startswith('allow-from'):
             # XXX Allow-from <us>
-            return response.text, x_frame_options
-        return response.text, None
+            return self.response.text, x_frame_options
+        return self.response.text, None
 
     def _parse(self, html):
         doc = BeautifulSoup(html, features="html.parser")

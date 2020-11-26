@@ -2,7 +2,7 @@ import logging
 
 import requests.exceptions
 from rest_auth.serializers import UserDetailsSerializer
-from rest_framework import serializers
+from rest_framework import serializers, status
 
 from . import models
 from .open_graph import OpenGraph
@@ -59,10 +59,14 @@ class TaskSerializer(serializers.HyperlinkedModelSerializer):
         website_link = attrs.get('website_link')
         if website_link:
             try:
-                self._og = OpenGraph(url=website_link)
+                self._og = OpenGraph(url=website_link)  # noqa
             except requests.exceptions.ConnectionError as e:
                 L.warning(e)
                 raise serializers.ValidationError({'website_link': f'Connection error for {website_link}'})
+            if self._og.response.status_code != status.HTTP_200_OK:
+                message = f'Website {website_link} responded with status code: {self._og.response.status_code}'
+                L.warning(message)
+                raise serializers.ValidationError({'website_link': f'{message}. Has to be 200'})
             attrs.update({
                 'og_image_link': self._og.image,
                 'website_link': self._og.RESOLVED_URL or website_link
