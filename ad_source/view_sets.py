@@ -20,7 +20,7 @@ from rest_framework.decorators import action, api_view, permission_classes
 from rest_framework.response import Response
 from web3 import Web3
 
-from . import authentication, models, serializers, utils, web3_providers
+from . import authentication, filters, models, serializers, utils, web3_providers
 from .management.commands.fetch_eth_price import CACHE_KEY
 from .models import Task
 
@@ -30,20 +30,13 @@ web3_storage = web3_providers.Web3ProviderStorage()
 class TaskViewSet(viewsets.ModelViewSet):
     authentication_classes = [authentication.CsrfExemptSessionAuthentication, BasicAuthentication]
     queryset = models.Task.objects.all()
+    permission_classes = [permissions.IsAuthenticatedOrReadOnly]
     serializer_class = serializers.TaskSerializer
-
-    def get_queryset(self):
-        qs = models.Task.objects.active(user=self.request.user)
-        chain = self.request.query_params.get('chain', None)
-        if chain is not None:
-            qs = qs.filter(chain=chain)
-        return qs
+    filterset_class = filters.TaskFilter
 
     @action(methods=['post'], detail=True, url_path='answer',
             url_name='task_answer', serializer_class=serializers.AnswerSerializer)
     def answer(self, request, pk=None):
-        if not bool(request.user and request.user.is_authenticated):
-            raise exceptions.NotAuthenticated("User is not authenticated")
         try:
             task_id = int(pk)
         except ValueError:

@@ -43,6 +43,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
 
     'rest_framework',
+    'django_filters',
     'drf_yasg',
 
     'ad_source',
@@ -89,6 +90,9 @@ DJANGO_ADMIN_URL = 'admin'
 
 # Rest Framework https://www.django-rest-framework.org/
 REST_FRAMEWORK = {
+    'DEFAULT_FILTER_BACKENDS': (
+        'django_filters.rest_framework.DjangoFilterBackend',
+    ),
     # Use Django's standard `django.contrib.auth` permissions,
     # or allow read-only access for unauthenticated users.
     'DEFAULT_PERMISSION_CLASSES': [
