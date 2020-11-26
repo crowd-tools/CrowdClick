@@ -124,6 +124,18 @@ def auth_view(request):
             response_data.update({'nonce': nonce})
             request.session['login_nonce'] = nonce
     elif request.method == 'POST':
+        if settings.DEBUG:
+            # Allow username/password auth in debug mode
+            if 'username' in request.data and 'password' in request.data:
+                username = request.data['username']
+                password = request.data['password']
+                user = get_object_or_404(User, username=username)
+                if user.check_password(password):
+                    login(request, user, backend="django.contrib.auth.backends.ModelBackend")
+                    response_data.update({'is_authenticated': request.user.is_authenticated})
+                    response_data.update({'username': request.user.username})
+                    return Response(data=response_data, status=status.HTTP_200_OK)
+
         # Authenticate user by signed `nonce` == `user_signature` and verify against `user_address`
         login_nonce = request.session.pop('login_nonce', None)
         if not login_nonce:
@@ -152,19 +164,20 @@ def auth_view(request):
             recovered_addr = '0x' + sha3.keccak_256(
                 ethereum.utils.ecrecover_to_pub(buffered_hashed_msg, *vrs)
             ).hexdigest()[24:]
-            if recovered_addr == user_address:
-                user, created = User.objects.get_or_create(
-                    username=recovered_addr,
-                )
-                login(request, user, backend="django.contrib.auth.backends.ModelBackend")
-                response_data.update({'is_authenticated': request.user.is_authenticated})
-                response_data.update({'username': request.user.username})
-                response_data.update({'created': created})
-            else:
+            if not recovered_addr == user_address:
                 return Response(
                     data={"user_signature": "User signature doesn't match `user_address`"},
                     status=status.HTTP_400_BAD_REQUEST,
                 )
+
+            user, created = User.objects.get_or_create(
+                username=recovered_addr,
+            )
+            login(request, user, backend="django.contrib.auth.backends.ModelBackend")
+
+            response_data.update({'is_authenticated': request.user.is_authenticated})
+            response_data.update({'username': request.user.username})
+            response_data.update({'created': created})
     return Response(data=response_data, status=status.HTTP_200_OK)
 
 
