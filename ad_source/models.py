@@ -2,10 +2,9 @@ import datetime
 from decimal import Decimal as D
 
 from django.contrib.auth.models import User
-from django.core.cache import cache
 from django.core import validators
+from django.core.cache import cache
 from django.db import models
-from django.utils import timezone
 
 from . import managers
 from .management.commands.fetch_eth_price import CACHE_KEY as FETCH_ETH_PRICE_CACHE_KEY
@@ -21,15 +20,18 @@ class Task(models.Model):
 
     title = models.CharField("Title", max_length=100)
     description = models.TextField("Description", max_length=100)
-    chain = models.CharField(max_length=15, choices=CHAIN_CHOICES, default=GOERLI)
+    chain = models.CharField("Chain", max_length=15, choices=CHAIN_CHOICES, default=GOERLI)
     website_link = models.CharField("Website Link", max_length=200, validators=[validators.URLValidator])
+    contract_address = models.CharField("Contract address", max_length=42)
     reward_per_click = models.DecimalField("Reward per click", max_digits=9, decimal_places=3)  # ETH but shown as USD
     og_image_link = models.URLField("OpenGraph Image Path", max_length=200, blank=True, null=True)
     spend_daily = models.DecimalField("Max budget to spend per day", max_digits=9, decimal_places=3)
     time_duration = models.DurationField("Time duration", default=datetime.timedelta(seconds=30))
-    created = models.DateTimeField(default=timezone.now)  # No show
-    is_active = models.BooleanField(default=True)
+    created = models.DateTimeField("Created", auto_now_add=True)  # No show
+    modified = models.DateTimeField("Modified", auto_now=True)  # No show
+    is_active = models.BooleanField("Is active", default=True)
     user = models.ForeignKey(User, related_name='tasks', on_delete=models.DO_NOTHING)
+    warning_message = models.CharField("Warning message", max_length=100, blank=True)
 
     objects = managers.TaskManager()
 
