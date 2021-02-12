@@ -13,10 +13,16 @@ class RewardViewSetTestCase(APITestCase):
     def setUp(self) -> None:
         self.task = models.Task.objects.get(id=1)
         self.url = reverse('reward_view-list', kwargs={'task_id': self.task.id})
+        self.admin = models.User.objects.get(username='admin')
 
     @patch('web3.eth.Eth.sendRawTransaction')
     @patch('ad_source.view_sets.Web3.toChecksumAddress')
     def test_create_reward(self, w3_checksum_mock, w3_send_transaction_mock):
+        answer = models.Answer.objects.create(
+            user=self.admin,
+            task=self.task,
+        )
+        self.task.answers.add(answer)
         web3_checksum_side_effects = {
             'admin': '0xDd2179e8D8755f810CdAe4a474F7c53F371FbB6A',
         }
@@ -41,3 +47,12 @@ class RewardViewSetTestCase(APITestCase):
         self.assertEqual(response.json(), {"error": "Reward already created"})
         self.assertEqual(w3_checksum_mock.call_count, 2)
         self.assertEqual(w3_send_transaction_mock.call_count, 1)
+
+    def test_create_reward_without_answers(self):
+        self.client.login(username='admin', password='admin')
+        response = self.client.post(self.url)
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+
+    def test_create_reward_unauthenticated(self):
+        response = self.client.post(self.url)
+        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)

@@ -1,3 +1,4 @@
+import logging
 import random
 
 import ethereum.utils
@@ -25,6 +26,9 @@ from .management.commands.fetch_eth_price import CACHE_KEY
 from .models import Task
 
 web3_storage = web3_providers.Web3ProviderStorage()
+
+
+logger = logging.getLogger(__name__)
 
 
 class TaskViewSet(viewsets.ModelViewSet):
@@ -199,13 +203,16 @@ class UserTasks(views.APIView):
         return Response(data=serializer.data, status=status.HTTP_200_OK)
 
 
-class RewardViewSet(viewsets.ModelViewSet):
+class RewardViewSet(mixins.CreateModelMixin, mixins.ListModelMixin, viewsets.GenericViewSet):
     authentication_classes = [authentication.CsrfExemptSessionAuthentication, BasicAuthentication]
     queryset = models.Reward.objects.all()
 
     def create(self, request, *args, **kwargs):
         task_id = kwargs['task_id']
         task = get_object_or_404(models.Task, pk=task_id)
+        if request.user.id not in task.answers.values_list('user_id', flat=True):
+            data = {"error": "User didn't answer the task"}
+            return Response(data=data, status=status.HTTP_400_BAD_REQUEST)
         reward, created = models.Reward.objects.get_or_create(
             receiver=request.user,
             task=task,
@@ -241,6 +248,10 @@ class RewardViewSet(viewsets.ModelViewSet):
                 "error": "Reward already created"
             }
             return Response(data=data, status=status.HTTP_400_BAD_REQUEST)
+
+    def list(self, request, *args, **kwargs):
+        logger.error(f"GET on /task/{kwargs.get('task_id')}/reward. {request.user}")
+        return exceptions.bad_request(request, exception=None)
 
 
 class ServerConfigViewSet(mixins.ListModelMixin, viewsets.GenericViewSet):
