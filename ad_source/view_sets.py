@@ -195,7 +195,9 @@ class UserTasks(views.APIView):
 
     def get(self, request):
         tasks = Task.objects.filter(user=request.user)
-        serializer = serializers.TaskSerializer(instance=tasks, context={'request': request}, many=True)
+        contract_address = request.query_params.get('contract_address')
+        filtered_tasks = tasks.filter(contract_address=contract_address)
+        serializer = serializers.TaskSerializer(instance=filtered_tasks, context={'request': request}, many=True)
         return Response(data=serializer.data, status=status.HTTP_200_OK)
 
 
