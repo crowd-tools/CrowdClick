@@ -93,6 +93,7 @@ class TaskSerializer(serializers.HyperlinkedModelSerializer):
             'time_duration',
             'questions',
             'warning_message',
+            'is_active'
         ]
 
 
