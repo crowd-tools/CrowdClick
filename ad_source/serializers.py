@@ -65,7 +65,7 @@ class TaskSerializer(serializers.HyperlinkedModelSerializer):
             if og.response.status_code != status.HTTP_200_OK:
                 message = f'Website {website_link} responded with status code: {og.response.status_code}'
                 L.warning(message)
-                raise serializers.ValidationError({'website_link': f'{message}. Has to be 200'})
+                # raise serializers.ValidationError({'website_link': f'{message}. Has to be 200'})
             attrs.update({
                 'og_image_link': og.image,
                 'website_link': og.RESOLVED_URL or website_link,
