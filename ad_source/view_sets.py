@@ -192,12 +192,11 @@ class Logout(views.APIView):
 class UserTasks(views.APIView):
     queryset = models.Task.objects.all()
     serializer_class = serializers.TaskSerializer
+    permission_classes = [permissions.IsAuthenticated]
 
-    def get(self, request):
-        tasks = Task.objects.filter(user=request.user)
-        contract_address = request.query_params.get('contract_address')
-        filtered_tasks = tasks.filter(contract_address=contract_address)
-        serializer = serializers.TaskSerializer(instance=filtered_tasks, context={'request': request}, many=True)
+    def get(self, request, *, contract_address: str):
+        tasks = Task.objects.filter(user=request.user, contract_address=contract_address)
+        serializer = serializers.TaskSerializer(instance=tasks, context={'request': request}, many=True)
         return Response(data=serializer.data, status=status.HTTP_200_OK)
 
 

@@ -26,5 +26,5 @@ urlpatterns = [
     path('api/', include(router.urls)),
     path(r'api/auth/', view_sets.auth_view, name='auth_view'),
     path(r'api/auth/logout/', view_sets.Logout.as_view(), name='logout_view'),
-    path(r'api/user/tasks/', view_sets.UserTasks.as_view(), name='user_tasks_view')
+    path(r'api/user/tasks/<str:contract_address>/', view_sets.UserTasks.as_view(), name='user_tasks_view')
 ]

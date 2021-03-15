@@ -6,6 +6,7 @@
       "website_link": "http://example.com",
       "title": "Check our site",
       "description": "Awesome site. Go check",
+      "contract_address": "0xdeadc0dedeadc0de",
       "chain": "goerli",
       "og_image_link": "https://via.placeholder.com/300x200.png",
       "reward_per_click": 1,
@@ -23,6 +24,7 @@
     "fields": {
       "website_link": "http://todo.com",
       "title": "Not active task",
+      "contract_address": "0xdeadbeefdeadbeef",
       "chain": "mumbai",
       "description": "Not active task. Go check",
       "reward_per_click": 1,

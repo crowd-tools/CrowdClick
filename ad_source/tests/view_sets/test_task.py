@@ -104,3 +104,24 @@ class TestTaskView(APITestCase):
         data = response.json()
         self.assertEqual(response.status_code, 201)
         self.assertEqual('Website has strict X-Frame-Options: deny', data['warning_message'])
+
+
+class TestUserTaskView(APITestCase):
+    fixtures = ['0000_users', '0001_task', '0002_question', '0003_options']
+
+    def test_list_user_tasks(self):
+        self.client.login(username='admin', password='admin')
+        response = self.client.get(
+            reverse('user_tasks_view', kwargs={'contract_address': '0xdeadc0dedeadc0de'})
+        )
+        self.assertEqual(response.status_code, 200)
+        data = response.json()
+        for task in data:
+            self.assertEqual(task['contract_address'], '0xdeadc0dedeadc0de')
+            self.assertEqual(task['user']['username'], 'admin')
+
+    def test_list_user_tasks_forbidden(self):
+        response = self.client.get(
+            reverse('user_tasks_view', kwargs={'contract_address': '0xdeadc0dedeadc0de'})
+        )
+        self.assertEqual(response.status_code, 403)
