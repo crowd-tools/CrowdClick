@@ -33,10 +33,20 @@ logger = logging.getLogger(__name__)
 
 class TaskViewSet(viewsets.ModelViewSet):
     authentication_classes = [authentication.CsrfExemptSessionAuthentication, BasicAuthentication]
-    queryset = models.Task.objects.all()
     permission_classes = [permissions.IsAuthenticatedOrReadOnly]
     serializer_class = serializers.TaskSerializer
     filterset_class = filters.TaskFilter
+
+    def get_queryset(self):
+        return models.Task.objects.active_for_user(self.request.user)
+
+    def create(self, request, *args, **kwargs):
+        serializer = serializers.TaskSerializer(data=request.data, context={'request': request})
+        if serializer.is_valid():
+            serializer.save(user=request.user)
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        else:
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
     @action(methods=['post'], detail=True, url_path='answer',
             url_name='task_answer', serializer_class=serializers.AnswerSerializer)
@@ -61,14 +71,6 @@ class TaskViewSet(viewsets.ModelViewSet):
         serializer = serializers.AnswerSerializer(data=request.data, context={'request': request})
         if serializer.is_valid():
             serializer.save(task=task, user=request.user)
-            return Response(serializer.data, status=status.HTTP_201_CREATED)
-        else:
-            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-
-    def create(self, request, *args, **kwargs):
-        serializer = serializers.TaskSerializer(data=request.data, context={'request': request})
-        if serializer.is_valid():
-            serializer.save(user=request.user)
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         else:
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
@@ -128,7 +130,7 @@ def auth_view(request):
             response_data.update({'nonce': nonce})
             request.session['login_nonce'] = nonce
     elif request.method == 'POST':
-        if settings.DEBUG:
+        if settings.DEBUG:  # pragma: no cover
             # Allow username/password auth in debug mode
             if 'username' in request.data and 'password' in request.data:
                 username = request.data['username']
