@@ -19,6 +19,7 @@ class TestAnswerView(APITestCase):
 
     def setUp(self):
         self.url = reverse('task_view-task_answer', kwargs={'pk': 1})
+        self.list_url = reverse('task_view-list')
 
     def test_create_answer_anon(self):
         response = self.client.post(self.url, data=self.ANSWER_DATA)
@@ -26,9 +27,15 @@ class TestAnswerView(APITestCase):
 
     def test_create_answer_admin(self):
         self.client.login(username='admin', password='admin')
+        response = self.client.get(self.list_url)
+        data = response.json()
+        self.assertEqual(data['count'], 2)
         response = self.client.post(self.url, data=self.ANSWER_DATA)
         self.assertEqual(response.status_code, 201)
         self.assertEqual(response.data['user']['username'], 'admin')
+        response = self.client.get(self.list_url)
+        data = response.json()
+        self.assertEqual(data['count'], 1)
 
     def test_create_answer_task_id_not_int(self):
         self.client.login(username='admin', password='admin')
