@@ -38,7 +38,7 @@ class Task(models.Model):
     class Meta:
         verbose_name_plural = "Task"
 
-    def __str__(self):
+    def __str__(self):  # pragma: no cover
         if self.title:
             return f"Task({self.title})"
         return "Task"
@@ -65,7 +65,7 @@ class Question(models.Model):
     class Meta:
         verbose_name_plural = "   Question"
 
-    def __str__(self):
+    def __str__(self):  # pragma: no cover
         return f"Question({self.title})"
 
 
@@ -78,7 +78,7 @@ class Option(models.Model):
     class Meta:
         verbose_name_plural = "  Option"
 
-    def __str__(self):
+    def __str__(self):  # pragma: no cover
         return f"Option({self.title})"
 
 
@@ -91,7 +91,7 @@ class Answer(models.Model):
     class Meta:
         verbose_name_plural = " Answer"
 
-    def __str__(self):
+    def __str__(self):  # pragma: no cover
         return f'Answer({self.task}, user={self.user})'
 
     def answered_questions(self):
