@@ -10,7 +10,7 @@ from web3.types import ENS
 
 from . import contract
 
-if typing.TYPE_CHECKING:
+if typing.TYPE_CHECKING:  # pragma: no cover
     from crowdclick.settings.defaults import web3_config_namedtuple
 
 
@@ -27,12 +27,12 @@ class Web3ProviderStorage(dict):
     def __missing__(self, key):
         config: web3_config_namedtuple = settings.WEB3_CONFIG[key]
 
-        if key not in settings.WEB3_CONFIG:
+        if key not in settings.WEB3_CONFIG:  # pragma: no cover
             raise ImproperlyConfigured(f"Requested Web3 provider {key} but \
             is missing in settings.WEB3_CONFIG")
         if settings.TEST:
             provider = Web3(Web3.EthereumTesterProvider())
-        else:
+        else:  # pragma: no cover
             provider = Web3(Web3.HTTPProvider(config.endpoint))
 
         contract_spec = json.loads(contract.abi)
