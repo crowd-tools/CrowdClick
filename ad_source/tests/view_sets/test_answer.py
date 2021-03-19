@@ -1,4 +1,5 @@
 from django.urls import reverse
+from rest_framework import status
 from rest_framework.test import APITestCase
 
 
@@ -61,3 +62,17 @@ class TestAnswerView(APITestCase):
         data['questions'][0]['options'][0]['id'] = 5
         response = self.client.post(self.url, data=data)
         self.assertEqual(response.status_code, 404)
+
+    def test_delete_answer_admin(self):
+        self.client.login(username='admin', password='admin')
+        response = self.client.delete(self.url)
+        self.assertEqual(response.status_code, status.HTTP_405_METHOD_NOT_ALLOWED)
+
+    def test_delete_answer_user(self):
+        self.client.login(username='0xa1f765189805e0e51ac9753a9bc7d99e2b90c705', password='admin')
+        response = self.client.delete(self.url)
+        self.assertEqual(response.status_code, status.HTTP_405_METHOD_NOT_ALLOWED)
+
+    def test_delete_answer_anon(self):
+        response = self.client.delete(self.url)
+        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)

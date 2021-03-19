@@ -1,6 +1,9 @@
 from django.urls import reverse
+from rest_framework import status
 from rest_framework.test import APITestCase
 import responses
+
+from ad_source import models
 
 
 class TestTaskView(APITestCase):
@@ -41,6 +44,8 @@ class TestTaskView(APITestCase):
 
     def setUp(self):
         self.url = reverse('task_view-list')
+        self.published_task = models.Task.objects.get(pk=1)
+        self.detail_url = reverse('task_view-detail', kwargs={'pk': self.published_task.id})
 
     def test_list_task(self):
         response = self.client.get(self.url)
@@ -103,6 +108,20 @@ class TestTaskView(APITestCase):
         data = response.json()
         self.assertEqual(response.status_code, 201)
         self.assertEqual('Website has strict X-Frame-Options: deny', data['warning_message'])
+
+    def test_delete_task_admin(self):
+        self.client.login(username='admin', password='admin')
+        response = self.client.delete(self.detail_url)
+        self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
+
+    def test_delete_task_user(self):
+        self.client.login(username='0xa1f765189805e0e51ac9753a9bc7d99e2b90c705', password='admin')
+        response = self.client.delete(self.detail_url)
+        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+
+    def test_delete_task_anon(self):
+        response = self.client.delete(self.detail_url)
+        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
 
 
 class TestUserTaskView(APITestCase):

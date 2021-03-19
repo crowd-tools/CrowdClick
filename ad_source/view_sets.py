@@ -48,6 +48,14 @@ class TaskViewSet(viewsets.ModelViewSet):
         else:
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
+    def destroy(self, request, *args, **kwargs):
+        if not request.user.is_superuser:
+            obj: models.Task = self.get_object()
+            if not obj.user == request.user:
+                return Response(data={'message': "Only owner can delete task"},
+                                status=status.HTTP_403_FORBIDDEN)
+        return super(TaskViewSet, self).destroy(request, *args, **kwargs)
+
     @action(methods=['post'], detail=True, url_path='answer',
             url_name='task_answer', serializer_class=serializers.AnswerSerializer)
     def answer(self, request, pk=None):
@@ -85,17 +93,26 @@ class TaskDashboardViewSet(viewsets.ModelViewSet):
         return models.Task.objects.dashboard(user=self.request.user)
 
 
-class QuestionViewSet(viewsets.ModelViewSet):
+class QuestionViewSet(mixins.CreateModelMixin,
+                      mixins.RetrieveModelMixin,
+                      mixins.ListModelMixin,
+                      viewsets.GenericViewSet):
     queryset = models.Question.objects.all()
     serializer_class = serializers.QuestionSerializer
 
 
-class OptionViewSet(viewsets.ModelViewSet):
+class OptionViewSet(mixins.CreateModelMixin,
+                    mixins.RetrieveModelMixin,
+                    mixins.ListModelMixin,
+                    viewsets.GenericViewSet):
     queryset = models.Option.objects.all()
     serializer_class = serializers.OptionSerializer
 
 
-class AnswerViewSet(viewsets.ModelViewSet):
+class AnswerViewSet(mixins.CreateModelMixin,
+                    mixins.RetrieveModelMixin,
+                    mixins.ListModelMixin,
+                    viewsets.GenericViewSet):
     queryset = models.Answer.objects.all()
     serializer_class = serializers.AnswerSerializer
 
