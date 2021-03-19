@@ -13,9 +13,12 @@ from .management.commands.fetch_eth_price import CACHE_KEY as FETCH_ETH_PRICE_CA
 class Task(models.Model):
     GOERLI = 'goerli'
     MUMBAI = 'mumbai'
+    BINANCE_TESTNET = 'bsc_testnet'
+    BINANCE_MAINNET = 'bsc_mainnet'
     CHAIN_CHOICES = (
         (GOERLI, 'Goerli'),
         (MUMBAI, 'Mumbai'),
+        (BINANCE_TESTNET, 'bsc_testnet'),
     )
 
     title = models.CharField("Title", max_length=100)
