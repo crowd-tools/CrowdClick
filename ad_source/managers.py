@@ -11,7 +11,7 @@ class TaskManager(models.Manager):
     # TODO Manager property `spend_today` - moving window since time `created`
 
     def active_for_user(self, user):
-        # XXX Extend SQL property `is_active` - we can spend from user account + didn't exceeded `spend_daily`
+        # XXX Extend SQL property `is_active` - we can spend from user account
         filters = {}
         filters.update({"is_active": True})
         qs = self.get_queryset().filter(**filters)
