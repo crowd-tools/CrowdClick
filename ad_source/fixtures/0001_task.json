@@ -14,7 +14,6 @@
       "created": "2013-01-01 00:00:00+00:00",
       "modified": "2013-01-01 00:00:00+00:00",
       "is_active": true,
-      "spend_daily": 50,
       "user_id": 1
     }
   },
@@ -31,7 +30,6 @@
       "time_duration": "00:00:30",
       "created": "2013-01-01 00:00:00+00:00",
       "modified": "2013-01-01 00:00:00+00:00",
-      "spend_daily": 50,
       "user_id": 2
     }
   }
