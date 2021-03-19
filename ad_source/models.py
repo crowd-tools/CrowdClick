@@ -25,7 +25,6 @@ class Task(models.Model):
     contract_address = models.CharField("Contract address", max_length=42)
     reward_per_click = models.DecimalField("Reward per click", max_digits=9, decimal_places=3)  # ETH but shown as USD
     og_image_link = models.URLField("OpenGraph Image Path", max_length=200, blank=True, null=True)
-    spend_daily = models.DecimalField("Max budget to spend per day", max_digits=9, decimal_places=3)
     time_duration = models.DurationField("Time duration", default=datetime.timedelta(seconds=30))
     created = models.DateTimeField("Created", auto_now_add=True)  # No show
     modified = models.DateTimeField("Modified", auto_now=True)  # No show
