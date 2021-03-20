@@ -1,4 +1,4 @@
-import json
+import logging
 import random
 
 import ethereum.utils
@@ -7,75 +7,38 @@ from django.conf import settings
 from django.contrib.auth import login, logout
 from django.contrib.auth.models import User
 from django.core.cache import cache
-from django.core.exceptions import ObjectDoesNotExist
-from django.http import HttpResponseNotFound, HttpResponseBadRequest, HttpResponseForbidden
 from django.shortcuts import get_object_or_404
-from rest_framework import permissions, status
-from rest_framework import viewsets, mixins, views
+from rest_framework import (
+    exceptions,
+    mixins,
+    permissions,
+    status,
+    views,
+    viewsets,
+)
 from rest_framework.authentication import BasicAuthentication
 from rest_framework.decorators import action, api_view, permission_classes
 from rest_framework.response import Response
 from web3 import Web3
 
-from . import authentication, contract, models, serializers, utils
+from . import authentication, filters, models, serializers, utils, web3_providers
 from .management.commands.fetch_eth_price import CACHE_KEY
 from .models import Task
 
-w3 = Web3(Web3.HTTPProvider(settings.MATIC_MUMBAI_ENDPOINT))
-contract_spec = json.loads(contract.abi)
-contract_abi = contract_spec["abi"]
-contract_instance = w3.eth.contract(abi=contract_abi, address=settings.CONTRACT_INSTANCE_ADDRESS)
+web3_storage = web3_providers.Web3ProviderStorage()
+
+
+logger = logging.getLogger(__name__)
 
 
 class TaskViewSet(viewsets.ModelViewSet):
     authentication_classes = [authentication.CsrfExemptSessionAuthentication, BasicAuthentication]
-    queryset = models.Task.objects.all()
+    permission_classes = [permissions.IsAuthenticatedOrReadOnly]
     serializer_class = serializers.TaskSerializer
+    filterset_class = filters.TaskFilter
 
     def get_queryset(self):
-        return models.Task.objects.active(user=self.request.user)
-
-    @action(methods=['post'], detail=True, url_path='answer',
-            url_name='task_answer', serializer_class=serializers.AnswerSerializer)
-    def answer(self, request, pk=None):
-        if not bool(request.user and request.user.is_authenticated):
-            return HttpResponseForbidden(content=b"User is not authenticated")
-        try:
-            task_id = int(pk)
-        except ValueError:
-            return HttpResponseBadRequest(content=b'Task id %s is not a number' % pk.encode('utf-8'))
-        try:
-            task = Task.objects.get(pk=task_id)
-        except ObjectDoesNotExist:
-            return HttpResponseNotFound(content=b"Task id %d wasn't found" % task_id)
-        for question in request.data['questions']:
-            if question['id'] not in task.questions.values_list('id', flat=True):
-                return HttpResponseNotFound(
-                    content=b"Question id %d wasn't found in task %d" % (question['id'], task_id)
-                )
-            for option in question['options']:
-                if option['id'] not in task.questions.filter(id=question['id']).values_list('options', flat=True):
-                    return HttpResponseNotFound(
-                        content=b"Option id %d wasn't found for question %d in task %d" % (
-                            option['id'], question['id'], task_id
-                        )
-                    )
-        request.data.update({"task": task, "user": request.user})
-        serializer = serializers.AnswerSerializer(data=request.data, context={'request': request})
-        if serializer.is_valid():
-            serializer.save(task=task, user=request.user)
-            return Response(serializer.data, status=status.HTTP_201_CREATED)
-        else:
-            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-
-    @action(methods=['get'], detail=False, url_path='dashboard',
-            url_name='task_dashboard', serializer_class=serializers.TaskDashboardSerializer)
-    def dashboard(self, request):
-        if not bool(request.user and request.user.is_authenticated):
-            return HttpResponseForbidden(content=b"User is not authenticated")
-        tasks = models.Task.objects.dashboard(user=request.user)
-        serializer = serializers.TaskDashboardSerializer(instance=tasks, context={'request': request}, many=True)
-        return Response(serializer.data, status=status.HTTP_200_OK)
+        return models.Task.objects.active_for_user(self.request.user)
 
     def create(self, request, *args, **kwargs):
         serializer = serializers.TaskSerializer(data=request.data, context={'request': request})
@@ -85,18 +48,71 @@ class TaskViewSet(viewsets.ModelViewSet):
         else:
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
+    def destroy(self, request, *args, **kwargs):
+        if not request.user.is_superuser:
+            obj: models.Task = self.get_object()
+            if not obj.user == request.user:
+                return Response(data={'message': "Only owner can delete task"},
+                                status=status.HTTP_403_FORBIDDEN)
+        return super(TaskViewSet, self).destroy(request, *args, **kwargs)
 
-class QuestionViewSet(viewsets.ModelViewSet):
+    @action(methods=['post'], detail=True, url_path='answer',
+            url_name='task_answer', serializer_class=serializers.AnswerSerializer)
+    def answer(self, request, pk=None):
+        try:
+            task_id = int(pk)
+        except ValueError:
+            raise exceptions.ValidationError(f"Task id {pk} is not a number")
+        try:
+            task = Task.objects.get(pk=task_id)
+        except Task.DoesNotExist:
+            raise exceptions.NotFound(f"Task id {task_id} wasn't found")
+        for question in request.data['questions']:
+            if question['id'] not in task.questions.values_list('id', flat=True):
+                raise exceptions.NotFound(f"Question id {question['id']} wasn't found in task {task_id}")
+            for option in question['options']:
+                if option['id'] not in task.questions.filter(id=question['id']).values_list('options', flat=True):
+                    raise exceptions.NotFound(
+                        f"Option id {option['id']} wasn't found for question {option['id']} in task {task_id}"
+                    )
+        request.data.update({"task": task, "user": request.user})
+        serializer = serializers.AnswerSerializer(data=request.data, context={'request': request})
+        if serializer.is_valid():
+            serializer.save(task=task, user=request.user)
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        else:
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+class TaskDashboardViewSet(viewsets.ModelViewSet):
+    serializer_class = serializers.TaskDashboardSerializer
+    permission_classes = [permissions.IsAuthenticated]
+    filterset_class = filters.TaskFilter
+
+    def get_queryset(self):
+        return models.Task.objects.dashboard(user=self.request.user)
+
+
+class QuestionViewSet(mixins.CreateModelMixin,
+                      mixins.RetrieveModelMixin,
+                      mixins.ListModelMixin,
+                      viewsets.GenericViewSet):
     queryset = models.Question.objects.all()
     serializer_class = serializers.QuestionSerializer
 
 
-class OptionViewSet(viewsets.ModelViewSet):
+class OptionViewSet(mixins.CreateModelMixin,
+                    mixins.RetrieveModelMixin,
+                    mixins.ListModelMixin,
+                    viewsets.GenericViewSet):
     queryset = models.Option.objects.all()
     serializer_class = serializers.OptionSerializer
 
 
-class AnswerViewSet(viewsets.ModelViewSet):
+class AnswerViewSet(mixins.CreateModelMixin,
+                    mixins.RetrieveModelMixin,
+                    mixins.ListModelMixin,
+                    viewsets.GenericViewSet):
     queryset = models.Answer.objects.all()
     serializer_class = serializers.AnswerSerializer
 
@@ -131,6 +147,18 @@ def auth_view(request):
             response_data.update({'nonce': nonce})
             request.session['login_nonce'] = nonce
     elif request.method == 'POST':
+        if settings.DEBUG:  # pragma: no cover
+            # Allow username/password auth in debug mode
+            if 'username' in request.data and 'password' in request.data:
+                username = request.data['username']
+                password = request.data['password']
+                user = get_object_or_404(User, username=username)
+                if user.check_password(password):
+                    login(request, user, backend="django.contrib.auth.backends.ModelBackend")
+                    response_data.update({'is_authenticated': request.user.is_authenticated})
+                    response_data.update({'username': request.user.username})
+                    return Response(data=response_data, status=status.HTTP_200_OK)
+
         # Authenticate user by signed `nonce` == `user_signature` and verify against `user_address`
         login_nonce = request.session.pop('login_nonce', None)
         if not login_nonce:
@@ -159,19 +187,20 @@ def auth_view(request):
             recovered_addr = '0x' + sha3.keccak_256(
                 ethereum.utils.ecrecover_to_pub(buffered_hashed_msg, *vrs)
             ).hexdigest()[24:]
-            if recovered_addr == user_address:
-                user, created = User.objects.get_or_create(
-                    username=recovered_addr,
-                )
-                login(request, user, backend="django.contrib.auth.backends.ModelBackend")
-                response_data.update({'is_authenticated': request.user.is_authenticated})
-                response_data.update({'username': request.user.username})
-                response_data.update({'created': created})
-            else:
+            if not recovered_addr == user_address:
                 return Response(
                     data={"user_signature": "User signature doesn't match `user_address`"},
                     status=status.HTTP_400_BAD_REQUEST,
                 )
+
+            user, created = User.objects.get_or_create(
+                username=recovered_addr,
+            )
+            login(request, user, backend="django.contrib.auth.backends.ModelBackend")
+
+            response_data.update({'is_authenticated': request.user.is_authenticated})
+            response_data.update({'username': request.user.username})
+            response_data.update({'created': created})
     return Response(data=response_data, status=status.HTTP_200_OK)
 
 
@@ -183,13 +212,27 @@ class Logout(views.APIView):
         return Response(status=status.HTTP_200_OK)
 
 
-class RewardViewSet(viewsets.ModelViewSet):
+class UserTasks(views.APIView):
+    queryset = models.Task.objects.all()
+    serializer_class = serializers.TaskSerializer
+    permission_classes = [permissions.IsAuthenticated]
+
+    def get(self, request, *, contract_address: str):
+        tasks = Task.objects.filter(user=request.user, contract_address=contract_address)
+        serializer = serializers.TaskSerializer(instance=tasks, context={'request': request}, many=True)
+        return Response(data=serializer.data, status=status.HTTP_200_OK)
+
+
+class RewardViewSet(mixins.CreateModelMixin, mixins.ListModelMixin, viewsets.GenericViewSet):
     authentication_classes = [authentication.CsrfExemptSessionAuthentication, BasicAuthentication]
     queryset = models.Reward.objects.all()
 
     def create(self, request, *args, **kwargs):
         task_id = kwargs['task_id']
         task = get_object_or_404(models.Task, pk=task_id)
+        if request.user.id not in task.answers.values_list('user_id', flat=True):
+            data = {"error": "User didn't answer the task"}
+            return Response(data=data, status=status.HTTP_400_BAD_REQUEST)
         reward, created = models.Reward.objects.get_or_create(
             receiver=request.user,
             task=task,
@@ -198,21 +241,23 @@ class RewardViewSet(viewsets.ModelViewSet):
                 'amount': task.reward_per_click,
             }
         )
-        checksummed_sender = Web3.toChecksumAddress(reward.sender.username)
-        checksummed_receiver = Web3.toChecksumAddress(reward.receiver.username)
         if created:
-            transaction = contract_instance.functions.forwardRewards(
+            checksummed_sender = Web3.toChecksumAddress(reward.sender.username)
+            checksummed_receiver = Web3.toChecksumAddress(reward.receiver.username)
+
+            w3_provider: web3_providers.Web3Provider = web3_storage[task.chain]
+            transaction = w3_provider.contract.functions.forwardRewards(
                 checksummed_receiver,  # To
                 checksummed_sender,  # From
                 task.website_link  # task's website url
             ).buildTransaction({
-                'chainId': 80001,
-                'gas': 100000,
-                'gasPrice': w3.toWei('1', 'gwei'),
-                'nonce': w3.eth.getTransactionCount(settings.ACCOUNT_OWNER_PUBLIC_KEY)
+                'chainId': w3_provider.chain_id,
+                'gas': w3_provider.default_gas_fee,
+                'gasPrice': w3_provider.web3.toWei('1', 'gwei'),
+                'nonce': w3_provider.web3.eth.getTransactionCount(w3_provider.public_key)
             })
-            txn_signed = w3.eth.account.signTransaction(transaction, private_key=settings.ACCOUNT_OWNER_PRIVATE_KEY)
-            tx_hash_hex = w3.eth.sendRawTransaction(txn_signed.rawTransaction)  # tx_hash
+            txn_signed = w3_provider.web3.eth.account.sign_transaction(transaction, private_key=w3_provider.private_key)
+            tx_hash_hex = w3_provider.web3.eth.sendRawTransaction(txn_signed.rawTransaction)  # tx_hash
             tx_hash = tx_hash_hex.hex()
             data = {
                 "tx_hash": tx_hash
@@ -223,3 +268,15 @@ class RewardViewSet(viewsets.ModelViewSet):
                 "error": "Reward already created"
             }
             return Response(data=data, status=status.HTTP_400_BAD_REQUEST)
+
+    def list(self, request, *args, **kwargs):
+        logger.error(f"GET on /task/{kwargs.get('task_id')}/reward. {request.user}")
+        return exceptions.bad_request(request, exception=None)
+
+
+class ServerConfigViewSet(mixins.ListModelMixin, viewsets.GenericViewSet):
+    def list(self, request, *args, **kwargs):
+        data = {
+            'public_key': settings.ACCOUNT_OWNER_PUBLIC_KEY
+        }
+        return Response(data)

@@ -14,6 +14,8 @@ import os
 import sys
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
+from collections import namedtuple
+
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
 
@@ -28,6 +30,7 @@ DEBUG = True
 
 ALLOWED_HOSTS = ["*"]
 
+TEST = ('test' in sys.argv) or ('unittest' in sys.argv)
 
 # Application definition
 
@@ -40,6 +43,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
 
     'rest_framework',
+    'django_filters',
     'drf_yasg',
 
     'ad_source',
@@ -86,6 +90,9 @@ DJANGO_ADMIN_URL = 'admin'
 
 # Rest Framework https://www.django-rest-framework.org/
 REST_FRAMEWORK = {
+    'DEFAULT_FILTER_BACKENDS': (
+        'django_filters.rest_framework.DjangoFilterBackend',
+    ),
     # Use Django's standard `django.contrib.auth` permissions,
     # or allow read-only access for unauthenticated users.
     'DEFAULT_PERMISSION_CLASSES': [
@@ -106,10 +113,29 @@ AUTH_NONCE_CHOICES = '0123456789abcdef'
 AUTH_NONCE_LENGTH = 32
 LOGIN_REDIRECT_URL = '/'
 
-INFURA_ROPSTEN_ENDPOINT = ''
-MATIC_MUMBAI_ENDPOINT = 'https://rpc-mumbai.matic.today'
-CONTRACT_INSTANCE_ADDRESS = '0xA3d2C3F78652B93311363bBDEc3d16867F6D5C29'
-ACCOUNT_OWNER_PUBLIC_KEY = '0xDd2179e8D8755f810CdAe4a474F7c53F371FbB6A'
+web3_config_namedtuple = namedtuple('Web3_Config', [
+    'endpoint', 'contract_address', 'chain_id', 'public_key', 'private_key', 'default_gas_fee'
+])
+WEB3_CONFIG = {
+    'mumbai': web3_config_namedtuple(
+        endpoint='https://rpc-mumbai.matic.today',
+        contract_address='0x81c4DCbBc60762923e4Ba3320e52f1E4201b989F',
+        chain_id=80001,
+        public_key='0xDd2179e8D8755f810CdAe4a474F7c53F371FbB6A',
+        private_key='a' * 64,
+        default_gas_fee=100000,
+    ),
+    'goerli': web3_config_namedtuple(
+        endpoint='https://goerli.infura.io/v3/' + 'a' * 32,
+        contract_address='0xC0499652EAb163462d3f4d4EEB2FE30fd181e6db',
+        chain_id=5,
+        public_key='0xDd2179e8D8755f810CdAe4a474F7c53F371FbB6A',
+        private_key='a' * 64,
+        default_gas_fee=2000000,
+    )
+}
+
+ACCOUNT_OWNER_PUBLIC_KEY = '0xDd2179e8D8755f810CdAe4a474F7c53F371FbB6A'  # ServerConfigViewSet
 
 # Database
 # https://docs.djangoproject.com/en/2.2/ref/settings/#databases

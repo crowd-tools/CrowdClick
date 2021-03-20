@@ -4,12 +4,14 @@ from django.db.models import Count
 
 class TaskManager(models.Manager):
     def get_queryset(self):
-        return super(TaskManager, self).get_queryset().prefetch_related('questions', 'questions__options')
+        return super(TaskManager, self).get_queryset().prefetch_related(
+            'questions', 'questions__options'
+        ).order_by('-reward_per_click')
 
     # TODO Manager property `spend_today` - moving window since time `created`
 
-    def active(self, user):
-        # XXX Extend SQL property `is_active` - we can spend from user account + didn't exceeded `spend_daily`
+    def active_for_user(self, user):
+        # XXX Extend SQL property `is_active` - we can spend from user account
         filters = {}
         filters.update({"is_active": True})
         qs = self.get_queryset().filter(**filters)

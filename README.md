@@ -1,7 +1,7 @@
 # CrowdClick
 
 [![contributions](https://img.shields.io/badge/contributions-welcome-brightgreen)](https://github.com/crowd-tools/CrowdClick/pulls)
-[![Build Status](https://travis-ci.com/crowd-tools/CrowdClick.svg?branch=master)](https://travis-ci.com/crowd-tools/CrowdClick)
+[![Build Status](https://github.com/crowd-tools/CrowdClick/actions/workflows/crowdclick.yml/badge.svg)](https://github.com/crowd-tools/CrowdClick/actions/workflows/crowdclick.yml)
 [![codecov](https://codecov.io/gh/crowd-tools/CrowdClick/branch/master/graph/badge.svg)](https://codecov.io/gh/crowd-tools/CrowdClick)
 [![apiary](https://img.shields.io/badge/apiary-doc-blue)](https://crowdclick.docs.apiary.io/)
 
