@@ -1,0 +1,26 @@
+# This workflow will trigger staging server to pull and apply latest changes
+
+name: CrowdClick Stage Deploy
+
+on:
+  push:
+    branches: [ stage ]
+
+jobs:
+  build:
+
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: [3.9]
+
+    steps:
+      - uses: actions/checkout@v1
+      - name: Deploy to Stage server
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ secrets.SERVER_IP }}
+          username: ${{ secrets.SERVER_USERNAME }}
+          key: ${{ secrets.KEY }}
+          passphrase: ${{ secrets.PASSPHRASE }}
+          script: cd ${{ secrets.PROJECT_PATH }} && ./deploy.sh

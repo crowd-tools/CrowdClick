@@ -7,6 +7,7 @@ static
 # Settings
 crowdclick/settings/local.py
 crowdclick/settings/production.py
+crowdclick/settings/stage.py
 
 # Coverage
 .coverage
