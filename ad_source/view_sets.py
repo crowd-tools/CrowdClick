@@ -7,6 +7,7 @@ from django.conf import settings
 from django.contrib.auth import login, logout
 from django.contrib.auth.models import User
 from django.core.cache import cache
+from django.db import transaction
 from django.shortcuts import get_object_or_404
 from rest_framework import (
     exceptions,
@@ -19,7 +20,6 @@ from rest_framework import (
 from rest_framework.authentication import BasicAuthentication
 from rest_framework.decorators import action, api_view, permission_classes
 from rest_framework.response import Response
-from web3 import Web3
 
 from . import authentication, filters, models, serializers, utils, web3_providers
 from .management.commands.fetch_eth_price import CACHE_KEY
@@ -230,44 +230,30 @@ class RewardViewSet(mixins.CreateModelMixin, mixins.ListModelMixin, viewsets.Gen
     def create(self, request, *args, **kwargs):
         task_id = kwargs['task_id']
         task = get_object_or_404(models.Task, pk=task_id)
-        if request.user.id not in task.answers.values_list('user_id', flat=True):
-            data = {"error": "User didn't answer the task"}
-            return Response(data=data, status=status.HTTP_400_BAD_REQUEST)
-        reward, created = models.Reward.objects.get_or_create(
-            receiver=request.user,
-            task=task,
-            defaults={
-                'sender': task.user,
-                'amount': task.reward_per_click,
-            }
-        )
-        if created:
-            checksummed_sender = Web3.toChecksumAddress(reward.sender.username)
-            checksummed_receiver = Web3.toChecksumAddress(reward.receiver.username)
-
-            w3_provider: web3_providers.Web3Provider = web3_storage[task.chain]
-            transaction = w3_provider.contract.functions.forwardRewards(
-                checksummed_receiver,  # To
-                checksummed_sender,  # From
-                task.website_link  # task's website url
-            ).buildTransaction({
-                'chainId': w3_provider.chain_id,
-                'gas': w3_provider.default_gas_fee,
-                'gasPrice': w3_provider.web3.toWei('1', 'gwei'),
-                'nonce': w3_provider.web3.eth.getTransactionCount(w3_provider.public_key)
-            })
-            txn_signed = w3_provider.web3.eth.account.sign_transaction(transaction, private_key=w3_provider.private_key)
-            tx_hash_hex = w3_provider.web3.eth.sendRawTransaction(txn_signed.rawTransaction)  # tx_hash
-            tx_hash = tx_hash_hex.hex()
-            data = {
-                "tx_hash": tx_hash
-            }
-            return Response(data=data, status=status.HTTP_201_CREATED)
-        else:
-            data = {
-                "error": "Reward already created"
-            }
-            return Response(data=data, status=status.HTTP_400_BAD_REQUEST)
+        with transaction.atomic():
+            if request.user.id not in task.answers.values_list('user_id', flat=True):
+                data = {"error": "User didn't answer the task"}
+                return Response(data=data, status=status.HTTP_400_BAD_REQUEST)
+            reward, created = models.Reward.objects.get_or_create(
+                receiver=request.user,
+                task=task,
+                defaults={
+                    'sender': task.user,
+                    'amount': task.reward_per_click,
+                }
+            )
+            if created:
+                w3_provider: web3_providers.Web3Provider = web3_storage[task.chain]
+                tx_hash = w3_provider.create_reward(task, reward)
+                data = {
+                    "tx_hash": tx_hash
+                }
+                return Response(data=data, status=status.HTTP_201_CREATED)
+            else:
+                data = {
+                    "error": "Reward already created"
+                }
+                return Response(data=data, status=status.HTTP_400_BAD_REQUEST)
 
     def list(self, request, *args, **kwargs):
         logger.error(f"GET on /task/{kwargs.get('task_id')}/reward. {request.user}")

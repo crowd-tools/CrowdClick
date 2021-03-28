@@ -8,8 +8,6 @@ class TaskManager(models.Manager):
             'questions', 'questions__options'
         ).order_by('-reward_per_click')
 
-    # TODO Manager property `spend_today` - moving window since time `created`
-
     def active_for_user(self, user):
         # XXX Extend SQL property `is_active` - we can spend from user account
         filters = {}
