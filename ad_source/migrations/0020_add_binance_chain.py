@@ -6,13 +6,13 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('ad_source', '0018_task_contract_address'),
+        ('ad_source', '0019_remove_task_spend_daily'),
     ]
 
     operations = [
         migrations.AlterField(
             model_name='task',
             name='chain',
-            field=models.CharField(choices=[('goerli', 'Goerli'), ('mumbai', 'Mumbai'), ('bsc_testnet', 'bsc_testnet')], default='goerli', max_length=15, verbose_name='Chain'),
+            field=models.CharField(choices=[('goerli', 'Goerli'), ('mumbai', 'Mumbai'), ('bsc_testnet', 'bsc_testnet'), ('bsc_mainnet', 'bsc_mainnet')], default='goerli', max_length=15, verbose_name='Chain'),
         ),
     ]

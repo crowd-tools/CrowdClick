@@ -19,6 +19,7 @@ class Task(models.Model):
         (GOERLI, 'Goerli'),
         (MUMBAI, 'Mumbai'),
         (BINANCE_TESTNET, 'bsc_testnet'),
+        (BINANCE_MAINNET, 'bsc_mainnet'),
     )
 
     title = models.CharField("Title", max_length=100)
