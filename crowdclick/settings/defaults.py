@@ -107,6 +107,7 @@ REST_FRAMEWORK = {
     'TEST_REQUEST_DEFAULT_FORMAT': 'json',
 }
 
+ACCOUNT_OWNER_PUBLIC_KEY = '0x9c76e3A23A87f624aAdEff7ca5e74103476eD11C'  # ServerConfigViewSet
 
 # Web3
 AUTH_NONCE_CHOICES = '0123456789abcdef'
@@ -119,23 +120,30 @@ web3_config_namedtuple = namedtuple('Web3_Config', [
 WEB3_CONFIG = {
     'mumbai': web3_config_namedtuple(
         endpoint='https://rpc-mumbai.matic.today',
-        contract_address='0x81c4DCbBc60762923e4Ba3320e52f1E4201b989F',
+        contract_address='0xb312aC99b9207286addf566B5BB08f7552aF0b15',
         chain_id=80001,
-        public_key='0xDd2179e8D8755f810CdAe4a474F7c53F371FbB6A',
+        public_key=ACCOUNT_OWNER_PUBLIC_KEY,
         private_key='a' * 64,
         default_gas_fee=100000,
     ),
     'goerli': web3_config_namedtuple(
         endpoint='https://goerli.infura.io/v3/' + 'a' * 32,
-        contract_address='0xC0499652EAb163462d3f4d4EEB2FE30fd181e6db',
+        contract_address='0x5f9A718D919463443A74A67Deb1aF056790C0ca0',
         chain_id=5,
-        public_key='0xDd2179e8D8755f810CdAe4a474F7c53F371FbB6A',
+        public_key=ACCOUNT_OWNER_PUBLIC_KEY,
+        private_key='a' * 64,
+        default_gas_fee=2000000,
+    ),
+    'bsc_testnet': web3_config_namedtuple(
+        endpoint='https://data-seed-prebsc-1-s1.binance.org:8545',
+        contract_address='',
+        chain_id=97,
+        public_key=ACCOUNT_OWNER_PUBLIC_KEY,
         private_key='a' * 64,
         default_gas_fee=2000000,
     )
 }
 
-ACCOUNT_OWNER_PUBLIC_KEY = '0xDd2179e8D8755f810CdAe4a474F7c53F371FbB6A'  # ServerConfigViewSet
 
 # Database
 # https://docs.djangoproject.com/en/2.2/ref/settings/#databases
