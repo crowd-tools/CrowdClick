@@ -33,6 +33,9 @@ class Task(models.Model):
     created = models.DateTimeField("Created", auto_now_add=True)  # No show
     modified = models.DateTimeField("Modified", auto_now=True)  # No show
     is_active = models.BooleanField("Is active", default=True)
+    is_active_web3 = models.BooleanField("Is active on Web3", default=True)
+    remaining_balance = models.DecimalField(
+        "Remaining balance for task", max_digits=9, decimal_places=3)  # ETH but shown as USD
     user = models.ForeignKey(User, related_name='tasks', on_delete=models.DO_NOTHING)
     warning_message = models.CharField("Warning message", max_length=100, blank=True)
 
@@ -51,6 +54,12 @@ class Task(models.Model):
         eth_to_usd = cache.get(FETCH_ETH_PRICE_CACHE_KEY)
         if eth_to_usd:
             return self.reward_per_click * D(str(eth_to_usd))
+
+    @property
+    def remaining_balance_usd(self):
+        eth_to_usd = cache.get(FETCH_ETH_PRICE_CACHE_KEY)
+        if eth_to_usd:
+            return self.remaining_balance * D(str(eth_to_usd))
 
 
 class Question(models.Model):
