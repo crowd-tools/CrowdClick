@@ -16,7 +16,7 @@ class RewardViewSetTestCase(APITestCase):
         self.admin = models.User.objects.get(username='admin')
 
     @patch('web3.eth.Eth.sendRawTransaction')
-    @patch('ad_source.view_sets.Web3.toChecksumAddress')
+    @patch('ad_source.web3_providers.Web3.toChecksumAddress')
     def test_create_reward(self, w3_checksum_mock, w3_send_transaction_mock):
         answer = models.Answer.objects.create(
             user=self.admin,

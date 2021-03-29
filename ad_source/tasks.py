@@ -8,12 +8,14 @@ logger = logging.getLogger(__name__)
 
 
 @celery.app.task
-def update_task_is_active_balance(task: models.Task = None) -> models.Task:
+def update_task_is_active_balance(task_id: int = None) -> models.Task:
 
-    if not task:
+    if not task_id:
         task = models.Task.objects.first()
+    else:
+        task = models.Task.objects.get(id=task_id)
         # TODO Remove
-    print(f'Got task to update {task}, id: {task.id}')
+    print(f'Got task to update id: {task}')
 
     w3_provider: web3_providers.Web3Provider = web3_providers.web3_storage[task.chain]
     is_active, balance = w3_provider.check_balance(task)

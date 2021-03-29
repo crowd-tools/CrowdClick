@@ -14,6 +14,7 @@ class TestTaskView(APITestCase):
         "website_link": "does_not_exist.com",
         "contract_address": "0xdeadc0dedeadc0de",
         "reward_per_click": 0.001,
+        "remaining_balance": 1,
         "time_duration": "00:00:30",
         "questions": [
             {

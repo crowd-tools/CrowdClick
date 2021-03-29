@@ -49,7 +49,7 @@ class TaskSerializer(serializers.HyperlinkedModelSerializer):
             q = models.Question.objects.create(title=question['title'], task=task)
             for option in question['options']:
                 models.Option.objects.create(title=option['title'], question=q)
-        tasks.update_task_is_active_balance.delay(task)
+        tasks.update_task_is_active_balance.delay(task.id)
         return task
 
     def validate_website_link(self, website_link):
@@ -90,6 +90,7 @@ class TaskSerializer(serializers.HyperlinkedModelSerializer):
             'contract_address',
             'reward_per_click',
             'reward_usd_per_click',
+            'remaining_balance',
             'time_duration',
             'questions',
             'warning_message',
