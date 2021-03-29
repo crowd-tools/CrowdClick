@@ -15,6 +15,7 @@ import sys
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 from collections import namedtuple
+from datetime import timedelta
 
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
@@ -43,6 +44,8 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
 
     'rest_framework',
+    'django_celery_beat',
+    'django_celery_results',
     'django_filters',
     'drf_yasg',
 
@@ -144,6 +147,25 @@ WEB3_CONFIG = {
     )
 }
 
+# Task queue
+BROKER_URL = 'pyamqp://guest@localhost//'
+
+# Celery
+CELERY_RESULT_BACKEND = 'django-db'
+
+# CELERY_RESULT_BACKEND = 'django-cache'
+
+CELERY_BEAT_SCHEDULE = {
+    'update-task-is-active-balance': {
+        'task': 'ad_source.tasks.update_task_is_active_balance',
+        'schedule': timedelta(minutes=1),
+        'options': {
+            'expires': 60
+        }
+    },
+}
+
+ACCOUNT_OWNER_PUBLIC_KEY = '0xDd2179e8D8755f810CdAe4a474F7c53F371FbB6A'  # ServerConfigViewSet
 
 # Database
 # https://docs.djangoproject.com/en/2.2/ref/settings/#databases

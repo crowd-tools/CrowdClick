@@ -1,3 +1,4 @@
+import decimal
 import json
 import typing
 
@@ -40,8 +41,11 @@ class Web3Provider(typing.NamedTuple):
         tx_hash = tx_hash_hex.hex()
         return tx_hash
 
-    def check_balance(self):
-        ...
+    def check_balance(self, task: models.Task) -> typing.Tuple[bool, typing.Union[int, decimal.Decimal]]:
+        response = self.contract.functions.lookupTask(
+            task.website_link,
+        ).call()
+        return bool(response['isActive']), Web3.fromWei(response['currentBudget'])
 
 
 class Web3ProviderStorage(dict):
@@ -57,7 +61,7 @@ class Web3ProviderStorage(dict):
             provider = Web3(Web3.HTTPProvider(config.endpoint))
 
         contract_spec = json.loads(contract.abi)
-        contract_abi = contract_spec["abi"]
+        contract_abi = contract_spec
         contract_instance = provider.eth.contract(abi=contract_abi, address=config.contract_address)
         w3_provider = Web3Provider(
             web3=provider,
@@ -69,3 +73,6 @@ class Web3ProviderStorage(dict):
         )
         self[key] = w3_provider
         return w3_provider
+
+
+web3_storage = Web3ProviderStorage()

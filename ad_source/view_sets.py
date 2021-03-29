@@ -25,8 +25,6 @@ from . import authentication, filters, models, serializers, utils, web3_provider
 from .management.commands.fetch_eth_price import CACHE_KEY
 from .models import Task
 
-web3_storage = web3_providers.Web3ProviderStorage()
-
 
 logger = logging.getLogger(__name__)
 
@@ -243,7 +241,7 @@ class RewardViewSet(mixins.CreateModelMixin, mixins.ListModelMixin, viewsets.Gen
                 }
             )
             if created:
-                w3_provider: web3_providers.Web3Provider = web3_storage[task.chain]
+                w3_provider: web3_providers.Web3Provider = web3_providers.web3_storage[task.chain]
                 tx_hash = w3_provider.create_reward(task, reward)
                 data = {
                     "tx_hash": tx_hash
