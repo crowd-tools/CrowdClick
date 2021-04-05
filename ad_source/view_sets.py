@@ -6,7 +6,6 @@ import sha3
 from django.conf import settings
 from django.contrib.auth import login, logout
 from django.contrib.auth.models import User
-from django.core.cache import cache
 from django.db import transaction
 from django.shortcuts import get_object_or_404
 from rest_framework import (
@@ -21,10 +20,16 @@ from rest_framework.authentication import BasicAuthentication
 from rest_framework.decorators import action, api_view, permission_classes
 from rest_framework.response import Response
 
-from . import authentication, filters, models, serializers, tasks, utils, web3_providers
-from .management.commands.fetch_eth_price import CACHE_KEY
-from .models import Task
-
+from . import (
+    authentication,
+    filters,
+    helpers,
+    models,
+    serializers,
+    tasks,
+    utils,
+    web3_providers
+)
 
 logger = logging.getLogger(__name__)
 
@@ -62,8 +67,8 @@ class TaskViewSet(viewsets.ModelViewSet):
         except ValueError:
             raise exceptions.ValidationError(f"Task id {pk} is not a number")
         try:
-            task = Task.objects.get(pk=task_id)
-        except Task.DoesNotExist:
+            task = models.Task.objects.get(pk=task_id)
+        except models.Task.DoesNotExist:
             raise exceptions.NotFound(f"Task id {task_id} wasn't found")
         for question in request.data['questions']:
             if question['id'] not in task.questions.values_list('id', flat=True):
@@ -124,7 +129,7 @@ class SubscribeViewSet(mixins.CreateModelMixin, viewsets.GenericViewSet):
 class ETHMemCacheViewSet(mixins.ListModelMixin, viewsets.ViewSet):
 
     def list(self, request, *args, **kwargs):
-        cache_dict = cache.get(CACHE_KEY, {})
+        cache_dict = helpers.ETH2USD.get_dict()
         return Response(cache_dict)
 
 
@@ -179,7 +184,7 @@ def auth_view(request):
                     status=status.HTTP_400_BAD_REQUEST,
                 )
             # Start the sign-up process
-            seed = "\x19Ethereum Signed Message:\n" + str(len((login_nonce))) + login_nonce
+            seed = "\x19Ethereum Signed Message:\n" + str(len(login_nonce)) + login_nonce
             buffered_hashed_msg = ethereum.utils.sha3(seed)
             vrs = utils.sig_to_vrs(user_signature)
             recovered_addr = '0x' + sha3.keccak_256(
@@ -216,8 +221,8 @@ class UserTasks(views.APIView):
     permission_classes = [permissions.IsAuthenticated]
 
     def get(self, request, *, contract_address: str):
-        tasks = Task.objects.filter(user=request.user, contract_address=contract_address)
-        serializer = serializers.TaskSerializer(instance=tasks, context={'request': request}, many=True)
+        user_tasks = models.Task.objects.filter(user=request.user, contract_address=contract_address)
+        serializer = serializers.TaskSerializer(instance=user_tasks, context={'request': request}, many=True)
         return Response(data=serializer.data, status=status.HTTP_200_OK)
 
 

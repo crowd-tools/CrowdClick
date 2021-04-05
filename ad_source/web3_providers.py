@@ -9,7 +9,7 @@ from web3 import Web3
 from web3.contract import Contract
 from web3.types import ENS
 
-from . import contract, models
+from . import contract, helpers, models
 
 if typing.TYPE_CHECKING:  # pragma: no cover
     from crowdclick.settings.defaults import web3_config_namedtuple
@@ -48,8 +48,8 @@ class Web3Provider(typing.NamedTuple):
         ).call({'from': checksum_address})
         task_budget, task_reward, current_budget, url, is_active, *_ = response
         task_budget_eth = self.web3.fromWei(task_budget, 'ether')
-        # TODO Convert task budget to USD
-        return is_active, task_budget_eth
+        task_budget_usd = helpers.ETH2USD.get() * task_budget_eth
+        return is_active, task_budget_usd
 
 
 class Web3ProviderStorage(dict):

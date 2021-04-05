@@ -3,11 +3,9 @@ from decimal import Decimal as D
 
 from django.contrib.auth.models import User
 from django.core import validators
-from django.core.cache import cache
 from django.db import models
 
-from . import managers
-from .management.commands.fetch_eth_price import CACHE_KEY as FETCH_ETH_PRICE_CACHE_KEY
+from . import helpers, managers
 
 
 class Task(models.Model):
@@ -51,15 +49,13 @@ class Task(models.Model):
 
     @property
     def reward_usd_per_click(self):
-        eth_to_usd = cache.get(FETCH_ETH_PRICE_CACHE_KEY)
-        if eth_to_usd:
-            return self.reward_per_click * D(str(eth_to_usd))
+        eth_to_usd = helpers.ETH2USD.get()
+        return self.reward_per_click * D(str(eth_to_usd))
 
     @property
     def remaining_balance_usd(self):
-        eth_to_usd = cache.get(FETCH_ETH_PRICE_CACHE_KEY)
-        if eth_to_usd:
-            return self.remaining_balance * D(str(eth_to_usd))
+        eth_to_usd = helpers.ETH2USD.get()
+        return self.remaining_balance * D(str(eth_to_usd))
 
 
 class Question(models.Model):
