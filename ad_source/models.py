@@ -35,7 +35,7 @@ class Task(models.Model):
     is_active = models.BooleanField("Is active", default=True)
     is_active_web3 = models.BooleanField("Is active on Web3", default=True)
     remaining_balance = models.DecimalField(
-        "Remaining balance for task", max_digits=9, decimal_places=3)  # ETH but shown as USD
+        "Remaining balance for task", max_digits=9, decimal_places=3, null=True, default=None)  # ETH but shown as USD
     user = models.ForeignKey(User, related_name='tasks', on_delete=models.DO_NOTHING)
     warning_message = models.CharField("Warning message", max_length=100, blank=True)
 

@@ -90,11 +90,13 @@ class TaskSerializer(serializers.HyperlinkedModelSerializer):
             'contract_address',
             'reward_per_click',
             'reward_usd_per_click',
-            'remaining_balance',
             'time_duration',
             'questions',
             'warning_message',
             'is_active'
+        ]
+        read_only_fields = [
+            'remaining_balance',
         ]
 
 

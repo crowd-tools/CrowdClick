@@ -18,7 +18,6 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='task',
             name='remaining_balance',
-            field=models.DecimalField(decimal_places=3, default=0, max_digits=9, verbose_name='Remaining balance for task'),
-            preserve_default=False,
+            field=models.DecimalField(decimal_places=3, default=None, max_digits=9, null=True, verbose_name='Remaining balance for task'),
         ),
     ]
