@@ -9,13 +9,16 @@ class TaskManager(models.Manager):
         ).order_by('-reward_per_click')
 
     def active_for_user(self, user):
-        # XXX Extend SQL property `is_active` - we can spend from user account
-        filters = {}
-        filters.update({"is_active": True})
+        # Filter for active tasks
+        filters = {"is_active": True, "is_active_web3": True}
         qs = self.get_queryset().filter(**filters)
+        # Filter for tasks having `remaining balance` >= `reward per click` OR `remaining balance` IS NULL
+        qs = qs.filter(
+            models.Q(remaining_balance__gte=models.F('reward_per_click') | models.Q(remaining_balance__isnull=True))
+        )
         if user.is_authenticated:
+            # Exclude tasks that user already answered
             qs = qs.exclude(
-                # Exclude tasks that user already answered
                 id__in=user.answers.values_list('task')
             )
         return qs
