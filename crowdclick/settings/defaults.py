@@ -156,13 +156,13 @@ CELERY_RESULT_BACKEND = 'django-db'
 # CELERY_RESULT_BACKEND = 'django-cache'
 
 CELERY_BEAT_SCHEDULE = {
-    'update-task-is-active-balance': {
-        'task': 'ad_source.tasks.update_task_is_active_balance',
-        'schedule': timedelta(minutes=1),
-        'options': {
-            'expires': 60
-        }
-    },
+    # 'update-task-is-active-balance': {
+    #     'task': 'ad_source.tasks.update_task_is_active_balance',
+    #     'schedule': timedelta(minutes=1),
+    #     'options': {
+    #         'expires': 60
+    #     }
+    # },
 }
 
 ACCOUNT_OWNER_PUBLIC_KEY = '0xDd2179e8D8755f810CdAe4a474F7c53F371FbB6A'  # ServerConfigViewSet

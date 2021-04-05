@@ -24,11 +24,11 @@ class Web3Provider(typing.NamedTuple):
     default_gas_fee: int
 
     def create_reward(self, task: models.Task, reward: models.Reward) -> str:
-        checksummed_sender = Web3.toChecksumAddress(reward.sender.username)
-        checksummed_receiver = Web3.toChecksumAddress(reward.receiver.username)
+        checksum_sender = Web3.toChecksumAddress(reward.sender.username)
+        checksum_receiver = Web3.toChecksumAddress(reward.receiver.username)
         w3_transaction = self.contract.functions.forwardRewards(
-            checksummed_receiver,  # To
-            checksummed_sender,  # From
+            checksum_receiver,  # To
+            checksum_sender,  # From
             task.website_link  # task's website url
         ).buildTransaction({
             'chainId': self.chain_id,
@@ -42,10 +42,14 @@ class Web3Provider(typing.NamedTuple):
         return tx_hash
 
     def check_balance(self, task: models.Task) -> typing.Tuple[bool, typing.Union[int, decimal.Decimal]]:
+        checksum_address = Web3.toChecksumAddress(task.user.username)
         response = self.contract.functions.lookupTask(
             task.website_link,
-        ).call()
-        return bool(response['isActive']), Web3.fromWei(response['currentBudget'])
+        ).call({'from': checksum_address})
+        task_budget, task_reward, current_budget, url, is_active, *_ = response
+        task_budget_eth = self.web3.fromWei(task_budget, 'ether')
+        # TODO Convert task budget to USD
+        return is_active, task_budget_eth
 
 
 class Web3ProviderStorage(dict):

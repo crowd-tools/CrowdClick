@@ -14,7 +14,7 @@ class TaskManager(models.Manager):
         qs = self.get_queryset().filter(**filters)
         # Filter for tasks having `remaining balance` >= `reward per click` OR `remaining balance` IS NULL
         qs = qs.filter(
-            models.Q(remaining_balance__gte=models.F('reward_per_click') | models.Q(remaining_balance__isnull=True))
+            models.Q(remaining_balance__gte=models.F('reward_per_click')) | models.Q(remaining_balance__isnull=True)
         )
         if user.is_authenticated:
             # Exclude tasks that user already answered

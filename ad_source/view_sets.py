@@ -21,7 +21,7 @@ from rest_framework.authentication import BasicAuthentication
 from rest_framework.decorators import action, api_view, permission_classes
 from rest_framework.response import Response
 
-from . import authentication, filters, models, serializers, utils, web3_providers
+from . import authentication, filters, models, serializers, tasks, utils, web3_providers
 from .management.commands.fetch_eth_price import CACHE_KEY
 from .models import Task
 
@@ -243,6 +243,7 @@ class RewardViewSet(mixins.CreateModelMixin, mixins.ListModelMixin, viewsets.Gen
             if created:
                 w3_provider: web3_providers.Web3Provider = web3_providers.web3_storage[task.chain]
                 tx_hash = w3_provider.create_reward(task, reward)
+                tasks.update_task_is_active_balance.delay(task.id)
                 data = {
                     "tx_hash": tx_hash
                 }
