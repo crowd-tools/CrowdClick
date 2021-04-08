@@ -2,7 +2,7 @@ beautifulsoup4==4.9.0
 django-filter==2.4.0
 django-rest-auth==0.9.5
 django-web3-auth==0.1.1
-Django==2.2.18
+Django==2.2.20
 djangorestframework==3.11.2
 drf-yasg==1.17.1
 ethereum==2.3.2
