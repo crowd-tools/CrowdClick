@@ -31,6 +31,7 @@ env = environ.Env(
     ALLOWED_HOSTS=(list, ["*"]),
 
     DATABASE_URL=(str, f"sqlite://{os.path.join(BASE_DIR, '../db.sqlite3')}"),  # XXX DEFAULT_DATABASE_ENV?
+    BROKER_URL=(str, 'pyamqp://guest@localhost//'),
 
     ACCOUNT_OWNER_PUBLIC_KEY=(str, '0x9c76e3A23A87f624aAdEff7ca5e74103476eD11C'),  # ServerConfigViewSet
     WEB3_CONFIG=(dict, {
@@ -71,11 +72,13 @@ ALLOWED_HOSTS = env.list('ALLOWED_HOSTS')
 # Database
 # https://docs.djangoproject.com/en/dev/ref/settings/#databases
 DATABASES = {'default': env.db('DATABASE_URL')}
+BROKER_URL = env.str('BROKER_URL')
 
 CACHES = {
     'default': {
         'BACKEND': 'django.core.cache.backends.memcached.MemcachedCache',
         'LOCATION': '127.0.0.1:11211',
+        'KEY_PREFIX': f'crowdclick_{ENVIRONMENT}'
     }
 }
 
