@@ -1,12 +1,11 @@
 db.sqlite3
 .idea
 __pycache__
-node_modules
 static
 
 # Settings
-crowdclick/settings/local.py
-crowdclick/settings/production.py
+crowdclick/settings/.env
+crowdclick/settings/local_optional.py
 
 # Coverage
 .coverage
