@@ -6,6 +6,7 @@ from rest_framework import status
 from rest_framework.test import APITestCase
 
 from ad_source import models
+from ad_source.helpers import ETH2USD_URL
 
 
 class TestTaskView(APITestCase):
@@ -72,6 +73,8 @@ class TestTaskView(APITestCase):
     @responses.activate
     def test_create_task_admin(self):
         with patch('ad_source.tasks.update_task_is_active_balance.delay') as mock_task:
+            responses.add(responses.GET, ETH2USD_URL.format(from_symbol='ETH', to_symbol='USD'),
+                          body='{"USD": 2099.65}', status=200)
             responses.add(responses.GET, 'http://does_not_exist.com',
                           body=self.OG_DATA, status=200)
             self.client.login(username='admin', password='admin')
@@ -89,6 +92,8 @@ class TestTaskView(APITestCase):
                           body=self.OG_DATA, status=200)
             responses.add(responses.GET, 'http://does_not_exist.com',
                           body=self.OG_DATA_2, status=200)
+            responses.add(responses.GET, ETH2USD_URL.format(from_symbol='ETH', to_symbol='USD'),
+                          body='{"USD": 2099.65}', status=200)
             self.client.login(username='admin', password='admin')
             self.client.post(self.url, data=self.TASK_DATA)
             mock_task.assert_called_with(3)
@@ -111,6 +116,8 @@ class TestTaskView(APITestCase):
             responses.add(responses.GET, 'http://does_not_exist.com',
                           body=self.OG_DATA, status=200,
                           headers={'X-Frame-Options': 'DENY'},)
+            responses.add(responses.GET, ETH2USD_URL.format(from_symbol='ETH', to_symbol='USD'),
+                          body='{"USD": 2099.65}', status=200)
             self.client.login(username='admin', password='admin')
             response = self.client.post(self.url, data=self.TASK_DATA)
             data = response.json()
