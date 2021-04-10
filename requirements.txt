@@ -2,11 +2,13 @@ beautifulsoup4==4.9.0
 celery==5.0.5
 django-celery-results==2.0.1
 django-celery-beat==2.2.0
+django-environ==0.4.5
 django-filter==2.4.0
 django-rest-auth==0.9.5
 django-web3-auth==0.1.1
-Django==2.2.18
-djangorestframework==3.11.0
+django-split-settings==1.0.1
+Django==2.2.20
+djangorestframework==3.11.2
 drf-yasg==1.17.1
 ethereum==2.3.2
 Pillow==8.1.1

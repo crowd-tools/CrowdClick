@@ -19,8 +19,9 @@ mkvirtualenv -p python3.6 -a . crowdclick
 # Install dependencies
 pip install -r requirements.txt
 
-# Initialize local settings
-echo 'from .defaults import *' > crowdclick/settings/local.py
+# (Optional) local settings
+cat crowdclick/settings/example.env > crowdclick/settings/.env
+cat crowdclick/settings/local_optional_example.py > crowdclick/settings/local_optional.py
 
 # Run migrations
 python manage.py migrate

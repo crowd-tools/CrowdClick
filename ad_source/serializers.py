@@ -49,7 +49,7 @@ class TaskSerializer(serializers.HyperlinkedModelSerializer):
             q = models.Question.objects.create(title=question['title'], task=task)
             for option in question['options']:
                 models.Option.objects.create(title=option['title'], question=q)
-        tasks.update_task_is_active_balance.delay(task)
+        tasks.update_task_is_active_balance.delay(task.id)
         return task
 
     def validate_website_link(self, website_link):
@@ -94,6 +94,9 @@ class TaskSerializer(serializers.HyperlinkedModelSerializer):
             'questions',
             'warning_message',
             'is_active'
+        ]
+        read_only_fields = [
+            'remaining_balance',
         ]
 
 

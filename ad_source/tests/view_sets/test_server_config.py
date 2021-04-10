@@ -1,3 +1,4 @@
+from django.conf import settings
 from django.urls import reverse
 from rest_framework import status
 from rest_framework.test import APITestCase
@@ -8,7 +9,7 @@ class TestSubscribeView(APITestCase):
         self.url = reverse('server_config-list')
 
     def test_get_server_config(self):
-        expected = {'public_key': '0xDd2179e8D8755f810CdAe4a474F7c53F371FbB6A'}
+        expected = {'public_key': settings.ACCOUNT_OWNER_PUBLIC_KEY}
         response = self.client.get(self.url)
         data = response.json()
         self.assertEqual(data, expected)

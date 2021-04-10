@@ -1,6 +1,7 @@
 import decimal
 import json
 import typing
+from dataclasses import dataclass
 
 from django.conf import settings
 from django.core.exceptions import ImproperlyConfigured
@@ -9,13 +10,14 @@ from web3 import Web3
 from web3.contract import Contract
 from web3.types import ENS
 
-from . import contract, models
+from . import contract, helpers, models
 
 if typing.TYPE_CHECKING:  # pragma: no cover
-    from crowdclick.settings.defaults import web3_config_namedtuple
+    from crowdclick.settings import Web3Config
 
 
-class Web3Provider(typing.NamedTuple):
+@dataclass
+class Web3Provider:
     web3: Web3
     contract: Contract
     chain_id: int
@@ -24,11 +26,11 @@ class Web3Provider(typing.NamedTuple):
     default_gas_fee: int
 
     def create_reward(self, task: models.Task, reward: models.Reward) -> str:
-        checksummed_sender = Web3.toChecksumAddress(reward.sender.username)
-        checksummed_receiver = Web3.toChecksumAddress(reward.receiver.username)
+        checksum_sender = Web3.toChecksumAddress(reward.sender.username)
+        checksum_receiver = Web3.toChecksumAddress(reward.receiver.username)
         w3_transaction = self.contract.functions.forwardRewards(
-            checksummed_receiver,  # To
-            checksummed_sender,  # From
+            checksum_receiver,  # To
+            checksum_sender,  # From
             task.website_link  # task's website url
         ).buildTransaction({
             'chainId': self.chain_id,
@@ -42,15 +44,19 @@ class Web3Provider(typing.NamedTuple):
         return tx_hash
 
     def check_balance(self, task: models.Task) -> typing.Tuple[bool, typing.Union[int, decimal.Decimal]]:
+        checksum_address = Web3.toChecksumAddress(task.user.username)
         response = self.contract.functions.lookupTask(
             task.website_link,
-        ).call()
-        return bool(response['isActive']), Web3.fromWei(response['currentBudget'])
+        ).call({'from': checksum_address})
+        task_budget, task_reward, current_budget, url, is_active, *_ = response
+        task_budget_eth = self.web3.fromWei(task_budget, 'ether')
+        task_budget_usd = helpers.ETH2USD.get() * task_budget_eth
+        return is_active, task_budget_usd
 
 
 class Web3ProviderStorage(dict):
     def __missing__(self, key):
-        config: web3_config_namedtuple = settings.WEB3_CONFIG[key]
+        config: Web3Config = settings.WEB3_CONFIG[key]
 
         if key not in settings.WEB3_CONFIG:  # pragma: no cover
             raise ImproperlyConfigured(f"Requested Web3 provider {key} but \
