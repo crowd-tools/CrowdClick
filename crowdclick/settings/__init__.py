@@ -49,7 +49,7 @@ DEBUG = env.bool('DEBUG')
 SECRET_KEY = env.str('SECRET_KEY')
 
 ENV = env.str('ENV')
-TEST = ('test' in sys.argv) or ('unittest' in sys.argv) or os.getenv('CI')
+TEST = ('test' in sys.argv) or ('unittest' in sys.argv) or os.getenv('CI') or False
 
 ENV_PRODUCTION = 'production'
 ENV_STAGING = 'staging'
