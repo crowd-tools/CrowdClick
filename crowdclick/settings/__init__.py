@@ -49,7 +49,7 @@ DEBUG = env.bool('DEBUG')
 SECRET_KEY = env.str('SECRET_KEY')
 
 ENV = env.str('ENV')
-TEST = ('test' in sys.argv) or ('unittest' in sys.argv)
+TEST = ('test' in sys.argv) or ('unittest' in sys.argv) or os.getenv('CI')
 
 ENV_PRODUCTION = 'production'
 ENV_STAGING = 'staging'
@@ -63,7 +63,7 @@ elif ENV == ENV_STAGING:
 else:
     ENVIRONMENT = ENV_LOCAL
 
-print(f'Using env: {ENVIRONMENT}', file=sys.stderr)
+print(f'Using environment: {ENVIRONMENT}: TEST: {TEST}', file=sys.stderr)
 
 ALLOWED_HOSTS = env.list('ALLOWED_HOSTS')
 
