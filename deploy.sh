@@ -7,7 +7,6 @@ set -x  # Output entering commands
 # Activate env, change directory to project root
 source ~/.virtualenvs/crowdclick_stage/bin/activate
 cd ~/crowd_click_stage/
-export DJANGO_SETTINGS_MODULE=crowdclick.settings.stage
 
 # Pull updates
 git checkout stage -f
