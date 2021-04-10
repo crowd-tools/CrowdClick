@@ -11,7 +11,7 @@ ETH2USD_CACHE_KEY = 'ETH-PRICES'
 class ETH2USD:
     @classmethod
     def get(cls, default: decimal.Decimal = None) -> decimal.Decimal:
-        data = cache.get(ETH2USD_CACHE_KEY)
+        data = cache.get(ETH2USD_CACHE_KEY, {})
         value = data.get("USD", None)
         if not value:
             value = cls.set(value=default)
