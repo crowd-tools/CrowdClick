@@ -4,7 +4,7 @@ import requests.exceptions
 from rest_auth.serializers import UserDetailsSerializer
 from rest_framework import serializers, status
 
-from . import models
+from . import models, tasks
 from .open_graph import OpenGraph
 from .utils import convert_url
 
@@ -44,11 +44,12 @@ class TaskSerializer(serializers.HyperlinkedModelSerializer):
 
     def create(self, validated_data):
         questions = validated_data.pop('questions')
-        task = models.Task.objects.create(**validated_data)
+        task = super(TaskSerializer, self).create(validated_data)
         for question in questions:
             q = models.Question.objects.create(title=question['title'], task=task)
             for option in question['options']:
                 models.Option.objects.create(title=option['title'], question=q)
+        tasks.update_task_is_active_balance.delay(task.id)
         return task
 
     def validate_website_link(self, website_link):
@@ -93,6 +94,9 @@ class TaskSerializer(serializers.HyperlinkedModelSerializer):
             'questions',
             'warning_message',
             'is_active'
+        ]
+        read_only_fields = [
+            'remaining_balance',
         ]
 
 

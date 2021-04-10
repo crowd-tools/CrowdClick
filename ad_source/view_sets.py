@@ -6,7 +6,7 @@ import sha3
 from django.conf import settings
 from django.contrib.auth import login, logout
 from django.contrib.auth.models import User
-from django.core.cache import cache
+from django.db import transaction
 from django.shortcuts import get_object_or_404
 from rest_framework import (
     exceptions,
@@ -19,14 +19,17 @@ from rest_framework import (
 from rest_framework.authentication import BasicAuthentication
 from rest_framework.decorators import action, api_view, permission_classes
 from rest_framework.response import Response
-from web3 import Web3
 
-from . import authentication, filters, models, serializers, utils, web3_providers
-from .management.commands.fetch_eth_price import CACHE_KEY
-from .models import Task
-
-web3_storage = web3_providers.Web3ProviderStorage()
-
+from . import (
+    authentication,
+    filters,
+    helpers,
+    models,
+    serializers,
+    tasks,
+    utils,
+    web3_providers
+)
 
 logger = logging.getLogger(__name__)
 
@@ -64,8 +67,8 @@ class TaskViewSet(viewsets.ModelViewSet):
         except ValueError:
             raise exceptions.ValidationError(f"Task id {pk} is not a number")
         try:
-            task = Task.objects.get(pk=task_id)
-        except Task.DoesNotExist:
+            task = models.Task.objects.get(pk=task_id)
+        except models.Task.DoesNotExist:
             raise exceptions.NotFound(f"Task id {task_id} wasn't found")
         for question in request.data['questions']:
             if question['id'] not in task.questions.values_list('id', flat=True):
@@ -126,7 +129,7 @@ class SubscribeViewSet(mixins.CreateModelMixin, viewsets.GenericViewSet):
 class ETHMemCacheViewSet(mixins.ListModelMixin, viewsets.ViewSet):
 
     def list(self, request, *args, **kwargs):
-        cache_dict = cache.get(CACHE_KEY, {})
+        cache_dict = helpers.ETH2USD.get_dict()
         return Response(cache_dict)
 
 
@@ -181,7 +184,7 @@ def auth_view(request):
                     status=status.HTTP_400_BAD_REQUEST,
                 )
             # Start the sign-up process
-            seed = "\x19Ethereum Signed Message:\n" + str(len((login_nonce))) + login_nonce
+            seed = "\x19Ethereum Signed Message:\n" + str(len(login_nonce)) + login_nonce
             buffered_hashed_msg = ethereum.utils.sha3(seed)
             vrs = utils.sig_to_vrs(user_signature)
             recovered_addr = '0x' + sha3.keccak_256(
@@ -218,8 +221,8 @@ class UserTasks(views.APIView):
     permission_classes = [permissions.IsAuthenticated]
 
     def get(self, request, *, contract_address: str):
-        tasks = Task.objects.filter(user=request.user, contract_address=contract_address)
-        serializer = serializers.TaskSerializer(instance=tasks, context={'request': request}, many=True)
+        user_tasks = models.Task.objects.filter(user=request.user, contract_address=contract_address)
+        serializer = serializers.TaskSerializer(instance=user_tasks, context={'request': request}, many=True)
         return Response(data=serializer.data, status=status.HTTP_200_OK)
 
 
@@ -230,44 +233,31 @@ class RewardViewSet(mixins.CreateModelMixin, mixins.ListModelMixin, viewsets.Gen
     def create(self, request, *args, **kwargs):
         task_id = kwargs['task_id']
         task = get_object_or_404(models.Task, pk=task_id)
-        if request.user.id not in task.answers.values_list('user_id', flat=True):
-            data = {"error": "User didn't answer the task"}
-            return Response(data=data, status=status.HTTP_400_BAD_REQUEST)
-        reward, created = models.Reward.objects.get_or_create(
-            receiver=request.user,
-            task=task,
-            defaults={
-                'sender': task.user,
-                'amount': task.reward_per_click,
-            }
-        )
-        if created:
-            checksummed_sender = Web3.toChecksumAddress(reward.sender.username)
-            checksummed_receiver = Web3.toChecksumAddress(reward.receiver.username)
-
-            w3_provider: web3_providers.Web3Provider = web3_storage[task.chain]
-            transaction = w3_provider.contract.functions.forwardRewards(
-                checksummed_receiver,  # To
-                checksummed_sender,  # From
-                task.website_link  # task's website url
-            ).buildTransaction({
-                'chainId': w3_provider.chain_id,
-                'gas': w3_provider.default_gas_fee,
-                'gasPrice': w3_provider.web3.toWei('1', 'gwei'),
-                'nonce': w3_provider.web3.eth.getTransactionCount(w3_provider.public_key)
-            })
-            txn_signed = w3_provider.web3.eth.account.sign_transaction(transaction, private_key=w3_provider.private_key)
-            tx_hash_hex = w3_provider.web3.eth.sendRawTransaction(txn_signed.rawTransaction)  # tx_hash
-            tx_hash = tx_hash_hex.hex()
-            data = {
-                "tx_hash": tx_hash
-            }
-            return Response(data=data, status=status.HTTP_201_CREATED)
-        else:
-            data = {
-                "error": "Reward already created"
-            }
-            return Response(data=data, status=status.HTTP_400_BAD_REQUEST)
+        with transaction.atomic():
+            if request.user.id not in task.answers.values_list('user_id', flat=True):
+                data = {"error": "User didn't answer the task"}
+                return Response(data=data, status=status.HTTP_400_BAD_REQUEST)
+            reward, created = models.Reward.objects.get_or_create(
+                receiver=request.user,
+                task=task,
+                defaults={
+                    'sender': task.user,
+                    'amount': task.reward_per_click,
+                }
+            )
+            if created:
+                w3_provider: web3_providers.Web3Provider = web3_providers.web3_storage[task.chain]
+                tx_hash = w3_provider.create_reward(task, reward)
+                tasks.update_task_is_active_balance.delay(task.id)
+                data = {
+                    "tx_hash": tx_hash
+                }
+                return Response(data=data, status=status.HTTP_201_CREATED)
+            else:
+                data = {
+                    "error": "Reward already created"
+                }
+                return Response(data=data, status=status.HTTP_400_BAD_REQUEST)
 
     def list(self, request, *args, **kwargs):
         logger.error(f"GET on /task/{kwargs.get('task_id')}/reward. {request.user}")

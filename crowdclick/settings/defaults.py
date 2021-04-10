@@ -3,6 +3,12 @@ settings with default values
 """
 
 import os
+import sys
+
+# Build paths inside the project like this: os.path.join(BASE_DIR, ...)
+from collections import namedtuple
+from datetime import timedelta
+
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/dev/howto/deployment/checklist/
@@ -18,6 +24,8 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
 
     'rest_framework',
+    'django_celery_beat',
+    'django_celery_results',
     'django_filters',
     'drf_yasg',
 
@@ -83,7 +91,6 @@ REST_FRAMEWORK = {
     ),
     'TEST_REQUEST_DEFAULT_FORMAT': 'json',
 }
-
 # Password validation
 # https://docs.djangoproject.com/en/dev/ref/settings/#auth-password-validators
 
