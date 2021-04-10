@@ -40,6 +40,7 @@ env = environ.Env(
     DJANGO_ADMIN_URL=(str, 'admin'),
 
     SENTRY_DSN=(str, ''),
+    SENTRY_DSN_CELERY=(str, ''),
 )
 
 # reading .env file
@@ -79,6 +80,7 @@ CACHES = {
 }
 
 SENTRY_DSN = env.str('SENTRY_DSN')
+SENTRY_DSN_CELERY = env.str('SENTRY_DSN_CELERY')
 
 if SENTRY_DSN:
     import sentry_sdk
