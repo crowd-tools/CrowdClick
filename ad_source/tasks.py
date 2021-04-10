@@ -1,8 +1,7 @@
 import logging
 
-# from celery import shared_task
-
-from . import models, celery, web3_providers
+from crowdclick import celery
+from . import models, web3_providers
 
 logger = logging.getLogger(__name__)
 
