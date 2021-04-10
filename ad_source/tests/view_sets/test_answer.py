@@ -36,13 +36,13 @@ class TestAnswerView(APITestCase):
         self.client.login(username='admin', password='admin')
         response = self.client.get(self.list_url)
         data = response.json()
-        self.assertEqual(data['count'], 2)
+        self.assertEqual(data['count'], 3)
         response = self.client.post(self.url, data=self.ANSWER_DATA)
         self.assertEqual(response.status_code, 201)
         self.assertEqual(response.data['user']['username'], 'admin')
         response = self.client.get(self.list_url)
         data = response.json()
-        self.assertEqual(data['count'], 1)
+        self.assertEqual(data['count'], 2)
 
     def test_create_answer_task_id_not_int(self):
         self.client.login(username='admin', password='admin')
@@ -82,3 +82,58 @@ class TestAnswerView(APITestCase):
     def test_delete_answer_anon(self):
         response = self.client.delete(self.url)
         self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+
+
+class TestQuizAnswerView(APITestCase):
+    fixtures = ['0000_users', '0001_task', '0002_question', '0003_options']
+    WRONG_ANSWER_DATA = {
+        "questions": [
+            {
+                "id": 3,
+                "options": [{"id": 6}]
+            }
+        ]
+    }
+    ANSWER_DATA = {
+        "questions": [
+            {
+                "id": 3,
+                "options": [{"id": 5}]
+            }
+        ]
+    }
+
+    def setUp(self):
+        self.url = reverse('task_view-task_answer', kwargs={'pk': 3})
+        self.list_url = reverse('task_view-list')
+
+    @responses.activate
+    def test_create_correct_admin(self):
+        responses.add(responses.GET, ETH2USD_URL.format(from_symbol='ETH', to_symbol='USD'),
+                      body='{"USD": 2099.65}', status=200)
+        self.client.login(username='admin', password='admin')
+        response = self.client.get(self.list_url)
+        data = response.json()
+        self.assertEqual(data['count'], 3)
+        response = self.client.post(self.url, data=self.ANSWER_DATA)
+        self.assertEqual(response.status_code, 201)
+        self.assertEqual(response.data['user']['username'], 'admin')
+        response = self.client.get(self.list_url)
+        data = response.json()
+        self.assertEqual(data['count'], 2)
+
+    @responses.activate
+    def test_create_wrong_admin(self):
+        # Creating wrong answer is allowed. Task will get hidden
+        responses.add(responses.GET, ETH2USD_URL.format(from_symbol='ETH', to_symbol='USD'),
+                      body='{"USD": 2099.65}', status=200)
+        self.client.login(username='admin', password='admin')
+        response = self.client.get(self.list_url)
+        data = response.json()
+        self.assertEqual(data['count'], 3)
+        response = self.client.post(self.url, data=self.WRONG_ANSWER_DATA)
+        self.assertEqual(response.status_code, 201)
+        self.assertEqual(response.data['user']['username'], 'admin')
+        response = self.client.get(self.list_url)
+        data = response.json()
+        self.assertEqual(data['count'], 2)

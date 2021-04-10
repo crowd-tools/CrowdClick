@@ -71,6 +71,8 @@ class Question(models.Model):
     title = models.CharField(max_length=100)
     question_type = models.CharField(max_length=2, choices=QUESTION_TYPES, default=SELECT_TYPE)
 
+    objects = managers.QuestionManager()
+
     class Meta:
         verbose_name_plural = "   Question"
 
@@ -81,6 +83,7 @@ class Question(models.Model):
 class Option(models.Model):
     question = models.ForeignKey(Question, related_name="options", on_delete=models.CASCADE)
     title = models.CharField(max_length=100)
+    is_correct = models.BooleanField(default=False)
 
     objects = managers.OptionManager()
 

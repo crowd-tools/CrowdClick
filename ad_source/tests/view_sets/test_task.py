@@ -53,7 +53,7 @@ class TestTaskView(APITestCase):
     def test_list_task(self):
         response = self.client.get(self.url)
         self.assertEqual(response.status_code, 200)
-        self.assertEqual(response.data['count'], 2)
+        self.assertEqual(response.data['count'], 3)
 
     def test_filter_tasks_by_chain(self):
         response = self.client.get(self.url, data={"chain": "mumbai"})
@@ -64,7 +64,7 @@ class TestTaskView(APITestCase):
         self.client.login(username='admin', password='admin')
         response = self.client.get(self.url)
         self.assertEqual(response.status_code, 200)
-        self.assertEqual(response.data['count'], 2)
+        self.assertEqual(response.data['count'], 3)
 
     def test_create_task_anon(self):
         response = self.client.post(self.url, data=self.TASK_DATA)
@@ -83,9 +83,9 @@ class TestTaskView(APITestCase):
                 data = response.json()
                 self.assertEqual(response.status_code, 201)
                 self.assertEqual(data['website_link'], 'http://does_not_exist.com/')
-                self.assertEqual(data['id'], 3)
-                mock_update_task.assert_called_once_with(3)
-                mock_screenshot_task.assert_called_once_with(3)
+                self.assertEqual(data['id'], 4)
+                mock_update_task.assert_called_once_with(4)
+                mock_screenshot_task.assert_called_once_with(4)
 
     @responses.activate
     def test_create_task_admin_with_second_missing_og_data(self):
@@ -100,15 +100,15 @@ class TestTaskView(APITestCase):
                               body='{"USD": 2099.65}', status=200)
                 self.client.login(username='admin', password='admin')
                 self.client.post(self.url, data=self.TASK_DATA)
-                mock_task.assert_called_once_with(3)
-                mock_screenshot_task.assert_called_once_with(3)
+                mock_task.assert_called_once_with(4)
+                mock_screenshot_task.assert_called_once_with(4)
                 response = self.client.post(self.url, data=self.TASK_DATA)
                 self.assertEqual(response.status_code, 201)
                 data = response.json()
                 self.assertEqual(data['website_link'], 'http://does_not_exist.com/')
                 self.assertIsNone(data['og_image_link'])
-                mock_task.assert_called_with(4)
-                mock_screenshot_task.assert_called_with(4)
+                mock_task.assert_called_with(5)
+                mock_screenshot_task.assert_called_with(5)
 
     def test_create_task_admin_with_connection_error(self):
         self.client.login(username='admin', password='admin')
@@ -131,7 +131,7 @@ class TestTaskView(APITestCase):
                 self.assertEqual(response.status_code, 201)
                 self.assertEqual('Website has strict X-Frame-Options: deny', data['warning_message'])
                 mock_task.assert_called_once_with(data['id'])
-                mock_screenshot_task.assert_called_once_with(3)
+                mock_screenshot_task.assert_called_once_with(4)
 
     def test_delete_task_admin(self):
         self.client.login(username='admin', password='admin')
