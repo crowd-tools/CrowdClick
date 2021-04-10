@@ -1,6 +1,7 @@
 import decimal
 import json
 import typing
+from dataclasses import dataclass
 
 from django.conf import settings
 from django.core.exceptions import ImproperlyConfigured
@@ -12,10 +13,11 @@ from web3.types import ENS
 from . import contract, helpers, models
 
 if typing.TYPE_CHECKING:  # pragma: no cover
-    from crowdclick.settings.defaults import web3_config_namedtuple
+    from crowdclick.settings import Web3Config
 
 
-class Web3Provider(typing.NamedTuple):
+@dataclass
+class Web3Provider:
     web3: Web3
     contract: Contract
     chain_id: int
@@ -54,7 +56,7 @@ class Web3Provider(typing.NamedTuple):
 
 class Web3ProviderStorage(dict):
     def __missing__(self, key):
-        config: web3_config_namedtuple = settings.WEB3_CONFIG[key]
+        config: Web3Config = settings.WEB3_CONFIG[key]
 
         if key not in settings.WEB3_CONFIG:  # pragma: no cover
             raise ImproperlyConfigured(f"Requested Web3 provider {key} but \
