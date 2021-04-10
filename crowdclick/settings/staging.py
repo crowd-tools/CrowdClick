@@ -2,7 +2,7 @@ import os
 
 DEBUG = False
 
-CELERY_DEFAULT_QUEUE = 'crowdclick_celery_stage'
+CELERY_TASK_DEFAULT_QUEUE = 'crowdclick_celery_stage'
 
 STATIC_ROOT = os.path.join(BASE_DIR, "static")
 
