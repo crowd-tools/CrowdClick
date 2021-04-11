@@ -31,7 +31,7 @@ class Web3Provider:
         w3_transaction = self.contract.functions.forwardRewards(
             checksum_receiver,  # To
             checksum_sender,  # From
-            task.website_link  # task's website url
+            task.uuid  # task's uuid
         ).buildTransaction({
             'chainId': self.chain_id,
             'gas': self.default_gas_fee,
@@ -46,7 +46,7 @@ class Web3Provider:
     def check_balance(self, task: models.Task) -> typing.Tuple[bool, typing.Union[int, decimal.Decimal]]:
         checksum_address = Web3.toChecksumAddress(task.user.username)
         response = self.contract.functions.lookupTask(
-            task.website_link,
+            task.uuid,
         ).call({'from': checksum_address})
         task_budget, task_reward, current_budget, url, is_active, *_ = response
         task_budget_eth = self.web3.fromWei(task_budget, 'ether')
