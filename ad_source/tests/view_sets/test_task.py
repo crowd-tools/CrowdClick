@@ -14,7 +14,7 @@ class TestTaskView(APITestCase):
     TASK_DATA = {
         "title": "Check our site",
         "description": "Awesome site. Go check it now and earn crypto",
-        "uuid": " d8f01220-4c85-4b35-a3e2-9ff33858a6e7",
+        "uuid": "d8f01220-4c85-4b35-a3e2-9ff33858a6e7",
         "website_link": "does_not_exist.com",
         "contract_address": "0xdeadc0dedeadc0de",
         "reward_per_click": 0.001,
@@ -92,6 +92,7 @@ class TestTaskView(APITestCase):
                 self.assertEqual(response.status_code, 201)
                 self.assertEqual(data['website_link'], 'http://does_not_exist.com/')
                 self.assertEqual(data['id'], 4)
+                self.assertEqual(data['uuid'], 'd8f01220-4c85-4b35-a3e2-9ff33858a6e7')
                 mock_update_task.assert_called_once_with(4)
                 mock_screenshot_task.assert_called_once_with(4)
 
