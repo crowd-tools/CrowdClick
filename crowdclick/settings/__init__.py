@@ -38,6 +38,8 @@ env = environ.Env(
         'mumbai': Web3Config()  # dataclass defaults
         # 'goerli', ...
     }),
+    ETH2USD_URL=(str, 'https://min-api.cryptocompare.com/data/price?fsym={from_symbol}&tsyms={to_symbol}'),
+    ETH2USD_CACHE_KEY=(str, 'ETH-PRICES'),
     DJANGO_ADMIN_URL=(str, 'admin'),
 
     SENTRY_DSN=(str, ''),
@@ -84,6 +86,9 @@ CACHES = {
 
 SENTRY_DSN = env.str('SENTRY_DSN')
 SENTRY_DSN_CELERY = env.str('SENTRY_DSN_CELERY')
+
+ETH2USD_URL = env.str('ETH2USD_URL')
+ETH2USD_CACHE_KEY = env.str('ETH2USD_CACHE_KEY')
 
 if SENTRY_DSN:
     import sentry_sdk

@@ -97,6 +97,7 @@ class TaskSerializer(serializers.HyperlinkedModelSerializer):
             'chain',
             'user',
             'og_image_link',
+            'uuid',
             'website_link',
             'website_image',
             'contract_address',

@@ -23,6 +23,7 @@ class Task(models.Model):
     title = models.CharField("Title", max_length=100)
     description = models.TextField("Description", max_length=100)
     chain = models.CharField("Chain", max_length=15, choices=CHAIN_CHOICES, default=GOERLI)
+    uuid = models.UUIDField('Web3 Task Identifier', unique=True, null=True)
     website_link = models.CharField("Website Link", max_length=200, validators=[validators.URLValidator])
     website_image = models.ImageField("Website Image", upload_to="task_website_image", null=True)
     contract_address = models.CharField("Contract address", max_length=42)

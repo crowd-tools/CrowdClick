@@ -26,3 +26,4 @@ WEB3_CONFIG = {
     ),
     # 'goerli', ...
 }
+ETH2USD_URL = 'https://extenral_services_has_to_be_mocked/?fsym={from_symbol}&tsyms={to_symbol}'
