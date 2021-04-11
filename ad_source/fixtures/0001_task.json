@@ -34,5 +34,22 @@
       "modified": "2013-01-01 00:00:00+00:00",
       "user_id": 2
     }
+  },
+  {
+    "model": "ad_source.task",
+    "pk": 3,
+    "fields": {
+      "website_link": "http://example.com/survey",
+      "title": "Survey task",
+      "contract_address": "0xdeadbeefdeadbeef",
+      "chain": "goerli",
+      "description": "Survey task. Guess the correct answer",
+      "reward_per_click": 1,
+      "remaining_balance": 10,
+      "time_duration": "00:00:30",
+      "created": "2013-01-01 00:00:00+00:00",
+      "modified": "2013-01-01 00:00:00+00:00",
+      "user_id": 1
+    }
   }
 ]

@@ -30,5 +30,22 @@
       "title": "Slow",
       "question": 2
     }
+  },
+  {
+    "model": "ad_source.option",
+    "pk": 5,
+    "fields": {
+      "title": "To be",
+      "is_correct": true,
+      "question": 3
+    }
+  },
+  {
+    "model": "ad_source.option",
+    "pk": 6,
+    "fields": {
+      "title": "Not to be",
+      "question": 3
+    }
   }
 ]
