@@ -66,6 +66,20 @@ class TestTaskView(APITestCase):
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.data['count'], 3)
 
+    def test_list_campaign_admin(self):
+        # List tasks that are not quiz
+        self.client.login(username='admin', password='admin')
+        response = self.client.get(self.url, data={'type': 'campaign'})
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.data['count'], 2)
+
+    def test_list_quiz_admin(self):
+        # List tasks that are quiz
+        self.client.login(username='admin', password='admin')
+        response = self.client.get(self.url, data={'type': 'quiz'})
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.data['count'], 1)
+
     def test_create_task_anon(self):
         response = self.client.post(self.url, data=self.TASK_DATA)
         self.assertEqual(response.status_code, 403)
