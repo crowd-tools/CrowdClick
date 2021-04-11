@@ -1,4 +1,10 @@
+import asyncio
+import io
 import logging
+
+from django.core.files.images import ImageFile
+from django.utils.text import slugify
+from pyppeteer import launch
 
 from crowdclick import celery
 from . import models, web3_providers
@@ -6,9 +12,22 @@ from . import models, web3_providers
 logger = logging.getLogger(__name__)
 
 
+async def async_create_task_screenshot(task_id: int):
+    task: models.Task = models.Task.objects.get(id=task_id)
+
+    browser = await launch(defaultViewport={'width': 1920, 'height': 1080})
+    page = await browser.newPage()
+    await page.goto(task.website_link, waitUntil='networkidle0')
+    buffer = await page.screenshot(fullPage=True)
+    image = ImageFile(io.BytesIO(buffer), name=f'{slugify(task.website_link)}.png')
+    task.website_image = image
+    task.save()
+    await browser.close()
+    logger.info(f'Downloaded new image for Task: {task}')
+
+
 @celery.app.task(bind=True)
 def update_task_is_active_balance(self, task_id: int = 4) -> dict:
-
     # Could be wrapped:
     # try:
     #     ...
@@ -33,3 +52,8 @@ def update_task_is_active_balance(self, task_id: int = 4) -> dict:
         "is_active": is_active,
         "remaining_balance": balance,
     }
+
+
+@celery.app.task(bind=True)
+def create_task_screenshot(self, task_id: int):
+    asyncio.run(async_create_task_screenshot(task_id=task_id))

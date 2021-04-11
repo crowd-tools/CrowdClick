@@ -25,6 +25,7 @@ class Task(models.Model):
     chain = models.CharField("Chain", max_length=15, choices=CHAIN_CHOICES, default=GOERLI)
     uuid = models.CharField('Web3 Task Identifier', max_length=36, unique=True, null=True)
     website_link = models.CharField("Website Link", max_length=200, validators=[validators.URLValidator])
+    website_image = models.ImageField("Website Image", upload_to="task_website_image", null=True)
     contract_address = models.CharField("Contract address", max_length=42)
     reward_per_click = models.DecimalField("Reward per click", max_digits=9, decimal_places=3)  # ETH but shown as USD
     og_image_link = models.URLField("OpenGraph Image Path", max_length=200, blank=True, null=True)
@@ -71,6 +72,8 @@ class Question(models.Model):
     title = models.CharField(max_length=100)
     question_type = models.CharField(max_length=2, choices=QUESTION_TYPES, default=SELECT_TYPE)
 
+    objects = managers.QuestionManager()
+
     class Meta:
         verbose_name_plural = "   Question"
 
@@ -81,6 +84,7 @@ class Question(models.Model):
 class Option(models.Model):
     question = models.ForeignKey(Question, related_name="options", on_delete=models.CASCADE)
     title = models.CharField(max_length=100)
+    is_correct = models.BooleanField(default=False)
 
     objects = managers.OptionManager()
 

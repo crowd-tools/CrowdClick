@@ -29,6 +29,19 @@ class TaskManager(models.Manager):
         )
 
 
+class QuestionManager(models.Manager):
+    def get_queryset(self):
+        qs = super(QuestionManager, self).get_queryset()
+        qs = qs.annotate(
+            is_quiz=models.Case(
+                models.When(options__is_correct=True, then=True),
+                default=False,
+                output_field=models.BooleanField(),
+            ),
+        )
+        return qs
+
+
 class OptionManager(models.Manager):
     def get_queryset(self):
         qs = super().get_queryset()
