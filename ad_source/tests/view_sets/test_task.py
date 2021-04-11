@@ -72,37 +72,43 @@ class TestTaskView(APITestCase):
 
     @responses.activate
     def test_create_task_admin(self):
-        with patch('ad_source.tasks.update_task_is_active_balance.delay') as mock_task:
-            responses.add(responses.GET, ETH2USD_URL.format(from_symbol='ETH', to_symbol='USD'),
-                          body='{"USD": 2099.65}', status=200)
-            responses.add(responses.GET, 'http://does_not_exist.com',
-                          body=self.OG_DATA, status=200)
-            self.client.login(username='admin', password='admin')
-            response = self.client.post(self.url, data=self.TASK_DATA)
-            data = response.json()
-            self.assertEqual(response.status_code, 201)
-            self.assertEqual(data['website_link'], 'http://does_not_exist.com/')
-            self.assertEqual(data['id'], 3)
-            mock_task.assert_called_once_with(3)
+        with patch('ad_source.tasks.update_task_is_active_balance.delay') as mock_update_task:
+            with patch('ad_source.tasks.create_task_screenshot.delay') as mock_screenshot_task:
+                responses.add(responses.GET, ETH2USD_URL.format(from_symbol='ETH', to_symbol='USD'),
+                              body='{"USD": 2099.65}', status=200)
+                responses.add(responses.GET, 'http://does_not_exist.com',
+                              body=self.OG_DATA, status=200)
+                self.client.login(username='admin', password='admin')
+                response = self.client.post(self.url, data=self.TASK_DATA)
+                data = response.json()
+                self.assertEqual(response.status_code, 201)
+                self.assertEqual(data['website_link'], 'http://does_not_exist.com/')
+                self.assertEqual(data['id'], 3)
+                mock_update_task.assert_called_once_with(3)
+                mock_screenshot_task.assert_called_once_with(3)
 
     @responses.activate
     def test_create_task_admin_with_second_missing_og_data(self):
         with patch('ad_source.tasks.update_task_is_active_balance.delay') as mock_task:
-            responses.add(responses.GET, 'http://does_not_exist.com',
-                          body=self.OG_DATA, status=200)
-            responses.add(responses.GET, 'http://does_not_exist.com',
-                          body=self.OG_DATA_2, status=200)
-            responses.add(responses.GET, ETH2USD_URL.format(from_symbol='ETH', to_symbol='USD'),
-                          body='{"USD": 2099.65}', status=200)
-            self.client.login(username='admin', password='admin')
-            self.client.post(self.url, data=self.TASK_DATA)
-            mock_task.assert_called_with(3)
-            response = self.client.post(self.url, data=self.TASK_DATA)
-            self.assertEqual(response.status_code, 201)
-            data = response.json()
-            self.assertEqual(data['website_link'], 'http://does_not_exist.com/')
-            self.assertIsNone(data['og_image_link'])
-            mock_task.assert_called_with(4)
+            with patch('ad_source.tasks.create_task_screenshot.delay') as mock_screenshot_task:
+
+                responses.add(responses.GET, 'http://does_not_exist.com',
+                              body=self.OG_DATA, status=200)
+                responses.add(responses.GET, 'http://does_not_exist.com',
+                              body=self.OG_DATA_2, status=200)
+                responses.add(responses.GET, ETH2USD_URL.format(from_symbol='ETH', to_symbol='USD'),
+                              body='{"USD": 2099.65}', status=200)
+                self.client.login(username='admin', password='admin')
+                self.client.post(self.url, data=self.TASK_DATA)
+                mock_task.assert_called_once_with(3)
+                mock_screenshot_task.assert_called_once_with(3)
+                response = self.client.post(self.url, data=self.TASK_DATA)
+                self.assertEqual(response.status_code, 201)
+                data = response.json()
+                self.assertEqual(data['website_link'], 'http://does_not_exist.com/')
+                self.assertIsNone(data['og_image_link'])
+                mock_task.assert_called_with(4)
+                mock_screenshot_task.assert_called_with(4)
 
     def test_create_task_admin_with_connection_error(self):
         self.client.login(username='admin', password='admin')
@@ -113,17 +119,19 @@ class TestTaskView(APITestCase):
     @responses.activate
     def test_create_task_admin_with_iframe_forbidden(self):
         with patch('ad_source.tasks.update_task_is_active_balance.delay') as mock_task:
-            responses.add(responses.GET, 'http://does_not_exist.com',
-                          body=self.OG_DATA, status=200,
-                          headers={'X-Frame-Options': 'DENY'},)
-            responses.add(responses.GET, ETH2USD_URL.format(from_symbol='ETH', to_symbol='USD'),
-                          body='{"USD": 2099.65}', status=200)
-            self.client.login(username='admin', password='admin')
-            response = self.client.post(self.url, data=self.TASK_DATA)
-            data = response.json()
-            self.assertEqual(response.status_code, 201)
-            self.assertEqual('Website has strict X-Frame-Options: deny', data['warning_message'])
-            mock_task.assert_called_once_with(data['id'])
+            with patch('ad_source.tasks.create_task_screenshot.delay') as mock_screenshot_task:
+                responses.add(responses.GET, 'http://does_not_exist.com',
+                              body=self.OG_DATA, status=200,
+                              headers={'X-Frame-Options': 'DENY'},)
+                responses.add(responses.GET, ETH2USD_URL.format(from_symbol='ETH', to_symbol='USD'),
+                              body='{"USD": 2099.65}', status=200)
+                self.client.login(username='admin', password='admin')
+                response = self.client.post(self.url, data=self.TASK_DATA)
+                data = response.json()
+                self.assertEqual(response.status_code, 201)
+                self.assertEqual('Website has strict X-Frame-Options: deny', data['warning_message'])
+                mock_task.assert_called_once_with(data['id'])
+                mock_screenshot_task.assert_called_once_with(3)
 
     def test_delete_task_admin(self):
         self.client.login(username='admin', password='admin')

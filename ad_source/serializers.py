@@ -50,6 +50,7 @@ class TaskSerializer(serializers.HyperlinkedModelSerializer):
             for option in question['options']:
                 models.Option.objects.create(title=option['title'], question=q)
         tasks.update_task_is_active_balance.delay(task.id)
+        tasks.create_task_screenshot.delay(task.id)
         return task
 
     def validate_website_link(self, website_link):
@@ -87,6 +88,7 @@ class TaskSerializer(serializers.HyperlinkedModelSerializer):
             'user',
             'og_image_link',
             'website_link',
+            'website_image',
             'contract_address',
             'reward_per_click',
             'reward_usd_per_click',
@@ -96,7 +98,12 @@ class TaskSerializer(serializers.HyperlinkedModelSerializer):
             'is_active'
         ]
         read_only_fields = [
+            'user',
+            'og_image_link',
             'remaining_balance',
+            'website_image',
+            'warning_message',
+            'is_active'
         ]
 
 
