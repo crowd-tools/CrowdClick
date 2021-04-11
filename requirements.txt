@@ -14,6 +14,7 @@ ethereum==2.3.2
 Pillow==8.1.1
 psycopg2==2.8.5
 python-memcached==1.59
+pyppeteer==0.2.5
 requests==2.23.0
 rlp==1.2.0
 sentry-sdk==0.14.3

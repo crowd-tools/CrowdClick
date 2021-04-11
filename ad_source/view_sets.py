@@ -237,6 +237,12 @@ class RewardViewSet(mixins.CreateModelMixin, mixins.ListModelMixin, viewsets.Gen
             if request.user.id not in task.answers.values_list('user_id', flat=True):
                 data = {"error": "User didn't answer the task"}
                 return Response(data=data, status=status.HTTP_400_BAD_REQUEST)
+            for question in task.questions.all():
+                if question.is_quiz:
+                    correct_option = question.options.get(is_correct=True)
+                    if not task.answers.filter(user=request.user, selected_options=correct_option).exists():
+                        data = {"error": "User didn't answer the task correctly"}
+                        return Response(data=data, status=status.HTTP_400_BAD_REQUEST)
             reward, created = models.Reward.objects.get_or_create(
                 receiver=request.user,
                 task=task,

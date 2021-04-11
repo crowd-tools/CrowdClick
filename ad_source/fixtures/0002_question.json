@@ -16,5 +16,14 @@
       "title": "Was it fast?",
       "question_type": "RA"
     }
+  },
+  {
+    "model": "ad_source.question",
+    "pk": 3,
+    "fields": {
+      "task": 3,
+      "title": "To be or not to be?",
+      "question_type": "RA"
+    }
   }
 ]

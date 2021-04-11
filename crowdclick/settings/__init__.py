@@ -30,7 +30,7 @@ env = environ.Env(
     SECRET_KEY=(str, '39h^zm85$8ehrv+_1o=d-k9caiu_e=$)0oti42w9)krz4@6_0c'),
     ALLOWED_HOSTS=(list, ["*"]),
 
-    DATABASE_URL=(str, f"sqlite://{os.path.join(BASE_DIR, '../db.sqlite3')}"),  # XXX DEFAULT_DATABASE_ENV?
+    DATABASE_URL=(str, f"sqlite:///{os.path.join(BASE_DIR, '../db.sqlite3')}"),
     BROKER_URL=(str, 'pyamqp://guest@localhost//'),
 
     ACCOUNT_OWNER_PUBLIC_KEY=(str, '0x9c76e3A23A87f624aAdEff7ca5e74103476eD11C'),  # ServerConfigViewSet
@@ -38,6 +38,8 @@ env = environ.Env(
         'mumbai': Web3Config()  # dataclass defaults
         # 'goerli', ...
     }),
+    ETH2USD_URL=(str, 'https://min-api.cryptocompare.com/data/price?fsym={from_symbol}&tsyms={to_symbol}'),
+    ETH2USD_CACHE_KEY=(str, 'ETH-PRICES'),
     DJANGO_ADMIN_URL=(str, 'admin'),
 
     SENTRY_DSN=(str, ''),
@@ -84,6 +86,9 @@ CACHES = {
 
 SENTRY_DSN = env.str('SENTRY_DSN')
 SENTRY_DSN_CELERY = env.str('SENTRY_DSN_CELERY')
+
+ETH2USD_URL = env.str('ETH2USD_URL')
+ETH2USD_CACHE_KEY = env.str('ETH2USD_CACHE_KEY')
 
 if SENTRY_DSN:
     import sentry_sdk

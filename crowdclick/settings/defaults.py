@@ -128,6 +128,7 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/dev/howto/static-files/
 
 MEDIA_ROOT = 'assets/'
+MEDIA_URL = '/backend_media/'
 LOGOUT_REDIRECT_URL = '/'
 
 STATIC_URL = '/backend_static/'

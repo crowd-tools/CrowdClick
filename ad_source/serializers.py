@@ -21,6 +21,7 @@ class OptionSerializer(serializers.HyperlinkedModelSerializer):
             'title',
             'url',
             'answer_count',
+            'is_correct',
         ]
 
 
@@ -50,10 +51,20 @@ class TaskSerializer(serializers.HyperlinkedModelSerializer):
             for option in question['options']:
                 models.Option.objects.create(title=option['title'], question=q)
         tasks.update_task_is_active_balance.delay(task.id)
+        tasks.create_task_screenshot.delay(task.id)
         return task
 
     def validate_website_link(self, website_link):
         return convert_url(website_link)
+
+    def validate_questions(self, questions):
+        for question in questions:
+            # Validate number of correct options is max one
+            correct_question_sum = sum([option.get('is_correct', False) for option in question.get('options', [])])
+            if not correct_question_sum <= 1:
+                raise serializers.ValidationError({
+                    'question': f"Question {question.get('title', '')} has {correct_question_sum} correct questions."})
+        return questions
 
     def validate(self, attrs):
         website_link = attrs.get('website_link')
@@ -86,7 +97,9 @@ class TaskSerializer(serializers.HyperlinkedModelSerializer):
             'chain',
             'user',
             'og_image_link',
+            'uuid',
             'website_link',
+            'website_image',
             'contract_address',
             'reward_per_click',
             'reward_usd_per_click',
@@ -96,7 +109,12 @@ class TaskSerializer(serializers.HyperlinkedModelSerializer):
             'is_active'
         ]
         read_only_fields = [
+            'user',
+            'og_image_link',
             'remaining_balance',
+            'website_image',
+            'warning_message',
+            'is_active'
         ]
 
 

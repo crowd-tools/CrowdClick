@@ -1,11 +1,26 @@
-db.sqlite3
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Env
+env
+.tool-versions
+.deployment.txt
+
+# IDE
 .idea
-__pycache__
-static
 
 # Settings
 crowdclick/settings/.env
 crowdclick/settings/local_optional.py
 
+# Database
+db.sqlite3
+
 # Coverage
 .coverage
+
+# Content
+static
+assets/task_website_image
