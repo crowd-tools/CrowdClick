@@ -30,7 +30,7 @@ env = environ.Env(
     SECRET_KEY=(str, '39h^zm85$8ehrv+_1o=d-k9caiu_e=$)0oti42w9)krz4@6_0c'),
     ALLOWED_HOSTS=(list, ["*"]),
 
-    DATABASE_URL=(str, f"sqlite://{os.path.join(BASE_DIR, '../db.sqlite3')}"),  # XXX DEFAULT_DATABASE_ENV?
+    DATABASE_URL=(str, f"sqlite:///{os.path.join(BASE_DIR, '../db.sqlite3')}"),
     BROKER_URL=(str, 'pyamqp://guest@localhost//'),
 
     ACCOUNT_OWNER_PUBLIC_KEY=(str, '0x9c76e3A23A87f624aAdEff7ca5e74103476eD11C'),  # ServerConfigViewSet
