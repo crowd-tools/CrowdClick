@@ -1,12 +1,12 @@
 from unittest.mock import patch
 
 import responses
+from django.conf import settings
 from django.urls import reverse
 from rest_framework import status
 from rest_framework.test import APITestCase
 
 from ad_source import models
-from ad_source.helpers import ETH2USD_URL
 
 
 class TestTaskView(APITestCase):
@@ -44,31 +44,46 @@ class TestTaskView(APITestCase):
         self.published_task = models.Task.objects.get(pk=1)
         self.detail_url = reverse('task_view-detail', kwargs={'pk': self.published_task.id})
 
+    @responses.activate
     def test_list_task(self):
+        responses.add(responses.GET, settings.ETH2USD_URL.format(from_symbol='ETH', to_symbol='USD'),
+                      body='{"USD": 2099.65}', status=200)
         response = self.client.get(self.url)
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.data['count'], 3)
 
+    @responses.activate
     def test_filter_tasks_by_chain(self):
+        responses.add(responses.GET, settings.ETH2USD_URL.format(from_symbol='ETH', to_symbol='USD'),
+                      body='{"USD": 2099.65}', status=200)
         response = self.client.get(self.url, data={"chain": "mumbai"})
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.data['count'], 1)
 
+    @responses.activate
     def test_list_task_admin(self):
+        responses.add(responses.GET, settings.ETH2USD_URL.format(from_symbol='ETH', to_symbol='USD'),
+                      body='{"USD": 2099.65}', status=200)
         self.client.login(username='admin', password='admin')
         response = self.client.get(self.url)
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.data['count'], 3)
 
+    @responses.activate
     def test_list_campaign_admin(self):
         # List tasks that are not quiz
+        responses.add(responses.GET, settings.ETH2USD_URL.format(from_symbol='ETH', to_symbol='USD'),
+                      body='{"USD": 2099.65}', status=200)
         self.client.login(username='admin', password='admin')
         response = self.client.get(self.url, data={'type': 'campaign'})
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.data['count'], 2)
 
+    @responses.activate
     def test_list_quiz_admin(self):
         # List tasks that are quiz
+        responses.add(responses.GET, settings.ETH2USD_URL.format(from_symbol='ETH', to_symbol='USD'),
+                      body='{"USD": 2099.65}', status=200)
         self.client.login(username='admin', password='admin')
         response = self.client.get(self.url, data={'type': 'quiz'})
         self.assertEqual(response.status_code, 200)
@@ -82,7 +97,7 @@ class TestTaskView(APITestCase):
     def test_create_task_admin(self):
         with patch('ad_source.tasks.update_task_is_active_balance.delay') as mock_update_task:
             with patch('ad_source.tasks.create_task_screenshot.delay') as mock_screenshot_task:
-                responses.add(responses.GET, ETH2USD_URL.format(from_symbol='ETH', to_symbol='USD'),
+                responses.add(responses.GET, settings.ETH2USD_URL.format(from_symbol='ETH', to_symbol='USD'),
                               body='{"USD": 2099.65}', status=200)
                 responses.add(responses.GET, 'http://does_not_exist.com',
                               body=self.OG_DATA, status=200)
@@ -102,7 +117,7 @@ class TestTaskView(APITestCase):
             with patch('ad_source.tasks.create_task_screenshot.delay') as mock_screenshot_task:
                 responses.add(responses.GET, 'http://does_not_exist.com',
                               body=self.OG_DATA, status=200)
-                responses.add(responses.GET, ETH2USD_URL.format(from_symbol='ETH', to_symbol='USD'),
+                responses.add(responses.GET, settings.ETH2USD_URL.format(from_symbol='ETH', to_symbol='USD'),
                               body='{"USD": 2099.65}', status=200)
                 self.client.login(username='admin', password='admin')
                 response = self.client.post(self.url, data=self.TASK_DATA)
@@ -127,7 +142,7 @@ class TestTaskView(APITestCase):
                 responses.add(responses.GET, 'http://does_not_exist.com',
                               body=self.OG_DATA, status=200,
                               headers={'X-Frame-Options': 'DENY'},)
-                responses.add(responses.GET, ETH2USD_URL.format(from_symbol='ETH', to_symbol='USD'),
+                responses.add(responses.GET, settings.ETH2USD_URL.format(from_symbol='ETH', to_symbol='USD'),
                               body='{"USD": 2099.65}', status=200)
                 self.client.login(username='admin', password='admin')
                 response = self.client.post(self.url, data=self.TASK_DATA)
@@ -142,7 +157,10 @@ class TestTaskView(APITestCase):
         response = self.client.delete(self.detail_url)
         self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
 
+    @responses.activate
     def test_delete_task_user(self):
+        responses.add(responses.GET, settings.ETH2USD_URL.format(from_symbol='ETH', to_symbol='USD'),
+                      body='{"USD": 2099.65}', status=200)
         self.client.login(username='0xa1f765189805e0e51ac9753a9bc7d99e2b90c705', password='admin')
         response = self.client.delete(self.detail_url)
         self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
@@ -155,7 +173,10 @@ class TestTaskView(APITestCase):
 class TestUserTaskView(APITestCase):
     fixtures = ['0000_users', '0001_task', '0002_question', '0003_options']
 
+    @responses.activate
     def test_list_user_tasks(self):
+        responses.add(responses.GET, settings.ETH2USD_URL.format(from_symbol='ETH', to_symbol='USD'),
+                      body='{"USD": 2099.65}', status=200)
         self.client.login(username='admin', password='admin')
         response = self.client.get(
             reverse('user_tasks_view', kwargs={'contract_address': '0xdeadc0dedeadc0de'})
