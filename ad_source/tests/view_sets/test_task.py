@@ -14,6 +14,7 @@ class TestTaskView(APITestCase):
     TASK_DATA = {
         "title": "Check our site",
         "description": "Awesome site. Go check it now and earn crypto",
+        "uuid": " d8f01220-4c85-4b35-a3e2-9ff33858a6e7",
         "website_link": "does_not_exist.com",
         "contract_address": "0xdeadc0dedeadc0de",
         "reward_per_click": 0.001,
@@ -34,13 +35,6 @@ class TestTaskView(APITestCase):
   <head>
     <meta property="og:image" content="http://ogp.me/logo.png">
   </head>
-  <body></body>
-</html>
-"""
-    OG_DATA_2 = """
-<!DOCTYPE html>
-<html>
-  <head></head>
   <body></body>
 </html>
 """
@@ -86,23 +80,19 @@ class TestTaskView(APITestCase):
             mock_task.assert_called_once_with(3)
 
     @responses.activate
-    def test_create_task_admin_with_second_missing_og_data(self):
+    def test_create_task_admin_with_duplicates(self):
         with patch('ad_source.tasks.update_task_is_active_balance.delay') as mock_task:
             responses.add(responses.GET, 'http://does_not_exist.com',
                           body=self.OG_DATA, status=200)
-            responses.add(responses.GET, 'http://does_not_exist.com',
-                          body=self.OG_DATA_2, status=200)
             responses.add(responses.GET, ETH2USD_URL.format(from_symbol='ETH', to_symbol='USD'),
                           body='{"USD": 2099.65}', status=200)
             self.client.login(username='admin', password='admin')
-            self.client.post(self.url, data=self.TASK_DATA)
-            mock_task.assert_called_with(3)
             response = self.client.post(self.url, data=self.TASK_DATA)
-            self.assertEqual(response.status_code, 201)
-            data = response.json()
-            self.assertEqual(data['website_link'], 'http://does_not_exist.com/')
-            self.assertIsNone(data['og_image_link'])
-            mock_task.assert_called_with(4)
+            mock_task.assert_called_with(3)
+            self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+            response = self.client.post(self.url, data=self.TASK_DATA)
+            self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+            self.assertIn('uuid', response.json())
 
     def test_create_task_admin_with_connection_error(self):
         self.client.login(username='admin', password='admin')

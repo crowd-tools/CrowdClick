@@ -2,7 +2,9 @@ db.sqlite3
 .idea
 __pycache__
 static
-
+env
+.tool-versions
+.deployment.txt
 # Settings
 crowdclick/settings/.env
 crowdclick/settings/local_optional.py
