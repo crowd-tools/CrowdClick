@@ -183,6 +183,7 @@ class TaskDashboardSerializer(TaskSerializer):
             'chain',
             'user',
             'og_image_link',
+            'uuid',
             'website_link',
             'reward_per_click',
             'reward_usd_per_click',
