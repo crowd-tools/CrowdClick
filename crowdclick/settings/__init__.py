@@ -18,7 +18,9 @@ from split_settings.tools import optional, include
 
 from .web3_config import Web3Config
 
-BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+from pathlib import Path
+
+BASE_DIR = Path(__file__).parent.parent
 
 env = environ.Env(
     # SECURITY WARNING: don't run with debug turned on in production!
