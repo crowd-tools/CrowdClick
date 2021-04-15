@@ -33,11 +33,17 @@ schema_view = get_schema_view(
    permission_classes=(permissions.IsAuthenticated,),
 )
 
+
+def trigger_error(request):
+    raise ZeroDivisionError("Keep calm and divide by zero - (This is emulated error)")
+
+
 urlpatterns = [
     path(f'{settings.DJANGO_ADMIN_URL}/', admin.site.urls),
     path('swagger/', schema_view.with_ui('swagger', cache_timeout=0), name='schema-swagger-ui'),
     path('redoc/', schema_view.with_ui('redoc', cache_timeout=0), name='schema-redoc'),
     path('', include('ad_source.urls')),
+    path('api/sentry-debug/', trigger_error),
 ] + static(
     settings.STATIC_URL, document_root=settings.STATIC_ROOT
 ) + static(
