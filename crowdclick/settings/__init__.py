@@ -90,6 +90,21 @@ SENTRY_DSN_CELERY = env.str('SENTRY_DSN_CELERY')
 ETH2USD_URL = env.str('ETH2USD_URL')
 ETH2USD_CACHE_KEY = env.str('ETH2USD_CACHE_KEY')
 
+env_settings = f'{ENVIRONMENT.lower()}.py'
+
+include(
+    'defaults.py',
+    'crowdclick.py',
+    optional('logging.py'),
+
+    optional(env_settings if not TEST else None),
+    optional('testing.py' if TEST else None),
+    optional('local_optional.py' if not TEST else None),
+
+    scope=locals()
+)
+
+
 if SENTRY_DSN:
     import sentry_sdk
     from sentry_sdk.integrations.django import DjangoIntegration
@@ -110,17 +125,3 @@ if SENTRY_DSN:
         # django.contrib.auth) you may enable sending PII data.
         send_default_pii=True,
     )
-
-env_settings = f'{ENVIRONMENT.lower()}.py'
-
-include(
-    'defaults.py',
-    'crowdclick.py',
-    optional('logging.py'),
-
-    optional(env_settings if not TEST else None),
-    optional('testing.py' if TEST else None),
-    optional('local_optional.py' if not TEST else None),
-
-    scope=locals()
-)
