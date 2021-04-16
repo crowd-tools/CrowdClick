@@ -92,25 +92,10 @@ SENTRY_DSN_CELERY = env.str('SENTRY_DSN_CELERY')
 ETH2USD_URL = env.str('ETH2USD_URL')
 ETH2USD_CACHE_KEY = env.str('ETH2USD_CACHE_KEY')
 
-env_settings = f'{ENVIRONMENT.lower()}.py'
-
-include(
-    'defaults.py',
-    'crowdclick.py',
-    optional('logging.py'),
-
-    optional(env_settings if not TEST else None),
-    optional('testing.py' if TEST else None),
-    optional('local_optional.py' if not TEST else None),
-
-    scope=locals()
-)
-
-
 if SENTRY_DSN:
     import sentry_sdk
     from sentry_sdk.integrations.django import DjangoIntegration
-    print(f"Initializing Sentry '{SENTRY_DSN}' {ENVIRONMENT}")
+    print(f"Initializing Sentry '{SENTRY_DSN}' {ENVIRONMENT}", file=sys.stderr)
     sentry_sdk.init(
         dsn=SENTRY_DSN,
         integrations=[DjangoIntegration()],
@@ -128,4 +113,18 @@ if SENTRY_DSN:
         send_default_pii=True,
     )
 else:
-    print(f"NOT Initializing Sentry dsn: '{SENTRY_DSN}'")
+    print(f"NOT Initializing Sentry dsn: '{SENTRY_DSN}'", file=sys.stderr)
+
+env_settings = f'{ENVIRONMENT.lower()}.py'
+
+include(
+    'defaults.py',
+    'crowdclick.py',
+    optional('logging.py'),
+
+    optional(env_settings if not TEST else None),
+    optional('testing.py' if TEST else None),
+    optional('local_optional.py' if not TEST else None),
+
+    scope=locals()
+)
