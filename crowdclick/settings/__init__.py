@@ -110,7 +110,7 @@ include(
 if SENTRY_DSN:
     import sentry_sdk
     from sentry_sdk.integrations.django import DjangoIntegration
-
+    print(f"Initializing Sentry '{SENTRY_DSN}' {ENVIRONMENT}")
     sentry_sdk.init(
         dsn=SENTRY_DSN,
         integrations=[DjangoIntegration()],
@@ -127,3 +127,5 @@ if SENTRY_DSN:
         # django.contrib.auth) you may enable sending PII data.
         send_default_pii=True,
     )
+else:
+    print(f"NOT Initializing Sentry dsn: '{SENTRY_DSN}'")
