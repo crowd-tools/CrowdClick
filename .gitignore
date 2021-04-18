@@ -18,6 +18,9 @@ crowdclick/settings/local_optional.py
 # Database
 db.sqlite3
 
+# Logging
+logs
+
 # Coverage
 .coverage
 
