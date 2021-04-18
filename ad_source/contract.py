@@ -351,6 +351,19 @@ abi = r'''
   {
     "inputs": [
       {
+        "internalType": "uint256",
+        "name": "_updatedMaximumWeiUserWithdrawal",
+        "type": "uint256"
+      }
+    ],
+    "name": "changeMaximumWeiUserWithdrawal",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
         "internalType": "address",
         "name": "_address",
         "type": "address"
