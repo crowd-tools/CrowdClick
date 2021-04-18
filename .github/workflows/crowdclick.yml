@@ -29,6 +29,7 @@ jobs:
         python -m pip install -r requirements-dev.txt
         mkdir -p assets/task_image
         echo 'iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAAAAAA6fptVAAAACklEQVR4nGP6DwABBQECz6AuzQAAAABJRU5ErkJggg==' | base64 -d > assets/task_image/placeholder.png
+        mkdir -p logs
     - name: Run migrations
       run: |
         python manage.py migrate
