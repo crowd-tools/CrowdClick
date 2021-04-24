@@ -10,7 +10,7 @@ from web3 import Web3
 from web3.contract import Contract
 from web3.types import ENS
 
-from . import contract, helpers, models
+from . import contracts, helpers, models
 
 if typing.TYPE_CHECKING:  # pragma: no cover
     from crowdclick.settings import Web3Config
@@ -20,6 +20,8 @@ if typing.TYPE_CHECKING:  # pragma: no cover
 class Web3Provider:
     web3: Web3
     contract: Contract
+    admin_contract: Contract
+    currency: str
     chain_id: int
     public_key: typing.Union[Address, ChecksumAddress, ENS]
     private_key: str
@@ -47,11 +49,28 @@ class Web3Provider:
         checksum_address = Web3.toChecksumAddress(task.user.username)
         response = self.contract.functions.lookupTask(
             str(task.uuid or ''),
-        ).call({'from': checksum_address})
+            checksum_address,
+        ).call()
         task_budget, task_reward, current_budget, url, is_active, *_ = response
         task_budget_eth = self.web3.fromWei(task_budget, 'ether')
         task_budget_usd = helpers.ETH2USD.get() * task_budget_eth
         return is_active, task_budget_usd
+
+    def push_underlying_usd_price(self):
+        # checksum_address = Web3.toChecksumAddress(self.public_key)
+        value = helpers.ETH2USD.get(from_symbol=self.currency)
+        value_uint = self.web3.toWei(value, 'ether')
+        w3_transaction = self.admin_contract.functions.adminPushUnderlyingUSDPrice(value_uint).buildTransaction({
+            'chainId': self.chain_id,
+            'gas': self.default_gas_fee,
+            'gasPrice': self.web3.toWei('1', 'gwei'),
+            'nonce': self.web3.eth.getTransactionCount(self.public_key)
+        })
+        txn_signed = self.web3.eth.account.sign_transaction(w3_transaction, private_key=self.private_key)
+        tx_hash_hex = self.web3.eth.sendRawTransaction(txn_signed.rawTransaction)  # tx_hash
+        tx_hash = tx_hash_hex.hex()
+        result = self.admin_contract.functions.getUnderlyingUsdPriceFeed().call()
+        return value_uint, result, tx_hash
 
 
 class Web3ProviderStorage(dict):
@@ -66,12 +85,15 @@ class Web3ProviderStorage(dict):
         else:  # pragma: no cover
             provider = Web3(Web3.HTTPProvider(config.endpoint))
 
-        contract_spec = json.loads(contract.abi)
-        contract_abi = contract_spec
-        contract_instance = provider.eth.contract(abi=contract_abi, address=config.contract_address)
+        escrow_contract_abi = json.loads(contracts.escrow_contract_abi)
+        oracle_contract_abi = json.loads(contracts.oracle_contract_abi)
+        contract_instance = provider.eth.contract(abi=escrow_contract_abi, address=config.escrow_address)
+        admin_contract_instance = provider.eth.contract(abi=oracle_contract_abi, address=config.oracle_address)
         w3_provider = Web3Provider(
             web3=provider,
             contract=contract_instance,
+            admin_contract=admin_contract_instance,
+            currency=config.currency,
             chain_id=config.chain_id,
             public_key=config.public_key,
             private_key=config.private_key,
