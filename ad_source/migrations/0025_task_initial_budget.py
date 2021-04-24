@@ -13,6 +13,6 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='task',
             name='initial_budget',
-            field=models.DecimalField(decimal_places=3, default=None, max_digits=9, null=True, verbose_name='Initial task budget '),
+            field=models.DecimalField(decimal_places=3, default=None, max_digits=9, null=True, verbose_name='Initial task budget'),
         ),
     ]
