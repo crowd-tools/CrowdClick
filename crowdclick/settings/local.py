@@ -31,6 +31,7 @@ class CorsMiddleware:
         response["Access-Control-Allow-Origin"] = "http://localhost:3000"
         response["Access-Control-Allow-Credentials"] = 'true'
         response["Access-Control-Allow-Headers"] = 'content-type'
+        response['Access-Control-Allow-Methods'] = 'GET, POST, PUT, PATCH, DELETE, OPTIONS'
         return response
 
 
