@@ -39,7 +39,7 @@ env = environ.Env(
         'mumbai': Web3Config()  # dataclass defaults
         # 'goerli', ...
     }),
-    ETH2USD_URL=(str, 'https://min-api.cryptocompare.com/data/price?fsym={from_symbol}&tsyms={to_symbol}'),
+    ETH2USD_URL=(str, 'https://min-api.cryptocompare.com/data/pricemulti?fsyms={from_symbol}&tsyms={to_symbol}'),
     ETH2USD_CACHE_KEY=(str, 'ETH-PRICES'),
     DJANGO_ADMIN_URL=(str, 'admin'),
 
@@ -81,7 +81,8 @@ CACHES = {
     'default': {
         'BACKEND': 'django.core.cache.backends.memcached.MemcachedCache',
         'LOCATION': '127.0.0.1:11211',
-        'KEY_PREFIX': f'crowdclick_{ENVIRONMENT}'
+        'KEY_PREFIX': f'crowdclick_{ENVIRONMENT}',
+        'TIMEOUT': 60 * 60,  # 1 hour
     }
 }
 
