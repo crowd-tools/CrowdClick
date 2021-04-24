@@ -106,7 +106,9 @@ class TaskSerializer(serializers.HyperlinkedModelSerializer):
             'time_duration',
             'questions',
             'warning_message',
-            'is_active'
+            'is_active',
+            'remaining_balance',
+            'initial_budget'
         ]
         read_only_fields = [
             'user',
@@ -114,7 +116,7 @@ class TaskSerializer(serializers.HyperlinkedModelSerializer):
             'remaining_balance',
             'website_image',
             'warning_message',
-            'is_active'
+            'is_active',
         ]
 
 
@@ -191,6 +193,8 @@ class TaskDashboardSerializer(TaskSerializer):
             'questions',
             'answers_result_count',
             'answers',
+            'remaining_balance',
+            'initial_budget'
         ]
 
 
