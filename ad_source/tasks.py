@@ -2,6 +2,7 @@ import asyncio
 import io
 import logging
 
+from django.conf import settings
 from django.core.files.images import ImageFile
 from django.utils.text import slugify
 from pyppeteer import launch
@@ -57,3 +58,15 @@ def update_task_is_active_balance(self, task_id: int = 4) -> dict:
 @celery.app.task(bind=True)
 def create_task_screenshot(self, task_id: int):
     asyncio.run(async_create_task_screenshot(task_id=task_id))
+
+
+@celery.app.task(bind=True)
+def push_underlying_usd_price(self):
+    """
+    For each client in settings, push his price to WEB3
+    """
+    for chain in settings.WEB3_CONFIG.keys():
+        w3_provider: web3_providers.Web3Provider = web3_providers.web3_storage[chain]
+        value, result, tx_hash = w3_provider.push_underlying_usd_price()
+        logger.info(f"Pushed underlying {w3_provider.currency} price {value}"
+                    f" result {result} to {chain}, tx: {tx_hash}")

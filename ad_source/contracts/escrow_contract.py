@@ -1,4 +1,4 @@
-abi = r'''
+escrow_contract_abi = r'''
 [
   {
     "anonymous": false,
