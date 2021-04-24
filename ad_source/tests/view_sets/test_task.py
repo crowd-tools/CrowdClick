@@ -107,6 +107,26 @@ class TestTaskView(APITestCase):
                 mock_screenshot_task.assert_called_once_with(4)
 
     @responses.activate
+    def test_create_quiz_task_admin(self):
+        with patch('ad_source.tasks.update_task_is_active_balance.delay') as mock_update_task:
+            with patch('ad_source.tasks.create_task_screenshot.delay') as mock_screenshot_task:
+                data = self.TASK_DATA
+                data['questions'][0]['options'][0]['is_correct'] = True
+                responses.add(responses.GET, ETH2USD.BASE_URL, body=ETH2USD_DATA, status=200)
+                responses.add(responses.GET, 'http://does_not_exist.com',
+                              body=self.OG_DATA, status=200)
+                self.client.login(username='admin', password='admin')
+                response = self.client.post(self.url, data=data)
+                data = response.json()
+                self.assertEqual(response.status_code, 201)
+                self.assertEqual(data['website_link'], 'http://does_not_exist.com/')
+                self.assertEqual(data['id'], 4)
+                self.assertTrue(data['questions'][0]['options'][0]['is_correct'])
+                self.assertEqual(data['uuid'], 'd8f01220-4c85-4b35-a3e2-9ff33858a6e7')
+                mock_update_task.assert_called_once_with(4)
+                mock_screenshot_task.assert_called_once_with(4)
+
+    @responses.activate
     def test_create_task_admin_with_duplicates(self):
         with patch('ad_source.tasks.update_task_is_active_balance.delay') as mock_task:
             with patch('ad_source.tasks.create_task_screenshot.delay') as mock_screenshot_task:
