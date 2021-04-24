@@ -1,8 +1,10 @@
 import responses
-from django.conf import settings
 from django.urls import reverse
 from rest_framework import status
 from rest_framework.test import APITestCase
+
+from ad_source.helpers import ETH2USD
+from ad_source.tests.view_sets import ETH2USD_DATA
 
 
 class TestAnswerView(APITestCase):
@@ -30,8 +32,7 @@ class TestAnswerView(APITestCase):
 
     @responses.activate
     def test_create_answer_admin(self):
-        responses.add(responses.GET, settings.ETH2USD_URL.format(from_symbol='ETH', to_symbol='USD'),
-                      body='{"USD": 2099.65}', status=200)
+        responses.add(responses.GET, ETH2USD.BASE_URL, body=ETH2USD_DATA, status=200)
         self.client.login(username='admin', password='admin')
         response = self.client.get(self.list_url)
         data = response.json()
@@ -108,8 +109,7 @@ class TestQuizAnswerView(APITestCase):
 
     @responses.activate
     def test_create_correct_admin(self):
-        responses.add(responses.GET, settings.ETH2USD_URL.format(from_symbol='ETH', to_symbol='USD'),
-                      body='{"USD": 2099.65}', status=200)
+        responses.add(responses.GET, ETH2USD.BASE_URL, body=ETH2USD_DATA, status=200)
         self.client.login(username='admin', password='admin')
         response = self.client.get(self.list_url)
         data = response.json()
@@ -124,8 +124,7 @@ class TestQuizAnswerView(APITestCase):
     @responses.activate
     def test_create_wrong_admin(self):
         # Creating wrong answer is allowed. Task will get hidden
-        responses.add(responses.GET, settings.ETH2USD_URL.format(from_symbol='ETH', to_symbol='USD'),
-                      body='{"USD": 2099.65}', status=200)
+        responses.add(responses.GET, ETH2USD.BASE_URL, body=ETH2USD_DATA, status=200)
         self.client.login(username='admin', password='admin')
         response = self.client.get(self.list_url)
         data = response.json()
