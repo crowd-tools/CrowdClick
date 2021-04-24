@@ -14,7 +14,11 @@ TASK_TYPE_CHOICES = {
 class TaskFilter(filters.FilterSet):
     public_key = filters.CharFilter(field_name='user__username')
     contract_address = filters.CharFilter(field_name='contract_address')
-    type = filters.ChoiceFilter(method='filter_type', choices=TASK_TYPE_CHOICES)
+    type = filters.ChoiceFilter(
+        method='filter_type',
+        choices=TASK_TYPE_CHOICES,
+        help_text=f"Options: {', '.join([k for k, v in TASK_TYPE_CHOICES])}"
+    )
 
     class Meta:
         model = models.Task
