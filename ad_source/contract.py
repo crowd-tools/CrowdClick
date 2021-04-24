@@ -403,6 +403,20 @@ abi = r'''
   },
   {
     "inputs": [],
+    "name": "isUserWithdrawalEnabled",
+    "outputs": [
+      {
+        "internalType": "bool",
+        "name": "",
+        "type": "bool"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function",
+    "constant": true
+  },
+  {
+    "inputs": [],
     "name": "withdrawUserBalance",
     "outputs": [],
     "stateMutability": "payable",
