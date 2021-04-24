@@ -3,6 +3,9 @@ __pycache__/
 *.py[cod]
 *$py.class
 
+# GitKeep
+!/**/.gitkeep
+
 # Env
 env
 .tool-versions
