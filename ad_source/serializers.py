@@ -49,7 +49,11 @@ class TaskSerializer(serializers.HyperlinkedModelSerializer):
         for question in questions:
             q = models.Question.objects.create(title=question['title'], task=task)
             for option in question['options']:
-                models.Option.objects.create(title=option['title'], question=q)
+                models.Option.objects.create(
+                    title=option['title'],
+                    question=q,
+                    is_correct=option.get('is_correct', False)
+                )
         tasks.update_task_is_active_balance.delay(task.id)
         tasks.create_task_screenshot.delay(task.id)
         return task
