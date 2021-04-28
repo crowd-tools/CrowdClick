@@ -30,14 +30,18 @@ class Web3Provider:
     def create_reward(self, task: models.Task, reward: models.Reward) -> str:
         checksum_sender = Web3.toChecksumAddress(reward.sender.username)
         checksum_receiver = Web3.toChecksumAddress(reward.receiver.username)
+        estimated_gas = self.contract.functions.forwardRewards(
+            checksum_receiver,  # To
+            checksum_sender,  # From
+            str(task.uuid or '')  # task's uuid
+        ).estimateGas({'from': self.public_key})
         w3_transaction = self.contract.functions.forwardRewards(
             checksum_receiver,  # To
             checksum_sender,  # From
             str(task.uuid or '')  # task's uuid
         ).buildTransaction({
             'chainId': self.chain_id,
-            'gas': self.default_gas_fee,
-            'gasPrice': self.web3.toWei('1', 'gwei'),
+            'gas': estimated_gas,
             'nonce': self.web3.eth.getTransactionCount(self.public_key)
         })
         txn_signed = self.web3.eth.account.sign_transaction(w3_transaction, private_key=self.private_key)
