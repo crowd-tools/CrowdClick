@@ -64,10 +64,12 @@ class Web3Provider:
         # checksum_address = Web3.toChecksumAddress(self.public_key)
         value = helpers.ETH2USD.get(from_symbol=self.currency)
         value_uint = self.web3.toWei(value, 'ether')
+        estimated_gas = self.admin_contract.functions.adminPushUnderlyingUSDPrice(
+            value_uint
+        ).estimateGas({'from': self.public_key})
         w3_transaction = self.admin_contract.functions.adminPushUnderlyingUSDPrice(value_uint).buildTransaction({
             'chainId': self.chain_id,
-            'gas': self.default_gas_fee,
-            'gasPrice': self.web3.toWei('1', 'gwei'),
+            'gas': estimated_gas,
             'nonce': self.web3.eth.getTransactionCount(self.public_key)
         })
         txn_signed = self.web3.eth.account.sign_transaction(w3_transaction, private_key=self.private_key)

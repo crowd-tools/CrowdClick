@@ -65,8 +65,11 @@ def push_underlying_usd_price(self):
     """
     For each client in settings, push his price to WEB3
     """
+    results = []
     for chain in settings.WEB3_CONFIG.keys():
         w3_provider: web3_providers.Web3Provider = web3_providers.web3_storage[chain]
         value, result, tx_hash = w3_provider.push_underlying_usd_price()
         logger.info(f"Pushed underlying {w3_provider.currency} price {value}"
                     f" result {result} to {chain}, tx: {tx_hash}")
+        results.append((value, result, tx_hash))
+    return results
