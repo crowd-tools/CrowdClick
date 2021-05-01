@@ -254,7 +254,7 @@ class RewardViewSet(mixins.CreateModelMixin, mixins.ListModelMixin, viewsets.Gen
             if created:
                 w3_provider: web3_providers.Web3Provider = web3_providers.web3_storage[task.chain]
                 tx_hash = w3_provider.create_reward(task, reward)
-                tasks.update_task_is_active_balance.delay(task.id)
+                tasks.update_task_is_active_balance.delay(task.id, tx_hash)
                 data = {
                     "tx_hash": tx_hash
                 }
