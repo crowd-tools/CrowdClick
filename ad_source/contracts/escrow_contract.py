@@ -124,7 +124,8 @@ escrow_contract_abi = r'''
       }
     ],
     "stateMutability": "view",
-    "type": "function"
+    "type": "function",
+    "constant": true
   },
   {
     "inputs": [],
@@ -137,7 +138,8 @@ escrow_contract_abi = r'''
       }
     ],
     "stateMutability": "view",
-    "type": "function"
+    "type": "function",
+    "constant": true
   },
   {
     "inputs": [],
@@ -150,7 +152,8 @@ escrow_contract_abi = r'''
       }
     ],
     "stateMutability": "view",
-    "type": "function"
+    "type": "function",
+    "constant": true
   },
   {
     "inputs": [],
@@ -163,7 +166,8 @@ escrow_contract_abi = r'''
       }
     ],
     "stateMutability": "view",
-    "type": "function"
+    "type": "function",
+    "constant": true
   },
   {
     "inputs": [
@@ -182,7 +186,8 @@ escrow_contract_abi = r'''
       }
     ],
     "stateMutability": "view",
-    "type": "function"
+    "type": "function",
+    "constant": true
   },
   {
     "inputs": [],
@@ -195,7 +200,8 @@ escrow_contract_abi = r'''
       }
     ],
     "stateMutability": "view",
-    "type": "function"
+    "type": "function",
+    "constant": true
   },
   {
     "inputs": [],
@@ -208,7 +214,8 @@ escrow_contract_abi = r'''
       }
     ],
     "stateMutability": "view",
-    "type": "function"
+    "type": "function",
+    "constant": true
   },
   {
     "inputs": [],
@@ -221,7 +228,8 @@ escrow_contract_abi = r'''
       }
     ],
     "stateMutability": "view",
-    "type": "function"
+    "type": "function",
+    "constant": true
   },
   {
     "inputs": [],
@@ -234,7 +242,8 @@ escrow_contract_abi = r'''
       }
     ],
     "stateMutability": "view",
-    "type": "function"
+    "type": "function",
+    "constant": true
   },
   {
     "inputs": [],
@@ -310,7 +319,8 @@ escrow_contract_abi = r'''
     "name": "openTask",
     "outputs": [],
     "stateMutability": "payable",
-    "type": "function"
+    "type": "function",
+    "payable": true
   },
   {
     "inputs": [
@@ -368,7 +378,8 @@ escrow_contract_abi = r'''
       }
     ],
     "stateMutability": "view",
-    "type": "function"
+    "type": "function",
+    "constant": true
   },
   {
     "inputs": [
@@ -387,7 +398,8 @@ escrow_contract_abi = r'''
       }
     ],
     "stateMutability": "view",
-    "type": "function"
+    "type": "function",
+    "constant": true
   },
   {
     "inputs": [],
@@ -400,14 +412,16 @@ escrow_contract_abi = r'''
       }
     ],
     "stateMutability": "view",
-    "type": "function"
+    "type": "function",
+    "constant": true
   },
   {
     "inputs": [],
     "name": "withdrawUserBalance",
     "outputs": [],
     "stateMutability": "payable",
-    "type": "function"
+    "type": "function",
+    "payable": true
   },
   {
     "inputs": [
@@ -420,7 +434,8 @@ escrow_contract_abi = r'''
     "name": "withdrawFromCampaign",
     "outputs": [],
     "stateMutability": "payable",
-    "type": "function"
+    "type": "function",
+    "payable": true
   },
   {
     "inputs": [
@@ -471,7 +486,8 @@ escrow_contract_abi = r'''
       }
     ],
     "stateMutability": "view",
-    "type": "function"
+    "type": "function",
+    "constant": true
   },
   {
     "inputs": [
@@ -494,7 +510,8 @@ escrow_contract_abi = r'''
     "name": "forwardRewards",
     "outputs": [],
     "stateMutability": "payable",
-    "type": "function"
+    "type": "function",
+    "payable": true
   },
   {
     "inputs": [
@@ -513,7 +530,8 @@ escrow_contract_abi = r'''
       }
     ],
     "stateMutability": "view",
-    "type": "function"
+    "type": "function",
+    "constant": true
   },
   {
     "inputs": [],
@@ -538,7 +556,8 @@ escrow_contract_abi = r'''
     "name": "adminPublisherWithdrawal",
     "outputs": [],
     "stateMutability": "payable",
-    "type": "function"
+    "type": "function",
+    "payable": true
   },
   {
     "inputs": [
@@ -551,7 +570,8 @@ escrow_contract_abi = r'''
     "name": "adminUserWithdrawal",
     "outputs": [],
     "stateMutability": "payable",
-    "type": "function"
+    "type": "function",
+    "payable": true
   }
 ]
 '''
