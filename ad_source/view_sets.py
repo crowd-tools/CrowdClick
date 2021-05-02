@@ -62,7 +62,6 @@ class TaskViewSet(mixins.CreateModelMixin,
                 self.permission_denied(
                     request,
                     message='only owner can delete task',
-                    code='permission_denied'
                 )
         return super(TaskViewSet, self).destroy(request, *args, **kwargs)
 
@@ -107,7 +106,7 @@ class TaskDashboardViewSet(viewsets.ModelViewSet):
 
     def check_object_permissions(self, request, obj: models.Task):
         if not request.user.is_superuser and not obj.user == request.user:
-            self.permission_denied(request, message='user not a task owner', code='permission_denied')
+            self.permission_denied(request, message='user not a task owner')
         super(TaskDashboardViewSet, self).check_object_permissions(request, obj)
 
     def get_queryset(self):
