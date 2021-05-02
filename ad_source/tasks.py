@@ -28,7 +28,7 @@ async def async_create_task_screenshot(task_id: int):
 
 
 @celery.app.task(bind=True)
-def update_task_is_active_balance(self, tx_hash: str = '', task_id: int = 4) -> dict:
+def update_task_is_active_balance(self, task_id: int, wait_for_tx: str = '') -> dict:
     # Could be wrapped:
     # try:
     #     ...
@@ -40,8 +40,9 @@ def update_task_is_active_balance(self, tx_hash: str = '', task_id: int = 4) -> 
     logger.info(f'Got task to update id: {task}')
 
     w3_provider: web3_providers.Web3Provider = web3_providers.web3_storage[task.chain]
-    if(len(tx_hash) > 0):
-        w3_provider.web3.eth.waitForTransactionReceipt(tx_hash)
+    if wait_for_tx:
+        logger.info(f'Waiting for TX: {wait_for_tx}')
+        w3_provider.web3.eth.waitForTransactionReceipt(wait_for_tx)
     is_active, balance = w3_provider.check_balance(task)
     logger.info(f'Got Web3 response; Task: {task}, is_active: {is_active}, remaining_balance: {balance}')
 

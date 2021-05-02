@@ -34,6 +34,7 @@ class Task(models.Model):
     modified = models.DateTimeField("Modified", auto_now=True)  # No show
     is_active = models.BooleanField("Is active", default=True)
     is_active_web3 = models.BooleanField("Is active on Web3", default=True)
+    initial_tx_hash = models.CharField("Initial transaction hash", max_length=66, blank=True, default='')
     remaining_balance = models.DecimalField(
         "Remaining balance for task", max_digits=9, decimal_places=3, null=True, default=None)  # ETH but shown as USD
     initial_budget = models.DecimalField(

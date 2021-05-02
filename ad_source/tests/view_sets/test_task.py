@@ -103,7 +103,7 @@ class TestTaskView(APITestCase):
                 self.assertEqual(data['website_link'], 'http://does_not_exist.com/')
                 self.assertEqual(data['id'], 4)
                 self.assertEqual(data['uuid'], 'd8f01220-4c85-4b35-a3e2-9ff33858a6e7')
-                mock_update_task.assert_called_once_with(4)
+                mock_update_task.assert_called_once_with(task_id=4, wait_for_tx='')
                 mock_screenshot_task.assert_called_once_with(4)
 
     @responses.activate
@@ -123,7 +123,7 @@ class TestTaskView(APITestCase):
                 self.assertEqual(data['id'], 4)
                 self.assertTrue(data['questions'][0]['options'][0]['is_correct'])
                 self.assertEqual(data['uuid'], 'd8f01220-4c85-4b35-a3e2-9ff33858a6e7')
-                mock_update_task.assert_called_once_with(4)
+                mock_update_task.assert_called_once_with(task_id=4, wait_for_tx='')
                 mock_screenshot_task.assert_called_once_with(4)
 
     @responses.activate
@@ -140,7 +140,7 @@ class TestTaskView(APITestCase):
                 self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
                 self.assertIn('uuid', response.json())
 
-                mock_task.assert_called_once_with(4)
+                mock_task.assert_called_once_with(task_id=4, wait_for_tx='')
                 mock_screenshot_task.assert_called_once_with(4)
 
     def test_create_task_admin_with_connection_error(self):
@@ -162,7 +162,7 @@ class TestTaskView(APITestCase):
                 data = response.json()
                 self.assertEqual(response.status_code, 201)
                 self.assertEqual('Website has strict X-Frame-Options: deny', data['warning_message'])
-                mock_task.assert_called_once_with(data['id'])
+                mock_task.assert_called_once_with(task_id=4, wait_for_tx='')
                 mock_screenshot_task.assert_called_once_with(4)
 
     def test_delete_task_admin(self):
