@@ -56,9 +56,9 @@ class Web3Provider:
             checksum_address,
         ).call()
         task_budget, task_reward, current_budget, url, is_active, *_ = response
-        task_budget_eth = self.web3.fromWei(task_budget, 'ether')
-        task_budget_usd = helpers.ETH2USD.get() * task_budget_eth
-        return is_active, task_budget_usd
+        current_budget_eth = self.web3.fromWei(current_budget, 'ether')
+        current_budget_usd = helpers.ETH2USD.get() * current_budget_eth
+        return is_active, current_budget_usd
 
     def push_underlying_usd_price(self):
         # checksum_address = Web3.toChecksumAddress(self.public_key)

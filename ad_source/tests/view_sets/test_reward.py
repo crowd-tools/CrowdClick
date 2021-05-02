@@ -17,6 +17,7 @@ class RewardViewSetTestCase(APITestCase):
 
     @patch('web3.eth.Eth.sendRawTransaction')
     @patch('ad_source.web3_providers.Web3.toChecksumAddress')
+    @patch('web3.contract.estimate_gas_for_function', lambda *args, **kwargs: 10)
     def test_create_reward(self, w3_checksum_mock, w3_send_transaction_mock):
         answer = models.Answer.objects.create(
             user=self.admin,
@@ -48,7 +49,7 @@ class RewardViewSetTestCase(APITestCase):
             self.assertEqual(w3_checksum_mock.call_count, 2)
             self.assertEqual(w3_send_transaction_mock.call_count, 1)
 
-            mock_task.assert_called_once_with(self.task.id)
+            mock_task.assert_called_once_with(task_id=self.task.id, wait_for_tx='6161616161')
 
     def test_create_reward_without_answers(self):
         self.client.login(username='admin', password='admin')
@@ -76,6 +77,7 @@ class RewardQuizViewSetTestCase(APITestCase):
 
     @patch('web3.eth.Eth.sendRawTransaction')
     @patch('ad_source.web3_providers.Web3.toChecksumAddress')
+    @patch('web3.contract.estimate_gas_for_function', lambda *args, **kwargs: 10)
     def test_create_reward(self, w3_checksum_mock, w3_send_transaction_mock):
         answer = models.Answer.objects.create(
             user=self.admin,
@@ -101,7 +103,7 @@ class RewardQuizViewSetTestCase(APITestCase):
             self.assertEqual(w3_checksum_mock.call_count, 2)
             self.assertEqual(w3_send_transaction_mock.call_count, 1)
 
-            mock_task.assert_called_once_with(self.task.id)
+            mock_task.assert_called_once_with(task_id=self.task.id, wait_for_tx='6161616161')
 
     def test_create_reward_wrong_answer(self):
         answer = models.Answer.objects.create(

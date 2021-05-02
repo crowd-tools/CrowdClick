@@ -34,7 +34,11 @@ from . import (
 logger = logging.getLogger(__name__)
 
 
-class TaskViewSet(viewsets.ModelViewSet):
+class TaskViewSet(mixins.CreateModelMixin,
+                  mixins.RetrieveModelMixin,
+                  mixins.DestroyModelMixin,
+                  mixins.ListModelMixin,
+                  viewsets.GenericViewSet):
     authentication_classes = [authentication.CsrfExemptSessionAuthentication, BasicAuthentication]
     permission_classes = [permissions.IsAuthenticatedOrReadOnly]
     serializer_class = serializers.TaskSerializer
@@ -55,8 +59,10 @@ class TaskViewSet(viewsets.ModelViewSet):
         if not request.user.is_superuser:
             obj: models.Task = self.get_object()
             if not obj.user == request.user:
-                return Response(data={'message': "Only owner can delete task"},
-                                status=status.HTTP_403_FORBIDDEN)
+                self.permission_denied(
+                    request,
+                    message='only owner can delete task',
+                )
         return super(TaskViewSet, self).destroy(request, *args, **kwargs)
 
     @action(methods=['post'], detail=True, url_path='answer',
@@ -89,8 +95,19 @@ class TaskViewSet(viewsets.ModelViewSet):
 
 class TaskDashboardViewSet(viewsets.ModelViewSet):
     serializer_class = serializers.TaskDashboardSerializer
+    authentication_classes = [authentication.CsrfExemptSessionAuthentication, BasicAuthentication]
     permission_classes = [permissions.IsAuthenticated]
     filterset_class = filters.TaskFilter
+
+    def get_permissions(self):
+        if self.request.method == 'OPTIONS':
+            return []
+        return super(TaskDashboardViewSet, self).get_permissions()
+
+    def check_object_permissions(self, request, obj: models.Task):
+        if not request.user.is_superuser and not obj.user == request.user:
+            self.permission_denied(request, message='user not a task owner')
+        super(TaskDashboardViewSet, self).check_object_permissions(request, obj)
 
     def get_queryset(self):
         return models.Task.objects.dashboard(user=self.request.user)
@@ -254,7 +271,7 @@ class RewardViewSet(mixins.CreateModelMixin, mixins.ListModelMixin, viewsets.Gen
             if created:
                 w3_provider: web3_providers.Web3Provider = web3_providers.web3_storage[task.chain]
                 tx_hash = w3_provider.create_reward(task, reward)
-                tasks.update_task_is_active_balance.delay(task.id)
+                tasks.update_task_is_active_balance.delay(task_id=task.id, wait_for_tx=tx_hash)
                 data = {
                     "tx_hash": tx_hash
                 }
