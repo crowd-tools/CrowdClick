@@ -28,7 +28,5 @@ class TaskFilter(filters.FilterSet):
         if value == TASK_TYPE_QUIZ:
             queryset = queryset.filter(questions__options__is_correct=True)
         elif value == TASK_TYPE_CAMPAIGN:
-            queryset = queryset.filter(id__in=queryset.filter(
-                questions__options__is_correct=False
-            ).values_list('id'))
+            queryset = queryset.exclude(questions__options__is_correct=True)
         return queryset
