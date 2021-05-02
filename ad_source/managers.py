@@ -24,6 +24,8 @@ class TaskManager(models.Manager):
         return qs
 
     def dashboard(self, user):
+        if user.is_anonymous:
+            return super(TaskManager, self).get_queryset().none()
         return self.get_queryset().filter(user=user).annotate(
             answers_result_count=Count('answers')
         )

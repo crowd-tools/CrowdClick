@@ -42,6 +42,39 @@ class TaskSerializer(serializers.HyperlinkedModelSerializer):
     questions = QuestionSerializer(many=True)
     og_image_link = serializers.URLField(read_only=True)
     user = UserDetailsSerializer(read_only=True)
+    tx_hash = serializers.CharField(source='initial_tx_hash', required=False)
+
+    class Meta:
+        model = models.Task
+        fields = [
+            'id',
+            'title',
+            'description',
+            'chain',
+            'user',
+            'og_image_link',
+            'uuid',
+            'website_link',
+            'website_image',
+            'contract_address',
+            'reward_per_click',
+            'reward_usd_per_click',
+            'time_duration',
+            'questions',
+            'warning_message',
+            'is_active',
+            'remaining_balance',
+            'initial_budget',
+            'tx_hash',
+        ]
+        read_only_fields = [
+            'user',
+            'og_image_link',
+            'remaining_balance',
+            'website_image',
+            'warning_message',
+            'is_active',
+        ]
 
     def create(self, validated_data):
         questions = validated_data.pop('questions')
@@ -54,7 +87,7 @@ class TaskSerializer(serializers.HyperlinkedModelSerializer):
                     question=q,
                     is_correct=option.get('is_correct', False)
                 )
-        tasks.update_task_is_active_balance.delay(task.id)
+        tasks.update_task_is_active_balance.delay(task_id=task.id, wait_for_tx=str(task.initial_tx_hash))
         tasks.create_task_screenshot.delay(task.id)
         return task
 
@@ -91,37 +124,6 @@ class TaskSerializer(serializers.HyperlinkedModelSerializer):
                     'warning_message': f'Website has strict X-Frame-Options: {og.X_FRAME_OPTIONS}',
                 })
         return super().validate(attrs)
-
-    class Meta:
-        model = models.Task
-        fields = [
-            'id',
-            'title',
-            'description',
-            'chain',
-            'user',
-            'og_image_link',
-            'uuid',
-            'website_link',
-            'website_image',
-            'contract_address',
-            'reward_per_click',
-            'reward_usd_per_click',
-            'time_duration',
-            'questions',
-            'warning_message',
-            'is_active',
-            'remaining_balance',
-            'initial_budget'
-        ]
-        read_only_fields = [
-            'user',
-            'og_image_link',
-            'remaining_balance',
-            'website_image',
-            'warning_message',
-            'is_active',
-        ]
 
 
 class SelectedOptionSerializer(serializers.HyperlinkedModelSerializer):
@@ -179,6 +181,7 @@ class AnswerSerializer(serializers.HyperlinkedModelSerializer):
 class TaskDashboardSerializer(TaskSerializer):
     answers_result_count = serializers.IntegerField(read_only=True)
     answers = AnswerSerializer(many=True)
+    tx_hash = serializers.CharField(source='initial_tx_hash', required=False)
 
     class Meta:
         model = models.Task
@@ -198,7 +201,8 @@ class TaskDashboardSerializer(TaskSerializer):
             'answers_result_count',
             'answers',
             'remaining_balance',
-            'initial_budget'
+            'initial_budget',
+            'tx_hash',
         ]
 
 
