@@ -97,7 +97,7 @@ class TaskDashboardViewSet(viewsets.ModelViewSet):
     serializer_class = serializers.TaskDashboardSerializer
     authentication_classes = [authentication.CsrfExemptSessionAuthentication, BasicAuthentication]
     permission_classes = [permissions.IsAuthenticated]
-    filterset_class = filters.TaskFilter
+    filterset_class = filters.TaskDashboardFilter
 
     def get_permissions(self):
         if self.request.method == 'OPTIONS':
