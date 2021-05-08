@@ -12,6 +12,8 @@ from . import models, web3_providers
 
 logger = logging.getLogger(__name__)
 
+RETRY_COUNTDOWN = 60 * 1  # 1 minute
+
 
 async def async_create_task_screenshot(task_id: int):
     task: models.Task = models.Task.objects.get(id=task_id)
@@ -28,14 +30,20 @@ async def async_create_task_screenshot(task_id: int):
 
 
 @celery.app.task(bind=True)
-def update_task_is_active_balance(self, task_id: int, wait_for_tx: str = '') -> dict:
-    # Could be wrapped:
-    # try:
-    #     ...
-    # except web3.Exception as exc:
-    #     # Retry in 5 minutes.
-    #     self.retry(countdown=60 * 5, exc=exc)
-
+def update_task_is_active_balance(
+        self,
+        task_id: int,
+        wait_for_tx: str = '',
+        should_be_active: bool = None,
+        retry: int = 0,
+) -> dict:
+    """
+    :param self: Celery task
+    :param task_id: ID of task to update
+    :param wait_for_tx: If provided the task will wait for transaction to be mined first
+    :param should_be_active: Expected result for retries
+    :param retry: Number of retries
+    """
     task = models.Task.objects.get(id=task_id)
     logger.info(f'Got task to update id: {task}')
 
@@ -45,6 +53,11 @@ def update_task_is_active_balance(self, task_id: int, wait_for_tx: str = '') -> 
         w3_provider.web3.eth.waitForTransactionReceipt(wait_for_tx)
     is_active, balance = w3_provider.check_balance(task)
     logger.info(f'Got Web3 response; Task: {task}, is_active: {is_active}, remaining_balance: {balance}')
+    if should_be_active is not None and should_be_active != is_active and retry > 0:
+        self.retry(
+            kwargs={'task_id': task_id, 'should_be_active': should_be_active, 'retry': retry - 1},
+            countdown=RETRY_COUNTDOWN,
+        )
 
     task.is_active_web3 = is_active
     task.remaining_balance = balance

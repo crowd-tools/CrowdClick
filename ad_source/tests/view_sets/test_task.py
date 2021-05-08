@@ -20,6 +20,7 @@ class TestTaskView(APITestCase):
         "contract_address": "0xdeadc0dedeadc0de",
         "reward_per_click": 0.001,
         "time_duration": "00:00:30",
+        "tx_hash": "0xdeadc0dedeadc0de",
         "questions": [
             {
                 "title": "Was it good?",
@@ -103,7 +104,26 @@ class TestTaskView(APITestCase):
                 self.assertEqual(data['website_link'], 'http://does_not_exist.com/')
                 self.assertEqual(data['id'], 4)
                 self.assertEqual(data['uuid'], 'd8f01220-4c85-4b35-a3e2-9ff33858a6e7')
-                mock_update_task.assert_called_once_with(task_id=4, wait_for_tx='')
+                mock_update_task.assert_called_once_with(task_id=4, wait_for_tx='0xdeadc0dedeadc0de')
+                mock_screenshot_task.assert_called_once_with(4)
+
+    @responses.activate
+    def test_create_task_admin_without_tx_hash(self):
+        with patch('ad_source.tasks.update_task_is_active_balance.delay') as mock_update_task:
+            with patch('ad_source.tasks.create_task_screenshot.delay') as mock_screenshot_task:
+                responses.add(responses.GET, ETH2USD.BASE_URL, body=ETH2USD_DATA, status=200)
+                responses.add(responses.GET, 'http://does_not_exist.com',
+                              body=self.OG_DATA, status=200)
+                data = self.TASK_DATA
+                del data['tx_hash']
+                self.client.login(username='admin', password='admin')
+                response = self.client.post(self.url, data=data)
+                data = response.json()
+                self.assertEqual(response.status_code, 201)
+                self.assertEqual(data['website_link'], 'http://does_not_exist.com/')
+                self.assertEqual(data['id'], 4)
+                self.assertEqual(data['uuid'], 'd8f01220-4c85-4b35-a3e2-9ff33858a6e7')
+                mock_update_task.assert_called_once_with(task_id=4, should_be_active=True, retry=5)
                 mock_screenshot_task.assert_called_once_with(4)
 
     @responses.activate
@@ -123,7 +143,7 @@ class TestTaskView(APITestCase):
                 self.assertEqual(data['id'], 4)
                 self.assertTrue(data['questions'][0]['options'][0]['is_correct'])
                 self.assertEqual(data['uuid'], 'd8f01220-4c85-4b35-a3e2-9ff33858a6e7')
-                mock_update_task.assert_called_once_with(task_id=4, wait_for_tx='')
+                mock_update_task.assert_called_once_with(task_id=4, wait_for_tx='0xdeadc0dedeadc0de')
                 mock_screenshot_task.assert_called_once_with(4)
 
     @responses.activate
@@ -140,7 +160,7 @@ class TestTaskView(APITestCase):
                 self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
                 self.assertIn('uuid', response.json())
 
-                mock_task.assert_called_once_with(task_id=4, wait_for_tx='')
+                mock_task.assert_called_once_with(task_id=4, wait_for_tx='0xdeadc0dedeadc0de')
                 mock_screenshot_task.assert_called_once_with(4)
 
     def test_create_task_admin_with_connection_error(self):
@@ -162,7 +182,7 @@ class TestTaskView(APITestCase):
                 data = response.json()
                 self.assertEqual(response.status_code, 201)
                 self.assertEqual('Website has strict X-Frame-Options: deny', data['warning_message'])
-                mock_task.assert_called_once_with(task_id=4, wait_for_tx='')
+                mock_task.assert_called_once_with(task_id=4, wait_for_tx='0xdeadc0dedeadc0de')
                 mock_screenshot_task.assert_called_once_with(4)
 
     def test_delete_task_admin(self):
