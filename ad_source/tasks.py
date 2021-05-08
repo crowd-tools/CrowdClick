@@ -2,6 +2,7 @@ import asyncio
 import io
 import logging
 
+from asgiref.sync import sync_to_async
 from django.conf import settings
 from django.core.files.images import ImageFile
 from django.utils.text import slugify
@@ -16,7 +17,7 @@ RETRY_COUNTDOWN = 60 * 1  # 1 minute
 
 
 async def async_create_task_screenshot(task_id: int):
-    task: models.Task = models.Task.objects.get(id=task_id)
+    task: models.Task = await sync_to_async(models.Task.objects.get)(id=task_id)
 
     browser = await launch(defaultViewport={'width': 1920, 'height': 1080})
     page = await browser.newPage()
@@ -24,7 +25,7 @@ async def async_create_task_screenshot(task_id: int):
     buffer = await page.screenshot(fullPage=True)
     image = ImageFile(io.BytesIO(buffer), name=f'{slugify(task.website_link)}.png')
     task.website_image = image
-    task.save()
+    await sync_to_async(task.save)()
     await browser.close()
     logger.info(f'Downloaded new image for Task: {task}')
 
@@ -45,7 +46,8 @@ def update_task_is_active_balance(
     :param retry: Number of retries
     """
     task = models.Task.objects.get(id=task_id)
-    logger.info(f'Got task to update id: {task}')
+    logger.info(f'Got task to update: {task}, wait_for_tx: {wait_for_tx}, '
+                f'should_be_active: {should_be_active}, retry: {retry}')
 
     w3_provider: web3_providers.Web3Provider = web3_providers.web3_storage[task.chain]
     if wait_for_tx:
