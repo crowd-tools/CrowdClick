@@ -99,6 +99,9 @@ class TaskDashboardViewSet(viewsets.ModelViewSet):
     permission_classes = [permissions.IsAuthenticated]
     filterset_class = filters.TaskDashboardFilter
 
+    def get_queryset(self):
+        return models.Task.objects.dashboard(user=self.request.user)
+
     def get_permissions(self):
         if self.request.method == 'OPTIONS':
             return []
@@ -109,8 +112,12 @@ class TaskDashboardViewSet(viewsets.ModelViewSet):
             self.permission_denied(request, message='user not a task owner')
         super(TaskDashboardViewSet, self).check_object_permissions(request, obj)
 
-    def get_queryset(self):
-        return models.Task.objects.dashboard(user=self.request.user)
+    @action(methods=['post'], detail=True, url_path='withdraw', url_name='withdraw')
+    def withdraw(self, request, *args, **kwargs):
+        instance: models.Task = self.get_object()
+        self.check_object_permissions(request, instance)
+        tasks.update_task_is_active_balance.delay(task_id=instance.id, should_be_active=False, retry=5)
+        return super(TaskDashboardViewSet, self).retrieve(request, *args, **kwargs)
 
 
 class QuestionViewSet(mixins.CreateModelMixin,
