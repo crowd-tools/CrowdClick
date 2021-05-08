@@ -77,6 +77,7 @@ class TaskSerializer(serializers.HyperlinkedModelSerializer):
         ]
 
     def create(self, validated_data):
+        validated_data['is_active_web3'] = False
         questions = validated_data.pop('questions')
         task = super(TaskSerializer, self).create(validated_data)
         for question in questions:
@@ -87,7 +88,10 @@ class TaskSerializer(serializers.HyperlinkedModelSerializer):
                     question=q,
                     is_correct=option.get('is_correct', False)
                 )
-        tasks.update_task_is_active_balance.delay(task_id=task.id, wait_for_tx=str(task.initial_tx_hash))
+        if task.initial_tx_hash:
+            tasks.update_task_is_active_balance.delay(task_id=task.id, wait_for_tx=str(task.initial_tx_hash))
+        else:
+            tasks.update_task_is_active_balance.delay(task_id=task.id, should_be_active=True, retry=5)
         tasks.create_task_screenshot.delay(task.id)
         return task
 
