@@ -20,13 +20,17 @@ async def async_create_task_screenshot(task_id: int):
     task: models.Task = await sync_to_async(models.Task.objects.get)(id=task_id)
 
     browser = await launch(defaultViewport={'width': 1920, 'height': 1080})
-    page = await browser.newPage()
-    await page.goto(task.website_link, waitUntil='networkidle0')
-    buffer = await page.screenshot(fullPage=True)
-    image = ImageFile(io.BytesIO(buffer), name=f'{slugify(task.website_link)}.png')
-    task.website_image = image
-    await sync_to_async(task.save)()
-    await browser.close()
+
+    try:
+        page = await browser.newPage()
+        await page.goto(task.website_link, waitUntil='domcontentloaded')
+        buffer = await page.screenshot(fullPage=True)
+        image = ImageFile(io.BytesIO(buffer), name=f'{slugify(task.website_link)}.png')
+        task.website_image = image
+        await sync_to_async(task.save)()
+    finally:
+        await browser.close()
+
     logger.info(f'Downloaded new image for Task: {task}')
 
 
