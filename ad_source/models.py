@@ -73,7 +73,7 @@ class Question(models.Model):
     )
 
     task = models.ForeignKey(Task, related_name="questions", on_delete=models.CASCADE)
-    title = models.CharField(max_length=100)
+    title = models.TextField()
     question_type = models.CharField(max_length=2, choices=QUESTION_TYPES, default=SELECT_TYPE)
 
     objects = managers.QuestionManager()
@@ -87,7 +87,7 @@ class Question(models.Model):
 
 class Option(models.Model):
     question = models.ForeignKey(Question, related_name="options", on_delete=models.CASCADE)
-    title = models.CharField(max_length=100)
+    title = models.TextField()
     is_correct = models.BooleanField(default=False)
 
     objects = managers.OptionManager()
