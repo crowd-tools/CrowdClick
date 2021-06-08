@@ -141,7 +141,6 @@ class TestTaskView(APITestCase):
                 self.assertEqual(response.status_code, 201)
                 self.assertEqual(data['website_link'], 'http://does_not_exist.com/')
                 self.assertEqual(data['id'], 4)
-                self.assertTrue(data['questions'][0]['options'][0]['is_correct'])
                 self.assertEqual(data['uuid'], 'd8f01220-4c85-4b35-a3e2-9ff33858a6e7')
                 mock_update_task.assert_called_once_with(task_id=4, wait_for_tx='0xdeadc0dedeadc0de')
                 mock_screenshot_task.assert_called_once_with(4)

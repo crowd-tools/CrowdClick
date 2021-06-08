@@ -13,6 +13,7 @@ L = logging.getLogger(__name__)
 
 class OptionSerializer(serializers.HyperlinkedModelSerializer):
     answer_count = serializers.IntegerField(read_only=True)
+    is_correct = serializers.BooleanField(write_only=True, required=False)
 
     class Meta:
         model = models.Option
