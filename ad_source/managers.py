@@ -4,9 +4,22 @@ from django.db.models import Count
 
 class TaskManager(models.Manager):
     def get_queryset(self):
-        return super(TaskManager, self).get_queryset().prefetch_related(
-            'questions', 'questions__options'
+        from .models import Question
+        qs = super(TaskManager, self).get_queryset()
+        qs = qs.annotate(
+            type=models.Case(
+                models.When(
+                    models.Exists(Question.objects.filter(task=models.OuterRef('id'), is_quiz=True)),
+                    then=models.Value('quiz')
+                ),
+                default=models.Value('campaign'), output_field=models.CharField()
+            )
+        ).select_related(
+            'user'
+        ).prefetch_related(
+            'questions', 'questions__options',
         ).order_by('-reward_per_click')
+        return qs
 
     def enabled(self):
         return self.get_queryset().filter(
@@ -45,10 +58,14 @@ class TaskManager(models.Manager):
 
 class QuestionManager(models.Manager):
     def get_queryset(self):
+        from .models import Option
         qs = super(QuestionManager, self).get_queryset()
         qs = qs.annotate(
             is_quiz=models.Case(
-                models.When(options__is_correct=True, then=True),
+                models.When(
+                    models.Exists(Option.objects.filter(question=models.OuterRef('id'), is_correct=True)),
+                    then=True
+                ),
                 default=False,
                 output_field=models.BooleanField(),
             ),

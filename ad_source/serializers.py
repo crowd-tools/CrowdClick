@@ -13,6 +13,7 @@ L = logging.getLogger(__name__)
 
 class OptionSerializer(serializers.HyperlinkedModelSerializer):
     answer_count = serializers.IntegerField(read_only=True)
+    is_correct = serializers.BooleanField(write_only=True, required=False)
 
     class Meta:
         model = models.Option
@@ -43,6 +44,7 @@ class TaskSerializer(serializers.HyperlinkedModelSerializer):
     og_image_link = serializers.URLField(read_only=True)
     user = UserDetailsSerializer(read_only=True)
     tx_hash = serializers.CharField(source='initial_tx_hash', required=False)
+    type = serializers.CharField(read_only=True)
 
     class Meta:
         model = models.Task
@@ -66,6 +68,7 @@ class TaskSerializer(serializers.HyperlinkedModelSerializer):
             'remaining_balance',
             'initial_budget',
             'tx_hash',
+            'type',
         ]
         read_only_fields = [
             'user',
@@ -91,7 +94,7 @@ class TaskSerializer(serializers.HyperlinkedModelSerializer):
         if task.initial_tx_hash:
             tasks.update_task_is_active_balance.delay(task_id=task.id, wait_for_tx=str(task.initial_tx_hash))
         else:
-            tasks.update_task_is_active_balance.delay(task_id=task.id, should_be_active=True, retry=5)
+            tasks.update_task_is_active_balance.delay(task_id=task.id, should_be_active=True, retry=10)
         tasks.create_task_screenshot.delay(task.id)
         return task
 
@@ -186,6 +189,7 @@ class TaskDashboardSerializer(TaskSerializer):
     answers_result_count = serializers.IntegerField(read_only=True)
     answers = AnswerSerializer(many=True)
     tx_hash = serializers.CharField(source='initial_tx_hash', required=False)
+    type = serializers.CharField(read_only=True)
 
     class Meta:
         model = models.Task
@@ -207,6 +211,7 @@ class TaskDashboardSerializer(TaskSerializer):
             'remaining_balance',
             'initial_budget',
             'tx_hash',
+            'type',
         ]
 
 

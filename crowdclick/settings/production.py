@@ -11,6 +11,9 @@ STATICFILES_DIRS = [
     os.path.join(BASE_DIR, "backend_static"),
 ]
 
+REST_FRAMEWORK['DEFAULT_RENDERER_CLASSES'] = ['rest_framework.renderers.JSONRenderer']
+
+
 CELERY_BEAT_SCHEDULE = {
     'update-task-is-active-balance': {
         'task': 'ad_source.tasks.push_underlying_usd_price',
