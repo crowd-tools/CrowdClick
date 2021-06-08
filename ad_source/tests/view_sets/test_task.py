@@ -52,6 +52,11 @@ class TestTaskView(APITestCase):
         response = self.client.get(self.url)
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.data['count'], 3)
+        for result in response.data['results']:
+            if result['id'] == 3:
+                self.assertEqual(result['type'], 'quiz')
+            else:
+                self.assertEqual(result['type'], 'campaign')
 
     @responses.activate
     def test_filter_tasks_by_chain(self):
