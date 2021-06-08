@@ -189,6 +189,7 @@ class TaskDashboardSerializer(TaskSerializer):
     answers_result_count = serializers.IntegerField(read_only=True)
     answers = AnswerSerializer(many=True)
     tx_hash = serializers.CharField(source='initial_tx_hash', required=False)
+    type = serializers.CharField(read_only=True)
 
     class Meta:
         model = models.Task
@@ -210,6 +211,7 @@ class TaskDashboardSerializer(TaskSerializer):
             'remaining_balance',
             'initial_budget',
             'tx_hash',
+            'type',
         ]
 
 
