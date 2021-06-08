@@ -94,7 +94,7 @@ class TaskSerializer(serializers.HyperlinkedModelSerializer):
         if task.initial_tx_hash:
             tasks.update_task_is_active_balance.delay(task_id=task.id, wait_for_tx=str(task.initial_tx_hash))
         else:
-            tasks.update_task_is_active_balance.delay(task_id=task.id, should_be_active=True, retry=5)
+            tasks.update_task_is_active_balance.delay(task_id=task.id, should_be_active=True, retry=10)
         tasks.create_task_screenshot.delay(task.id)
         return task
 

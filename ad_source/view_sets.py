@@ -116,7 +116,7 @@ class TaskDashboardViewSet(viewsets.ModelViewSet):
     def withdraw(self, request, *args, **kwargs):
         instance: models.Task = self.get_object()
         self.check_object_permissions(request, instance)
-        tasks.update_task_is_active_balance.delay(task_id=instance.id, should_be_active=False, retry=5)
+        tasks.update_task_is_active_balance.delay(task_id=instance.id, should_be_active=False, retry=10)
         return super(TaskDashboardViewSet, self).retrieve(request, *args, **kwargs)
 
 

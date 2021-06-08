@@ -79,4 +79,4 @@ class TestTaskDashboardView(APITestCase):
             data = response.json()
             self.assertEqual(response.status_code, status.HTTP_200_OK, data)
             self.assertEqual(data['website_link'], 'http://example.com')
-            mock_update_task.assert_called_once_with(task_id=task.id, should_be_active=False, retry=5)
+            mock_update_task.assert_called_once_with(task_id=task.id, should_be_active=False, retry=10)
