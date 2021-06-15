@@ -22,8 +22,8 @@ router.register(r'server_config', view_sets.ServerConfigViewSet, basename='serve
 
 
 urlpatterns = [
-    path('api/', include(router.urls)),
-    path(r'api/auth/', view_sets.auth_view, name='auth_view'),
-    path(r'api/auth/logout/', view_sets.Logout.as_view(), name='logout_view'),
-    path(r'api/user/tasks/<str:contract_address>/', view_sets.UserTasks.as_view(), name='user_tasks_view')
+    path('', include(router.urls)),
+    path(r'auth/', view_sets.auth_view, name='auth_view'),
+    path(r'auth/logout/', view_sets.Logout.as_view(), name='logout_view'),
+    path(r'user/tasks/<str:contract_address>/', view_sets.UserTasks.as_view(), name='user_tasks_view')
 ]

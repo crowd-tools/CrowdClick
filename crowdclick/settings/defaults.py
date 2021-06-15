@@ -3,11 +3,8 @@ settings with default values
 """
 
 import os
-import sys
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
-from collections import namedtuple
-from datetime import timedelta
 
 
 # Quick-start development settings - unsuitable for production
@@ -23,13 +20,15 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
 
-    'rest_framework',
+    'ckeditor',
     'django_celery_beat',
     'django_celery_results',
     'django_filters',
     'drf_yasg',
+    'rest_framework',
 
     'ad_source',
+    'blog',
 ]
 
 MIDDLEWARE = [
