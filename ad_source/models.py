@@ -1,8 +1,10 @@
 import datetime
 from decimal import Decimal as D
 
+from django.conf import settings
 from django.contrib.auth.models import User
 from django.core import validators
+from django.core.exceptions import ImproperlyConfigured
 from django.db import models
 
 from . import helpers, managers
@@ -54,13 +56,20 @@ class Task(models.Model):
         return "Task"
 
     @property
+    def currency(self):
+        if self.chain in settings.WEB3_CONFIG:
+            return settings.WEB3_CONFIG[self.chain].currency
+        else:
+            raise ImproperlyConfigured(f'{self.chain} not found in {list(settings.WEB3_CONFIG.keys())}')
+
+    @property
     def reward_usd_per_click(self):
-        eth_to_usd = helpers.ETH2USD.get()
+        eth_to_usd = helpers.ETH2USD.get(from_symbol=self.currency)
         return self.reward_per_click * D(str(eth_to_usd))
 
     @property
     def remaining_balance_usd(self):
-        eth_to_usd = helpers.ETH2USD.get()
+        eth_to_usd = helpers.ETH2USD.get(from_symbol=self.currency)
         return self.remaining_balance * D(str(eth_to_usd))
 
 
