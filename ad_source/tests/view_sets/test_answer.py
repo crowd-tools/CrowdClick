@@ -5,10 +5,10 @@ from rest_framework.test import APITestCase
 
 from ad_source.helpers import ETH2USD
 from ad_source.tests.view_sets import ETH2USD_DATA
+from ad_source.tests import mixins
 
 
-class TestAnswerView(APITestCase):
-    fixtures = ['0000_users', '0001_task', '0002_question', '0003_options']
+class TestAnswerView(mixins.DataTestMixin, APITestCase):
     ANSWER_DATA = {
         "questions": [
             {
@@ -75,7 +75,7 @@ class TestAnswerView(APITestCase):
         self.assertEqual(response.status_code, status.HTTP_405_METHOD_NOT_ALLOWED)
 
     def test_delete_answer_user(self):
-        self.client.login(username='0xa1f765189805e0e51ac9753a9bc7d99e2b90c705', password='admin')
+        self.client.login(username='0xa1f765189805e0e51ac9753a9bc7d99e2b90c705', password='user')
         response = self.client.delete(self.url)
         self.assertEqual(response.status_code, status.HTTP_405_METHOD_NOT_ALLOWED)
 
@@ -84,8 +84,7 @@ class TestAnswerView(APITestCase):
         self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
 
 
-class TestQuizAnswerView(APITestCase):
-    fixtures = ['0000_users', '0001_task', '0002_question', '0003_options']
+class TestQuizAnswerView(mixins.DataTestMixin, APITestCase):
     WRONG_ANSWER_DATA = {
         "questions": [
             {

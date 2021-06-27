@@ -5,10 +5,10 @@ from rest_framework import status
 from rest_framework.test import APITestCase
 
 from ad_source import models
+from ad_source.tests import mixins
 
 
-class RewardViewSetTestCase(APITestCase):
-    fixtures = ['0000_users', '0001_task', '0002_question', '0003_options']
+class RewardViewSetTestCase(mixins.DataTestMixin, APITestCase):
 
     def setUp(self) -> None:
         self.task = models.Task.objects.get(id=1)
@@ -65,8 +65,7 @@ class RewardViewSetTestCase(APITestCase):
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
 
 
-class RewardQuizViewSetTestCase(APITestCase):
-    fixtures = ['0000_users', '0001_task', '0002_question', '0003_options']
+class RewardQuizViewSetTestCase(mixins.DataTestMixin, APITestCase):
 
     def setUp(self) -> None:
         self.task = models.Task.objects.get(id=3)

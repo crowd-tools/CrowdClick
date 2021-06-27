@@ -8,6 +8,8 @@ from rest_framework.test import APITestCase
 from ad_source import models
 from ad_source.helpers import ETH2USD
 from ad_source.tests.view_sets import ETH2USD_DATA
+from ad_source.tests import mixins
+
 
 EXAMPLE_COM = '''
 <!doctype html>
@@ -24,8 +26,7 @@ EXAMPLE_COM = '''
 '''
 
 
-class TestTaskDashboardView(APITestCase):
-    fixtures = ['0000_users', '0001_task', '0002_question', '0003_options']
+class TestTaskDashboardView(mixins.DataTestMixin, APITestCase):
 
     def setUp(self):
         self.list_url = reverse('task_dashboard-list')

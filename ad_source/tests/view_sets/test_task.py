@@ -8,10 +8,10 @@ from rest_framework.test import APITestCase
 from ad_source import models
 from ad_source.helpers import ETH2USD
 from ad_source.tests.view_sets import ETH2USD_DATA
+from ad_source.tests import mixins
 
 
-class TestTaskView(APITestCase):
-    fixtures = ['0000_users', '0001_task', '0002_question', '0003_options']
+class TestTaskView(mixins.DataTestMixin, APITestCase):
     TASK_DATA = {
         "title": "Check our site",
         "description": "Awesome site. Go check it now and earn crypto",
@@ -206,8 +206,7 @@ class TestTaskView(APITestCase):
         self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
 
 
-class TestUserTaskView(APITestCase):
-    fixtures = ['0000_users', '0001_task', '0002_question', '0003_options']
+class TestUserTaskView(mixins.DataTestMixin, APITestCase):
 
     @responses.activate
     def test_list_user_tasks(self):
