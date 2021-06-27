@@ -272,7 +272,7 @@ class RewardViewSet(mixins.CreateModelMixin, mixins.ListModelMixin, viewsets.Gen
                 task=task,
                 defaults={
                     'sender': task.user,
-                    'amount': task.reward_per_click,
+                    'amount': task.reward_per_click.amount,
                 }
             )
             if created:

@@ -21,6 +21,7 @@ class TestTaskView(mixins.DataTestMixin, APITestCase):
         "reward_per_click": 0.001,
         "time_duration": "00:00:30",
         "tx_hash": "0xdeadc0dedeadc0de",
+        "chain": "goerli",
         "questions": [
             {
                 "title": "Was it good?",

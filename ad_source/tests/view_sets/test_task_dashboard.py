@@ -43,7 +43,7 @@ class TestTaskDashboardView(mixins.DataTestMixin, APITestCase):
     @responses.activate
     def test_get_dashboard_detail(self):
         responses.add(responses.GET, ETH2USD.BASE_URL, body=ETH2USD_DATA, status=200)
-        task = models.Task.objects.first()
+        task = models.Task.objects.dashboard(self.admin).first()
         response = self.client.get(
             reverse('task_dashboard-detail', kwargs={'pk': task.id})
         )
@@ -60,7 +60,7 @@ class TestTaskDashboardView(mixins.DataTestMixin, APITestCase):
         data = {
             'website_link': 'https://example.com',
         }
-        task = models.Task.objects.first()
+        task = models.Task.objects.dashboard(self.admin).first()
         response = self.client.patch(
             reverse('task_dashboard-detail', kwargs={'pk': task.id}),
             data=data,
@@ -73,7 +73,7 @@ class TestTaskDashboardView(mixins.DataTestMixin, APITestCase):
     def test_withdraw_dashboard_detail(self):
         responses.add(responses.GET, ETH2USD.BASE_URL, body=ETH2USD_DATA, status=200)
         with patch('ad_source.tasks.update_task_is_active_balance.delay') as mock_update_task:
-            task = models.Task.objects.first()
+            task = models.Task.objects.dashboard(self.admin).last()
             response = self.client.post(
                 reverse('task_dashboard-withdraw', kwargs={'pk': task.id}),
             )

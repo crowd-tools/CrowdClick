@@ -1,6 +1,7 @@
 import logging
 
 import requests.exceptions
+from djmoney.contrib.django_rest_framework import MoneyField
 from rest_auth.serializers import UserDetailsSerializer
 from rest_framework import serializers, status
 
@@ -45,6 +46,10 @@ class TaskSerializer(serializers.HyperlinkedModelSerializer):
     user = UserDetailsSerializer(read_only=True)
     tx_hash = serializers.CharField(source='initial_tx_hash', required=False)
     type = serializers.CharField(read_only=True)
+    reward_per_click = MoneyField(max_digits=11, decimal_places=5)
+    reward_usd_per_click = MoneyField(max_digits=11, decimal_places=5, read_only=True)
+    remaining_balance = MoneyField(max_digits=9, decimal_places=3, read_only=True)
+    initial_budget = MoneyField(max_digits=9, decimal_places=3, required=False)
 
     class Meta:
         model = models.Task
@@ -190,6 +195,9 @@ class TaskDashboardSerializer(TaskSerializer):
     answers = AnswerSerializer(many=True)
     tx_hash = serializers.CharField(source='initial_tx_hash', required=False)
     type = serializers.CharField(read_only=True)
+    reward_per_click = MoneyField(max_digits=11, decimal_places=5)
+    remaining_balance = MoneyField(max_digits=9, decimal_places=3, required=False)
+    initial_budget = MoneyField(max_digits=9, decimal_places=3, required=False)
 
     class Meta:
         model = models.Task
