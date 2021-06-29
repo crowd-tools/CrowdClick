@@ -6,12 +6,10 @@ from rest_framework import status
 from rest_framework.test import APITestCase
 
 from ad_source import models
-from ad_source.helpers import ETH2USD
-from ad_source.tests.view_sets import ETH2USD_DATA
+from ad_source.tests import mixins
 
 
-class TestTaskView(APITestCase):
-    fixtures = ['0000_users', '0001_task', '0002_question', '0003_options']
+class TestTaskView(mixins.DataTestMixin, APITestCase):
     TASK_DATA = {
         "title": "Check our site",
         "description": "Awesome site. Go check it now and earn crypto",
@@ -21,6 +19,7 @@ class TestTaskView(APITestCase):
         "reward_per_click": 0.001,
         "time_duration": "00:00:30",
         "tx_hash": "0xdeadc0dedeadc0de",
+        "chain": "goerli",
         "questions": [
             {
                 "title": "Was it good?",
@@ -48,7 +47,6 @@ class TestTaskView(APITestCase):
 
     @responses.activate
     def test_list_task(self):
-        responses.add(responses.GET, ETH2USD.BASE_URL, body=ETH2USD_DATA, status=200)
         response = self.client.get(self.url)
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.data['count'], 3)
@@ -60,14 +58,12 @@ class TestTaskView(APITestCase):
 
     @responses.activate
     def test_filter_tasks_by_chain(self):
-        responses.add(responses.GET, ETH2USD.BASE_URL, body=ETH2USD_DATA, status=200)
         response = self.client.get(self.url, data={"chain": "mumbai"})
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.data['count'], 1)
 
     @responses.activate
     def test_list_task_admin(self):
-        responses.add(responses.GET, ETH2USD.BASE_URL, body=ETH2USD_DATA, status=200)
         self.client.login(username='admin', password='admin')
         response = self.client.get(self.url)
         self.assertEqual(response.status_code, 200)
@@ -76,7 +72,6 @@ class TestTaskView(APITestCase):
     @responses.activate
     def test_list_campaign_admin(self):
         # List tasks that are not quiz
-        responses.add(responses.GET, ETH2USD.BASE_URL, body=ETH2USD_DATA, status=200)
         self.client.login(username='admin', password='admin')
         response = self.client.get(self.url, data={'type': 'campaign'})
         self.assertEqual(response.status_code, 200)
@@ -85,7 +80,6 @@ class TestTaskView(APITestCase):
     @responses.activate
     def test_list_quiz_admin(self):
         # List tasks that are quiz
-        responses.add(responses.GET, ETH2USD.BASE_URL, body=ETH2USD_DATA, status=200)
         self.client.login(username='admin', password='admin')
         response = self.client.get(self.url, data={'type': 'quiz'})
         self.assertEqual(response.status_code, 200)
@@ -99,7 +93,6 @@ class TestTaskView(APITestCase):
     def test_create_task_admin(self):
         with patch('ad_source.tasks.update_task_is_active_balance.delay') as mock_update_task:
             with patch('ad_source.tasks.create_task_screenshot.delay') as mock_screenshot_task:
-                responses.add(responses.GET, ETH2USD.BASE_URL, body=ETH2USD_DATA, status=200)
                 responses.add(responses.GET, 'http://does_not_exist.com',
                               body=self.OG_DATA, status=200)
                 self.client.login(username='admin', password='admin')
@@ -116,7 +109,6 @@ class TestTaskView(APITestCase):
     def test_create_task_admin_without_tx_hash(self):
         with patch('ad_source.tasks.update_task_is_active_balance.delay') as mock_update_task:
             with patch('ad_source.tasks.create_task_screenshot.delay') as mock_screenshot_task:
-                responses.add(responses.GET, ETH2USD.BASE_URL, body=ETH2USD_DATA, status=200)
                 responses.add(responses.GET, 'http://does_not_exist.com',
                               body=self.OG_DATA, status=200)
                 data = self.TASK_DATA
@@ -137,7 +129,6 @@ class TestTaskView(APITestCase):
             with patch('ad_source.tasks.create_task_screenshot.delay') as mock_screenshot_task:
                 data = self.TASK_DATA
                 data['questions'][0]['options'][0]['is_correct'] = True
-                responses.add(responses.GET, ETH2USD.BASE_URL, body=ETH2USD_DATA, status=200)
                 responses.add(responses.GET, 'http://does_not_exist.com',
                               body=self.OG_DATA, status=200)
                 self.client.login(username='admin', password='admin')
@@ -156,7 +147,6 @@ class TestTaskView(APITestCase):
             with patch('ad_source.tasks.create_task_screenshot.delay') as mock_screenshot_task:
                 responses.add(responses.GET, 'http://does_not_exist.com',
                               body=self.OG_DATA, status=200)
-                responses.add(responses.GET, ETH2USD.BASE_URL, body=ETH2USD_DATA, status=200)
                 self.client.login(username='admin', password='admin')
                 response = self.client.post(self.url, data=self.TASK_DATA)
                 self.assertEqual(response.status_code, status.HTTP_201_CREATED)
@@ -180,7 +170,6 @@ class TestTaskView(APITestCase):
                 responses.add(responses.GET, 'http://does_not_exist.com',
                               body=self.OG_DATA, status=200,
                               headers={'X-Frame-Options': 'DENY'},)
-                responses.add(responses.GET, ETH2USD.BASE_URL, body=ETH2USD_DATA, status=200)
                 self.client.login(username='admin', password='admin')
                 response = self.client.post(self.url, data=self.TASK_DATA)
                 data = response.json()
@@ -196,7 +185,6 @@ class TestTaskView(APITestCase):
 
     @responses.activate
     def test_delete_task_user(self):
-        responses.add(responses.GET, ETH2USD.BASE_URL, body=ETH2USD_DATA, status=200)
         self.client.login(username='0xa1f765189805e0e51ac9753a9bc7d99e2b90c705', password='admin')
         response = self.client.delete(self.detail_url)
         self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
@@ -206,12 +194,10 @@ class TestTaskView(APITestCase):
         self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
 
 
-class TestUserTaskView(APITestCase):
-    fixtures = ['0000_users', '0001_task', '0002_question', '0003_options']
+class TestUserTaskView(mixins.DataTestMixin, APITestCase):
 
     @responses.activate
     def test_list_user_tasks(self):
-        responses.add(responses.GET, ETH2USD.BASE_URL, body=ETH2USD_DATA, status=200)
         self.client.login(username='admin', password='admin')
         response = self.client.get(
             reverse('user_tasks_view', kwargs={'contract_address': '0xdeadc0dedeadc0de'})

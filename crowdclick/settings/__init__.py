@@ -40,6 +40,7 @@ env = environ.Env(
         # 'goerli', ...
     }),
     ETH2USD_URL=(str, 'https://min-api.cryptocompare.com/data/pricemulti?fsyms={from_symbol}&tsyms={to_symbol}'),
+    CRYPTOCOMPARE_URL=(str, 'https://min-api.cryptocompare.com/data/pricemulti?tsyms={symbols}&fsyms={base_currency}'),
     ETH2USD_CACHE_KEY=(str, 'ETH-PRICES'),
     DJANGO_ADMIN_URL=(str, 'admin'),
 
@@ -76,6 +77,7 @@ ALLOWED_HOSTS = env.list('ALLOWED_HOSTS')
 # https://docs.djangoproject.com/en/dev/ref/settings/#databases
 DATABASES = {'default': env.db('DATABASE_URL')}
 BROKER_URL = env.str('BROKER_URL')
+CRYPTOCOMPARE_URL = env.str('CRYPTOCOMPARE_URL')
 
 CACHES = {
     'default': {

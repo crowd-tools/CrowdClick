@@ -5,12 +5,13 @@ from dataclasses import dataclass
 
 from django.conf import settings
 from django.core.exceptions import ImproperlyConfigured
+from djmoney.contrib.exchange.models import get_rate
 from eth_typing import Address, ChecksumAddress
 from web3 import Web3
 from web3.contract import Contract
 from web3.types import ENS
 
-from . import contracts, helpers, models
+from . import contracts, models
 
 if typing.TYPE_CHECKING:  # pragma: no cover
     from crowdclick.settings import Web3Config
@@ -57,13 +58,12 @@ class Web3Provider:
         ).call()
         task_budget, task_reward, current_budget, url, is_active, *_ = response
         current_budget_eth = self.web3.fromWei(current_budget, 'ether')
-        current_budget_usd = helpers.ETH2USD.get() * current_budget_eth
+        current_budget_usd = get_rate(source=self.currency, target='USD') * current_budget_eth
         return is_active, current_budget_usd
 
     def push_underlying_usd_price(self):
-        # checksum_address = Web3.toChecksumAddress(self.public_key)
-        value = helpers.ETH2USD.get(from_symbol=self.currency)
-        value_uint = self.web3.toWei(value, 'ether')
+        rate = get_rate(source=self.currency, target='USD')
+        value_uint = self.web3.toWei(rate, 'ether')
         estimated_gas = self.admin_contract.functions.adminPushUnderlyingUSDPrice(
             value_uint
         ).estimateGas({'from': self.public_key})

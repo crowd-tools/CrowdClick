@@ -5,6 +5,7 @@ import logging
 from asgiref.sync import sync_to_async
 from django.conf import settings
 from django.core.files.images import ImageFile
+from django.utils.module_loading import import_string
 from django.utils.text import slugify
 from pyppeteer import launch
 
@@ -82,11 +83,13 @@ def create_task_screenshot(self, task_id: int):
     asyncio.run(async_create_task_screenshot(task_id=task_id))
 
 
-@celery.app.task(bind=True)
-def push_underlying_usd_price(self):
+@celery.app.task
+def update_rates(backend=settings.EXCHANGE_BACKEND, **kwargs):
     """
-    For each client in settings, push his price to WEB3
+    Update rates and push underlying price to WEB3
     """
+    backend = import_string(backend)()
+    backend.update_rates(**kwargs)
     results = []
     for chain in settings.WEB3_CONFIG.keys():
         w3_provider: web3_providers.Web3Provider = web3_providers.web3_storage[chain]
