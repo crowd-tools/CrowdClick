@@ -11,6 +11,11 @@ class CryptoCompareBackend(SimpleExchangeBackend):
     def get_url(self, **params):
         return self.url.format(**params)
 
+    def get_params(self):
+        return {
+            "symbols": ','.join(settings.CURRENCIES)
+        }
+
     def get_rates(self, **params):
         response = self.get_response(**params)
         return self.parse_json(response)[params['base_currency']]
