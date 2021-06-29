@@ -8,6 +8,7 @@ from django.contrib.auth import login, logout
 from django.contrib.auth.models import User
 from django.db import transaction
 from django.shortcuts import get_object_or_404
+from djmoney.contrib.exchange.models import Rate
 from rest_framework import (
     exceptions,
     mixins,
@@ -23,7 +24,6 @@ from rest_framework.response import Response
 from . import (
     authentication,
     filters,
-    helpers,
     models,
     serializers,
     tasks,
@@ -150,11 +150,11 @@ class SubscribeViewSet(mixins.CreateModelMixin, viewsets.GenericViewSet):
     permission_classes = permissions.AllowAny,
 
 
-class ETHMemCacheViewSet(mixins.ListModelMixin, viewsets.ViewSet):
-
-    def list(self, request, *args, **kwargs):
-        cache_dict = helpers.ETH2USD.get_dict()
-        return Response(cache_dict)
+class RateViewSet(mixins.ListModelMixin, viewsets.GenericViewSet):
+    queryset = Rate.objects.all()
+    serializer_class = serializers.RateSerializer
+    permission_classes = permissions.AllowAny,
+    pagination_class = None
 
 
 @api_view(['GET', 'POST'])

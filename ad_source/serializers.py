@@ -2,6 +2,7 @@ import logging
 
 import requests.exceptions
 from djmoney.contrib.django_rest_framework import MoneyField
+from djmoney.contrib.exchange.models import Rate
 from rest_auth.serializers import UserDetailsSerializer
 from rest_framework import serializers, status
 
@@ -229,3 +230,18 @@ class SubscribeSerializer(serializers.ModelSerializer):
         fields = [
             'email'
         ]
+
+
+class RateSerializer(serializers.ModelSerializer):
+    last_update = serializers.SerializerMethodField()
+
+    class Meta:
+        model = Rate
+        fields = [
+            'currency',
+            'value',
+            'last_update',
+        ]
+
+    def get_last_update(self, instance: Rate):
+        return instance.backend.last_update

@@ -5,14 +5,6 @@ from django.db import migrations, models
 import djmoney.models.fields
 
 
-def update_rates(apps, schema_editor):
-    # from ad_source.exchange.backends import CryptoCompareBackend
-    #
-    # backend = CryptoCompareBackend()
-    # backend.update_rates(symbols='ETH,BNB,MATIC')
-    pass
-
-
 def delete_tasks(apps, schema_editor):
     Reward = apps.get_model('ad_source', 'Reward')
     Answer = apps.get_model('ad_source', 'Answer')
@@ -57,7 +49,5 @@ class Migration(migrations.Migration):
             name='reward_per_click',
             field=ad_source.fields.MoneyField(currency_field_name='currency', decimal_places=10, max_digits=18, verbose_name='Reward per click'),
         ),
-
-        migrations.RunPython(update_rates, reverse_code=migrations.RunPython.noop),
-        # migrations.RunPython(delete_tasks, reverse_code=migrations.RunPython.noop),
+        migrations.RunPython(delete_tasks, reverse_code=migrations.RunPython.noop),
     ]
