@@ -3,7 +3,8 @@ settings with default values
 """
 
 import os
-import sys
+
+import moneyed
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 from collections import namedtuple
@@ -27,6 +28,8 @@ INSTALLED_APPS = [
     'django_celery_beat',
     'django_celery_results',
     'django_filters',
+    'djmoney',
+    'djmoney.contrib.exchange',
     'drf_yasg',
 
     'ad_source',
@@ -139,3 +142,15 @@ STATIC_ROOT = 'static'
 STATICFILES_DIRS = [
     os.path.join(BASE_DIR, "static"),
 ]
+
+
+ETH = moneyed.add_currency(code='ETH', numeric='ETH', name='Ethereum')
+BNB = moneyed.add_currency(code='BNB', numeric='BNB', name='Binance Coin')
+MATIC = moneyed.add_currency(code='MATIC', numeric='MATIC', name='Matic')
+
+CURRENCIES = ('USD', 'ETH', 'BNB', 'MATIC')
+CURRENCY_CHOICES = [('USD', 'USD'), ('ETH', 'ETH'), ('BNB', 'BNB'), ('MATIC', 'MATIC')]
+
+CURRENCY_CODE_MAX_LENGTH = 5
+
+EXCHANGE_BACKEND = 'ad_source.exchange.backends.CryptoCompareBackend'

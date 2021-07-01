@@ -4,6 +4,7 @@ django-celery-results==2.1.0
 django-celery-beat==2.2.0
 django-environ==0.4.5
 django-filter==2.4.0
+django-money==2.0
 django-rest-auth==0.9.5
 django-web3-auth==0.1.2
 django-split-settings==1.0.1

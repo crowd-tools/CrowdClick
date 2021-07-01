@@ -1,5 +1,9 @@
 import datetime
 import unittest
+from decimal import Decimal
+
+from djmoney.contrib.exchange.models import Rate, ExchangeBackend
+from djmoney.money import Money
 
 from ad_source import models
 
@@ -29,8 +33,8 @@ class TaskMixin(unittest.TestCase):
             contract_address="0xdeadc0dedeadc0de",
             chain="goerli",
             og_image_link="https://via.placeholder.com/300x200.png",
-            reward_per_click=1,
-            remaining_balance=10,
+            reward_per_click=Money(1, 'USD'),
+            # remaining_balance=Money(10, 'ETH'),
             time_duration=datetime.timedelta(seconds=30),
             created="2013-01-01 00:00:00+00:00",
             modified="2013-01-01 00:00:00+00:00",
@@ -43,8 +47,8 @@ class TaskMixin(unittest.TestCase):
             contract_address="0xdeadbeefdeadbeef",
             chain="mumbai",
             description="Not active task. Go check",
-            reward_per_click=1,
-            remaining_balance=10,
+            reward_per_click=Money(1, 'MATIC'),
+            # remaining_balance=Money(10, 'MATIC'),
             time_duration=datetime.timedelta(seconds=30),
             created="2013-01-01 00:00:00+00:00",
             modified="2013-01-01 00:00:00+00:00",
@@ -56,8 +60,8 @@ class TaskMixin(unittest.TestCase):
             contract_address="0xdeadbeefdeadbeef",
             chain="goerli",
             description="Survey task. Guess the correct answer",
-            reward_per_click=1,
-            remaining_balance=10,
+            reward_per_click=Money(1, 'ETH'),
+            # remaining_balance=Money(10, 'ETH'),
             time_duration=datetime.timedelta(seconds=30),
             created="2013-01-01 00:00:00+00:00",
             modified="2013-01-01 00:00:00+00:00",
@@ -117,5 +121,32 @@ class OptionsMixin(unittest.TestCase):
         )
 
 
-class DataTestMixin(UserMixin, TaskMixin, QuestionMixin, OptionsMixin):
+class RateMixin(unittest.TestCase):
+    @classmethod
+    def setUpClass(cls) -> None:
+        super().setUpClass()
+        backend, _created = ExchangeBackend.objects.get_or_create(
+            name='cryptocompare.com',
+            defaults={
+                'base_currency': 'USD',
+            },
+        )
+        Rate.objects.create(
+            currency='BNB',
+            value=Decimal('0.003600'),
+            backend=backend
+        )
+        Rate.objects.create(
+            currency='ETH',
+            value=Decimal('	0.000550'),
+            backend=backend
+        )
+        Rate.objects.create(
+            currency='MATIC',
+            value=Decimal('0.956900'),
+            backend=backend
+        )
+
+
+class DataTestMixin(UserMixin, TaskMixin, QuestionMixin, OptionsMixin, RateMixin):
     pass
