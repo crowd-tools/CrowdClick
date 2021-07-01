@@ -18,7 +18,7 @@ app.config_from_object('django.conf:settings', namespace='CELERY')
 # Load task modules from all registered Django app configs.
 app.autodiscover_tasks()
 
-if settings.SENTRY_DSN_CELERY:
+if settings.SENTRY_DSN_CELERY:  # pragma: no cover
     import sentry_sdk
     from sentry_sdk.integrations.celery import CeleryIntegration
 

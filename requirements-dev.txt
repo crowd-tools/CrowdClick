@@ -1,6 +1,6 @@
 -r requirements.txt
-flake8==3.7.9
-codecov==2.0.22
-coverage==5.0.4
-responses==0.10.12
+flake8==3.9.2
+codecov==2.1.11
+coverage==5.5
+responses==0.13.3
 eth-tester==0.2.0b2
