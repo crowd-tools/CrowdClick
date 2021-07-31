@@ -19,11 +19,13 @@ if typing.TYPE_CHECKING:
 class Task(models.Model):
     GOERLI = 'goerli'
     MUMBAI = 'mumbai'
+    POLYGON_MAINNET = 'polygon_mainnet'
     BINANCE_TESTNET = 'bsc_testnet'
     BINANCE_MAINNET = 'bsc_mainnet'
     CHAIN_CHOICES = (
         (GOERLI, 'Goerli (ETH)'),
         (MUMBAI, 'Mumbai (MATIC)'),
+        (POLYGON_MAINNET, 'Polygon (Matic)'),
         (BINANCE_TESTNET, 'bsc_testnet (BNB)'),
         (BINANCE_MAINNET, 'bsc_mainnet (BNB)'),
     )
