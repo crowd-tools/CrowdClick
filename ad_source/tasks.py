@@ -14,8 +14,6 @@ from . import models, web3_providers
 
 logger = logging.getLogger(__name__)
 
-RETRY_COUNTDOWN = 20 * 1  # 20 seconds
-
 
 async def async_create_task_screenshot(task_id: int):
     task: models.Task = await sync_to_async(models.Task.objects.get)(id=task_id)
@@ -63,7 +61,7 @@ def update_task_is_active_balance(
     if should_be_active is not None and should_be_active != is_active and retry > 0:
         self.retry(
             kwargs={'task_id': task_id, 'should_be_active': should_be_active, 'retry': retry - 1},
-            countdown=RETRY_COUNTDOWN, max_retries=10
+            countdown=settings.WEB3_RETRY_COUNTDOWN, max_retries=settings.WEB3_RETRY_COUNTDOWN
         )
 
     task.is_active_web3 = is_active
