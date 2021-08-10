@@ -25,7 +25,7 @@ async def async_create_task_screenshot(task_id: int):
     try:
         page = await browser.newPage()
         await page.goto(task.website_link, waitUntil='domcontentloaded')
-        buffer = await page.screenshot(fullPage=True)
+        buffer = await page.screenshot()
         image = ImageFile(io.BytesIO(buffer), name=f'{slugify(task.website_link)}.png')
         task.website_image = image
         await sync_to_async(task.save)()
