@@ -1,34 +1,37 @@
 import asyncio
 import io
 import logging
+import aiohttp
 
 from asgiref.sync import sync_to_async
 from django.conf import settings
 from django.core.files.images import ImageFile
 from django.utils.module_loading import import_string
 from django.utils.text import slugify
-from pyppeteer import launch
 
 from crowdclick import celery
 from . import models, web3_providers
 
 logger = logging.getLogger(__name__)
 
+SCREENSHOT_MACHINE_URL = (
+    f'https://api.screenshotmachine.com'
+    f'?key={settings.SCREENSHOT_MACHINE_KEY}'
+    f'&url={{url}}'
+    f'&dimension={settings.SCREENSHOT_MACHINE_DIMENSION}'
+)
+
 
 async def async_create_task_screenshot(task_id: int):
     task: models.Task = await sync_to_async(models.Task.objects.get)(id=task_id)
-
-    browser = await launch(defaultViewport={'width': 1920, 'height': 1080})
-
-    try:
-        page = await browser.newPage()
-        await page.goto(task.website_link, waitUntil='domcontentloaded')
-        buffer = await page.screenshot()
-        image = ImageFile(io.BytesIO(buffer), name=f'{slugify(task.website_link)}.png')
-        task.website_image = image
-        await sync_to_async(task.save)()
-    finally:
-        await browser.close()
+    async with aiohttp.ClientSession() as session:
+        async with session.get(
+                SCREENSHOT_MACHINE_URL.format(url=task.website_link),
+        ) as response:
+            buffer = await response.read()
+            image = ImageFile(io.BytesIO(buffer), name=f'{slugify(task.website_link)}.png')
+            task.website_image = image
+            await sync_to_async(task.save)()
 
     logger.info(f'Downloaded new image for Task: {task}')
 
