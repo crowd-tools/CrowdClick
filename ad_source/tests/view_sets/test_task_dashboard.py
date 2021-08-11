@@ -1,6 +1,7 @@
 from unittest.mock import patch
 
 import responses
+from django.conf import settings
 from django.urls import reverse
 from rest_framework import status
 from rest_framework.test import APITestCase
@@ -73,4 +74,6 @@ class TestTaskDashboardView(mixins.DataTestMixin, APITestCase):
             data = response.json()
             self.assertEqual(response.status_code, status.HTTP_200_OK, data)
             self.assertEqual(data['website_link'], 'http://example.com')
-            mock_update_task.assert_called_once_with(task_id=task.id, should_be_active=False, retry=10)
+            mock_update_task.assert_called_once_with(
+                task_id=task.id, should_be_active=False, retry=settings.WEB3_RETRY
+            )
