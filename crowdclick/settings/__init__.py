@@ -45,6 +45,10 @@ env = environ.Env(
     ETH2USD_URL=(str, 'https://min-api.cryptocompare.com/data/pricemulti?fsyms={from_symbol}&tsyms={to_symbol}'),
     CRYPTOCOMPARE_URL=(str, 'https://min-api.cryptocompare.com/data/pricemulti?tsyms={symbols}&fsyms={base_currency}'),
     ETH2USD_CACHE_KEY=(str, 'ETH-PRICES'),
+
+    SCREENSHOT_MACHINE_KEY=(str, 'SCREENSHOT_MACHINE_KEY'),
+    SCREENSHOT_MACHINE_DIMENSION=(str, '1024xfull'),
+
     DJANGO_ADMIN_URL=(str, 'admin'),
 
     SENTRY_DSN=(str, ''),
@@ -81,6 +85,9 @@ ALLOWED_HOSTS = env.list('ALLOWED_HOSTS')
 DATABASES = {'default': env.db('DATABASE_URL')}
 BROKER_URL = env.str('BROKER_URL')
 CRYPTOCOMPARE_URL = env.str('CRYPTOCOMPARE_URL')
+
+SCREENSHOT_MACHINE_KEY = env.str('SCREENSHOT_MACHINE_KEY')
+SCREENSHOT_MACHINE_DIMENSION = env.str('SCREENSHOT_MACHINE_DIMENSION')
 
 CACHES = {
     'default': {
