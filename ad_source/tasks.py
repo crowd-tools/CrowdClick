@@ -42,18 +42,16 @@ def update_task_is_active_balance(
         task_id: int,
         wait_for_tx: str = '',
         should_be_active: bool = None,
-        retry: int = 0,
 ) -> dict:
     """
     :param self: Celery task
     :param task_id: ID of task to update
     :param wait_for_tx: If provided the task will wait for transaction to be mined first
     :param should_be_active: Expected result for retries
-    :param retry: Number of retries
     """
     task = models.Task.objects.get(id=task_id)
     logger.info(f'Got task to update: {task}, wait_for_tx: {wait_for_tx}, '
-                f'should_be_active: {should_be_active}, retry: {retry}')
+                f'should_be_active: {should_be_active}')
 
     w3_provider: web3_providers.Web3Provider = web3_providers.web3_storage[task.chain]
     if wait_for_tx:
@@ -61,10 +59,10 @@ def update_task_is_active_balance(
         w3_provider.web3.eth.waitForTransactionReceipt(wait_for_tx)
     is_active, balance = w3_provider.check_balance(task)
     logger.info(f'Got Web3 response; Task: {task}, is_active: {is_active}, remaining_balance: {balance}')
-    if should_be_active is not None and should_be_active != is_active and retry > 0:
+    if should_be_active is not None and should_be_active != is_active:
         self.retry(
-            kwargs={'task_id': task_id, 'should_be_active': should_be_active, 'retry': retry - 1},
-            countdown=settings.WEB3_RETRY_COUNTDOWN, max_retries=settings.WEB3_RETRY_COUNTDOWN
+            countdown=settings.WEB3_RETRY_COUNTDOWN,
+            max_retries=settings.WEB3_RETRY_COUNTDOWN,
         )
 
     task.is_active_web3 = is_active
