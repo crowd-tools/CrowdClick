@@ -1,7 +1,6 @@
 import logging
 
 import requests.exceptions
-from django.conf import settings
 from djmoney.contrib.django_rest_framework import MoneyField
 from djmoney.contrib.exchange.models import Rate
 from rest_auth.serializers import UserDetailsSerializer
@@ -102,7 +101,7 @@ class TaskSerializer(serializers.HyperlinkedModelSerializer):
             tasks.update_task_is_active_balance.delay(task_id=task.id, wait_for_tx=str(task.initial_tx_hash))
         else:
             tasks.update_task_is_active_balance.delay(
-                task_id=task.id, should_be_active=True, retry=settings.WEB3_RETRY
+                task_id=task.id, should_be_active=True,
             )
         tasks.create_task_screenshot.delay(task.id)
         return task
