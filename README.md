@@ -1,5 +1,6 @@
 # CrowdClick
 
+[![Creative Common](https://licensebuttons.net/l/by-nc-sa/4.0/80x15.png)](https://creativecommons.org/licenses/by-nc-sa/4.0/)
 [![contributions](https://img.shields.io/badge/contributions-welcome-brightgreen)](https://github.com/crowd-tools/CrowdClick/pulls)
 [![Build Status](https://github.com/crowd-tools/CrowdClick/actions/workflows/crowdclick.yml/badge.svg)](https://github.com/crowd-tools/CrowdClick/actions/workflows/crowdclick.yml)
 [![codecov](https://codecov.io/gh/crowd-tools/CrowdClick/branch/master/graph/badge.svg)](https://codecov.io/gh/crowd-tools/CrowdClick)
