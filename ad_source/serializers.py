@@ -85,6 +85,7 @@ class TaskSerializer(serializers.HyperlinkedModelSerializer):
             'website_image',
             'warning_message',
             'is_active',
+            'sku',
         ]
 
     def create(self, validated_data):
@@ -227,6 +228,9 @@ class TaskDashboardSerializer(TaskSerializer):
             'tx_hash',
             'type',
             'is_private',
+        ]
+        read_only_fields = [
+            'sku',
         ]
 
 
