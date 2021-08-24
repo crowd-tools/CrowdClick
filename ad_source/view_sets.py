@@ -43,9 +43,13 @@ class TaskViewSet(mixins.CreateModelMixin,
     permission_classes = [permissions.IsAuthenticatedOrReadOnly]
     serializer_class = serializers.TaskSerializer
     filterset_class = filters.TaskFilter
+    lookup_field = 'sku'
 
     def get_queryset(self):
-        return models.Task.objects.active_for_user(self.request.user)
+        qs = models.Task.objects.active_for_user(self.request.user)
+        if self.action == 'list':  # Don't show private tasks on list
+            qs = qs.filter(is_private=False)
+        return qs
 
     def create(self, request, *args, **kwargs):
         serializer = serializers.TaskSerializer(data=request.data, context={'request': request})
@@ -67,22 +71,18 @@ class TaskViewSet(mixins.CreateModelMixin,
 
     @action(methods=['post'], detail=True, url_path='answer',
             url_name='task_answer', serializer_class=serializers.AnswerSerializer)
-    def answer(self, request, pk=None):
+    def answer(self, request, sku=None):
         try:
-            task_id = int(pk)
-        except ValueError:
-            raise exceptions.ValidationError(f"Task id {pk} is not a number")
-        try:
-            task = models.Task.objects.get(pk=task_id)
+            task = models.Task.objects.get(sku=sku)
         except models.Task.DoesNotExist:
-            raise exceptions.NotFound(f"Task id {task_id} wasn't found")
+            raise exceptions.NotFound(f"Task sku {sku} wasn't found")
         for question in request.data['questions']:
             if question['id'] not in task.questions.values_list('id', flat=True):
-                raise exceptions.NotFound(f"Question id {question['id']} wasn't found in task {task_id}")
+                raise exceptions.NotFound(f"Question id {question['id']} wasn't found in task {sku}")
             for option in question['options']:
                 if option['id'] not in task.questions.filter(id=question['id']).values_list('options', flat=True):
                     raise exceptions.NotFound(
-                        f"Option id {option['id']} wasn't found for question {option['id']} in task {task_id}"
+                        f"Option id {option['id']} wasn't found for question {option['id']} in task {sku}"
                     )
         request.data.update({"task": task, "user": request.user})
         serializer = serializers.AnswerSerializer(data=request.data, context={'request': request})
