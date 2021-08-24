@@ -7,6 +7,7 @@ from django.conf import settings
 from django.contrib.auth import login, logout
 from django.contrib.auth.models import User
 from django.db import transaction
+from django.http import Http404
 from django.shortcuts import get_object_or_404
 from djmoney.contrib.exchange.models import Rate
 from rest_framework import (
@@ -44,6 +45,22 @@ class TaskViewSet(mixins.CreateModelMixin,
     serializer_class = serializers.TaskSerializer
     filterset_class = filters.TaskFilter
     lookup_field = 'sku'
+
+    def get_object(self):
+        try:
+            return super(TaskViewSet, self).get_object()
+        except Http404:
+            # Retry with ID fallback on public task
+            queryset = self.filter_queryset(self.get_queryset())
+            lookup_url_kwarg = self.lookup_url_kwarg or self.lookup_field
+            filter_kwargs = {
+                'pk': self.kwargs[lookup_url_kwarg],
+                'is_private': False,
+            }
+            obj = get_object_or_404(queryset, **filter_kwargs)
+            # May raise a permission denied
+            self.check_object_permissions(self.request, obj)
+            return obj
 
     def get_queryset(self):
         qs = models.Task.objects.active_for_user(self.request.user)
