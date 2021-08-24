@@ -43,7 +43,7 @@ class TestTaskView(mixins.DataTestMixin, APITestCase):
     def setUp(self):
         self.url = reverse('task_view-list')
         self.published_task = models.Task.objects.get(pk=1)
-        self.detail_url = reverse('task_view-detail', kwargs={'pk': self.published_task.id})
+        self.detail_url = reverse('task_view-detail', kwargs={'sku': self.published_task.sku})
 
     @responses.activate
     def test_list_task(self):

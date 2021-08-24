@@ -34,6 +34,7 @@ class TaskMixin(unittest.TestCase):
             chain="goerli",
             og_image_link="https://via.placeholder.com/300x200.png",
             reward_per_click=Money(1, 'USD'),
+            sku='GOEASK',  # Goerli task
             # remaining_balance=Money(10, 'ETH'),
             time_duration=datetime.timedelta(seconds=30),
             created="2013-01-01 00:00:00+00:00",
@@ -49,6 +50,7 @@ class TaskMixin(unittest.TestCase):
             description="Not active task. Go check",
             reward_per_click=Money(1, 'MATIC'),
             # remaining_balance=Money(10, 'MATIC'),
+            sku='MUMASK',  # Mumbai task
             time_duration=datetime.timedelta(seconds=30),
             created="2013-01-01 00:00:00+00:00",
             modified="2013-01-01 00:00:00+00:00",
@@ -61,6 +63,7 @@ class TaskMixin(unittest.TestCase):
             chain="goerli",
             description="Survey task. Guess the correct answer",
             reward_per_click=Money(1, 'ETH'),
+            sku='SURASK',  # Survey task
             # remaining_balance=Money(10, 'ETH'),
             time_duration=datetime.timedelta(seconds=30),
             created="2013-01-01 00:00:00+00:00",
