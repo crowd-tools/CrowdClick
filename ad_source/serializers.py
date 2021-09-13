@@ -77,6 +77,7 @@ class TaskSerializer(serializers.HyperlinkedModelSerializer):
             'tx_hash',
             'type',
             'is_private',
+            'sku'
         ]
         read_only_fields = [
             'user',
@@ -228,6 +229,7 @@ class TaskDashboardSerializer(TaskSerializer):
             'tx_hash',
             'type',
             'is_private',
+            'sku'
         ]
         read_only_fields = [
             'sku',
