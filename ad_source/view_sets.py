@@ -274,8 +274,8 @@ class RewardViewSet(mixins.CreateModelMixin, mixins.ListModelMixin, viewsets.Gen
     queryset = models.Reward.objects.all()
 
     def create(self, request, *args, **kwargs):
-        task_id = kwargs['task_id']
-        task = get_object_or_404(models.Task, pk=task_id)
+        task_sku = kwargs['task_sku']
+        task = get_object_or_404(models.Task, sku=task_sku)
         with transaction.atomic():
             if request.user.id not in task.answers.values_list('user_id', flat=True):
                 data = {"error": "User didn't answer the task"}

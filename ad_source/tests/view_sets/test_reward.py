@@ -12,7 +12,7 @@ class RewardViewSetTestCase(mixins.DataTestMixin, APITestCase):
 
     def setUp(self) -> None:
         self.task = models.Task.objects.get(id=1)
-        self.url = reverse('reward_view-list', kwargs={'task_id': self.task.id})
+        self.url = reverse('reward_view-list', kwargs={'task_sku': self.task.sku})
         self.admin = models.User.objects.get(username='admin')
 
     @patch('web3.eth.Eth.sendRawTransaction')
@@ -69,7 +69,7 @@ class RewardQuizViewSetTestCase(mixins.DataTestMixin, APITestCase):
 
     def setUp(self) -> None:
         self.task = models.Task.objects.get(id=3)
-        self.url = reverse('reward_view-list', kwargs={'task_id': self.task.id})
+        self.url = reverse('reward_view-list', kwargs={'task_sku': self.task.sku})
         self.admin = models.User.objects.get(username='admin')
         self.option = models.Option.objects.get(id=5)
         self.wrong_option = models.Option.objects.get(id=6)
