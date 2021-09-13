@@ -13,7 +13,7 @@ Django==3.2.5
 djangorestframework==3.12.4
 drf-yasg==1.20.0
 ethereum==2.3.2
-Pillow==8.3.0
+Pillow==8.3.2
 psycopg2==2.9.1
 python-memcached==1.59
 requests==2.25.1
