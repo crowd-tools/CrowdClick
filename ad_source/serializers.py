@@ -1,4 +1,5 @@
 import logging
+from decimal import Decimal
 
 import requests.exceptions
 from djmoney.contrib.django_rest_framework import MoneyField
@@ -236,14 +237,19 @@ class SubscribeSerializer(serializers.ModelSerializer):
 
 class RateSerializer(serializers.ModelSerializer):
     last_update = serializers.SerializerMethodField()
+    value_to_usd = serializers.SerializerMethodField()
 
     class Meta:
         model = Rate
         fields = [
             'currency',
             'value',
+            'value_to_usd',
             'last_update',
         ]
 
     def get_last_update(self, instance: Rate):
         return instance.backend.last_update
+
+    def get_value_to_usd(self, instance: Rate):
+        return Decimal("1") / instance.value
