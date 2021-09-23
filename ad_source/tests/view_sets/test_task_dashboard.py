@@ -46,6 +46,7 @@ class TestTaskDashboardView(mixins.DataTestMixin, APITestCase):
         data = response.json()
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(data['answers_result_count'], 0)
+        self.assertTrue(data['questions'][0]['options'][0]['is_correct'])
 
     @responses.activate
     def test_update_dashboard_detail(self):
