@@ -29,8 +29,36 @@ class OptionSerializer(serializers.HyperlinkedModelSerializer):
         ]
 
 
+class OptionDashboardSerializer(OptionSerializer):
+    answer_count = serializers.IntegerField()
+    is_correct = serializers.BooleanField()
+
+    class Meta:
+        model = models.Option
+        fields = [
+            'id',
+            'title',
+            'url',
+            'answer_count',
+            'is_correct',
+        ]
+
+
 class QuestionSerializer(serializers.HyperlinkedModelSerializer):
     options = OptionSerializer(many=True)
+
+    class Meta:
+        model = models.Question
+        fields = [
+            'id',
+            'title',
+            'url',
+            'options',
+        ]
+
+
+class QuestionDashboardSerializer(serializers.HyperlinkedModelSerializer):
+    options = OptionDashboardSerializer(many=True)
 
     class Meta:
         model = models.Question
@@ -195,8 +223,8 @@ class AnswerSerializer(serializers.HyperlinkedModelSerializer):
 
 
 class TaskDashboardSerializer(TaskSerializer):
+    questions = QuestionDashboardSerializer(many=True)
     answers_result_count = serializers.IntegerField(read_only=True)
-    answers = AnswerSerializer(many=True)
     tx_hash = serializers.CharField(source='initial_tx_hash', required=False)
     type = serializers.CharField(read_only=True)
     reward_per_click = MoneyField(max_digits=11, decimal_places=5)
@@ -219,7 +247,6 @@ class TaskDashboardSerializer(TaskSerializer):
             'time_duration',
             'questions',
             'answers_result_count',
-            'answers',
             'remaining_balance',
             'initial_budget',
             'tx_hash',
