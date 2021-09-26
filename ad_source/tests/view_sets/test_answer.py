@@ -21,7 +21,7 @@ class TestAnswerView(mixins.DataTestMixin, APITestCase):
     }
 
     def setUp(self):
-        self.url = reverse('task_view-task_answer', kwargs={'pk': 1})
+        self.url = reverse('task_view-task_answer', kwargs={'sku': 'GOEASK'})
         self.list_url = reverse('task_view-list')
 
     def test_create_answer_anon(self):
@@ -41,21 +41,15 @@ class TestAnswerView(mixins.DataTestMixin, APITestCase):
         data = response.json()
         self.assertEqual(data['count'], 2)
 
-    def test_create_answer_task_id_not_int(self):
-        self.client.login(username='admin', password='admin')
-        url = reverse('task_view-task_answer', kwargs={'pk': "foo"})
-        response = self.client.post(url, data=self.ANSWER_DATA)
-        self.assertEqual(response.status_code, 400)
-
     def test_create_answer_task_doesnt_exist(self):
         self.client.login(username='admin', password='admin')
-        url = reverse('task_view-task_answer', kwargs={'pk': 666})
+        url = reverse('task_view-task_answer', kwargs={'sku': 'NOT-EXISTS'})
         response = self.client.post(url, data=self.ANSWER_DATA)
         self.assertEqual(response.status_code, 404)
 
     def test_create_answer_for_different_task(self):
         self.client.login(username='admin', password='admin')
-        url = reverse('task_view-task_answer', kwargs={'pk': 2})
+        url = reverse('task_view-task_answer', kwargs={'sku': 'MUMASK'})
         response = self.client.post(url, data=self.ANSWER_DATA)
         self.assertEqual(response.status_code, 404)
 
@@ -100,7 +94,7 @@ class TestQuizAnswerView(mixins.DataTestMixin, APITestCase):
     }
 
     def setUp(self):
-        self.url = reverse('task_view-task_answer', kwargs={'pk': 3})
+        self.url = reverse('task_view-task_answer', kwargs={'sku': 'SURASK'})
         self.list_url = reverse('task_view-list')
 
     @responses.activate

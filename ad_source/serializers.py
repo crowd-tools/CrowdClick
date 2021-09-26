@@ -80,6 +80,7 @@ class TaskSerializer(serializers.HyperlinkedModelSerializer):
     reward_usd_per_click = MoneyField(max_digits=11, decimal_places=5, read_only=True)
     remaining_balance = MoneyField(max_digits=9, decimal_places=3, read_only=True)
     initial_budget = MoneyField(max_digits=9, decimal_places=3, required=False)
+    is_private = serializers.BooleanField(default=False, write_only=True)
 
     class Meta:
         model = models.Task
@@ -104,6 +105,8 @@ class TaskSerializer(serializers.HyperlinkedModelSerializer):
             'initial_budget',
             'tx_hash',
             'type',
+            'is_private',
+            'sku'
         ]
         read_only_fields = [
             'user',
@@ -112,6 +115,7 @@ class TaskSerializer(serializers.HyperlinkedModelSerializer):
             'website_image',
             'warning_message',
             'is_active',
+            'sku',
         ]
 
     def create(self, validated_data):
@@ -230,6 +234,7 @@ class TaskDashboardSerializer(TaskSerializer):
     reward_per_click = MoneyField(max_digits=11, decimal_places=5)
     remaining_balance = MoneyField(max_digits=9, decimal_places=3, required=False)
     initial_budget = MoneyField(max_digits=9, decimal_places=3, required=False)
+    is_private = serializers.BooleanField(default=False)
 
     class Meta:
         model = models.Task
@@ -251,6 +256,11 @@ class TaskDashboardSerializer(TaskSerializer):
             'initial_budget',
             'tx_hash',
             'type',
+            'is_private',
+            'sku'
+        ]
+        read_only_fields = [
+            'sku',
         ]
 
 
