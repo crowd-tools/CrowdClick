@@ -1,7 +1,7 @@
 import logging
+from decimal import Decimal
 
 import requests.exceptions
-from django.conf import settings
 from djmoney.contrib.django_rest_framework import MoneyField
 from djmoney.contrib.exchange.models import Rate
 from rest_auth.serializers import UserDetailsSerializer
@@ -29,8 +29,36 @@ class OptionSerializer(serializers.HyperlinkedModelSerializer):
         ]
 
 
+class OptionDashboardSerializer(OptionSerializer):
+    answer_count = serializers.IntegerField()
+    is_correct = serializers.BooleanField()
+
+    class Meta:
+        model = models.Option
+        fields = [
+            'id',
+            'title',
+            'url',
+            'answer_count',
+            'is_correct',
+        ]
+
+
 class QuestionSerializer(serializers.HyperlinkedModelSerializer):
     options = OptionSerializer(many=True)
+
+    class Meta:
+        model = models.Question
+        fields = [
+            'id',
+            'title',
+            'url',
+            'options',
+        ]
+
+
+class QuestionDashboardSerializer(serializers.HyperlinkedModelSerializer):
+    options = OptionDashboardSerializer(many=True)
 
     class Meta:
         model = models.Question
@@ -102,7 +130,7 @@ class TaskSerializer(serializers.HyperlinkedModelSerializer):
             tasks.update_task_is_active_balance.delay(task_id=task.id, wait_for_tx=str(task.initial_tx_hash))
         else:
             tasks.update_task_is_active_balance.delay(
-                task_id=task.id, should_be_active=True, retry=settings.WEB3_RETRY
+                task_id=task.id, should_be_active=True,
             )
         tasks.create_task_screenshot.delay(task.id)
         return task
@@ -195,8 +223,8 @@ class AnswerSerializer(serializers.HyperlinkedModelSerializer):
 
 
 class TaskDashboardSerializer(TaskSerializer):
+    questions = QuestionDashboardSerializer(many=True)
     answers_result_count = serializers.IntegerField(read_only=True)
-    answers = AnswerSerializer(many=True)
     tx_hash = serializers.CharField(source='initial_tx_hash', required=False)
     type = serializers.CharField(read_only=True)
     reward_per_click = MoneyField(max_digits=11, decimal_places=5)
@@ -219,7 +247,6 @@ class TaskDashboardSerializer(TaskSerializer):
             'time_duration',
             'questions',
             'answers_result_count',
-            'answers',
             'remaining_balance',
             'initial_budget',
             'tx_hash',
@@ -237,14 +264,19 @@ class SubscribeSerializer(serializers.ModelSerializer):
 
 class RateSerializer(serializers.ModelSerializer):
     last_update = serializers.SerializerMethodField()
+    value_to_usd = serializers.SerializerMethodField()
 
     class Meta:
         model = Rate
         fields = [
             'currency',
             'value',
+            'value_to_usd',
             'last_update',
         ]
 
     def get_last_update(self, instance: Rate):
         return instance.backend.last_update
+
+    def get_value_to_usd(self, instance: Rate):
+        return Decimal("1") / instance.value

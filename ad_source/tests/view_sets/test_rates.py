@@ -19,5 +19,5 @@ class TestSubscribeView(mixins.RateMixin, APITestCase):
 
         data = response.json()
         self.assertEqual(len(data), 3)
-        self.assertEqual(list(data[0].keys()), ['currency', 'value', 'last_update'])
-        self.assertEqual(list(data[0].values()), ['BNB', '0.003600', unittest.mock.ANY])
+        self.assertEqual(list(data[0].keys()), ['currency', 'value', 'value_to_usd', 'last_update'])
+        self.assertEqual(list(data[0].values()), ['BNB', '0.003600', 277.77777777777777, unittest.mock.ANY])
