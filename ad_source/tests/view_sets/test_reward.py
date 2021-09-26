@@ -14,6 +14,7 @@ class RewardViewSetTestCase(mixins.DataTestMixin, APITestCase):
         self.task = models.Task.objects.get(id=1)
         self.url = reverse('reward_view-list', kwargs={'task_sku': self.task.sku})
         self.admin = models.User.objects.get(username='admin')
+        self.detail_url = reverse('task_view-detail', kwargs={'sku': self.task.sku})
 
     @patch('web3.eth.Eth.sendRawTransaction')
     @patch('ad_source.web3_providers.Web3.toChecksumAddress')
@@ -50,6 +51,9 @@ class RewardViewSetTestCase(mixins.DataTestMixin, APITestCase):
             self.assertEqual(w3_send_transaction_mock.call_count, 1)
 
             mock_task.assert_called_once_with(task_id=self.task.id, wait_for_tx='6161616161')
+
+            response = self.client.get(self.detail_url)
+            self.assertEqual(response.status_code, status.HTTP_200_OK)
 
     def test_create_reward_without_answers(self):
         self.client.login(username='admin', password='admin')
