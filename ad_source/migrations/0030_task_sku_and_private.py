@@ -35,7 +35,7 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='task',
             name='sku',
-            field=models.CharField(blank=True, null=True, max_length=6, unique=True, verbose_name='SKU'),
+            field=models.CharField(blank=True, null=True, max_length=6, verbose_name='SKU'),
         ),
         migrations.RunPython(code=generate_task_sku, reverse_code=migrations.RunPython.noop),
     ]
