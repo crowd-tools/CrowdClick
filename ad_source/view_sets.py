@@ -63,6 +63,8 @@ class TaskViewSet(mixins.CreateModelMixin,
             return obj
 
     def get_queryset(self):
+        if self.action == 'retrieve':  # Return all tasks on detail
+            return models.Task.objects.all()
         qs = models.Task.objects.active_for_user(self.request.user)
         if self.action == 'list':  # Don't show private tasks on list
             qs = qs.filter(is_private=False)
