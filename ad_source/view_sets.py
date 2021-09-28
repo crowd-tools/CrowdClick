@@ -9,6 +9,7 @@ from django.contrib.auth.models import User
 from django.db import transaction
 from django.http import Http404
 from django.shortcuts import get_object_or_404
+from django.utils.decorators import method_decorator
 from django.views.decorators.csrf import csrf_exempt
 from djmoney.contrib.exchange.models import Rate
 from rest_framework import (
@@ -165,7 +166,7 @@ class AnswerViewSet(mixins.CreateModelMixin,
     queryset = models.Answer.objects.all()
     serializer_class = serializers.AnswerSerializer
 
-@csrf_exempt
+@method_decorator(csrf_exempt, name='dispatch')
 class SubscribeViewSet(mixins.CreateModelMixin, viewsets.GenericViewSet):
     queryset = models.Subscribe.objects.all()
     serializer_class = serializers.SubscribeSerializer
