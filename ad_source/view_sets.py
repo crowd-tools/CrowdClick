@@ -166,6 +166,7 @@ class AnswerViewSet(mixins.CreateModelMixin,
     queryset = models.Answer.objects.all()
     serializer_class = serializers.AnswerSerializer
 
+
 @method_decorator(csrf_exempt, name='dispatch')
 class SubscribeViewSet(mixins.CreateModelMixin, viewsets.GenericViewSet):
     queryset = models.Subscribe.objects.all()
