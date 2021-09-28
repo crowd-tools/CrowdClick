@@ -8,7 +8,7 @@ from web3.types import ENS as Ens
 
 @dataclass
 class Web3Config:
-    endpoint: str = 'https://rpc-mumbai.matic.today'
+    endpoints: set = ('https://rpc-mumbai.matic.today', )
     escrow_address: typing.Union[Address, str] = '0xdeadc0dedeadc0dedeadc0dedeadc0dedeadc0de'
     oracle_address: typing.Union[Address, str] = '0xdeadc0dedeadc0dedeadc0dedeadc0dedeadc0de'
     currency: str = 'MATIC'
