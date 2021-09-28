@@ -17,7 +17,7 @@ CACHES = {
 
 WEB3_CONFIG = {
     'goerli': Web3Config(
-        endpoint='https://goerli.infura.io/v3/' + 'a' * 32,
+        endpoints={'https://goerli.infura.io/v3/' + 'a' * 32},
         escrow_address='0x5f9A718D919463443A74A67Deb1aF056790C0ca0',
         oracle_address='0x2020b5644C4Ce52411E57cfD9D899a766Fc1E103',
         currency='ETH',
@@ -27,7 +27,7 @@ WEB3_CONFIG = {
         default_gas_fee=2000000,
     ),
     'mumbai': Web3Config(
-        endpoint='https://rpc-mumbai.matic.today',
+        endpoints={'https://rpc-mumbai.matic.today'},
         escrow_address='0x5f9A718D919463443A74A67Deb1aF056790C0ca0',
         oracle_address='0x2020b5644C4Ce52411E57cfD9D899a766Fc1E103',
         currency='MATIC',
