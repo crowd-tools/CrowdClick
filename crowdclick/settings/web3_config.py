@@ -1,6 +1,6 @@
 # Dataclass for Web3 config
 import typing
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 
 from eth_typing import Address, ChecksumAddress
 from web3.types import ENS as Ens
@@ -8,7 +8,7 @@ from web3.types import ENS as Ens
 
 @dataclass
 class Web3Config:
-    endpoints: set = ('https://rpc-mumbai.matic.today', )
+    endpoints: set = field(default_factory=set)
     escrow_address: typing.Union[Address, str] = '0xdeadc0dedeadc0dedeadc0dedeadc0dedeadc0de'
     oracle_address: typing.Union[Address, str] = '0xdeadc0dedeadc0dedeadc0dedeadc0dedeadc0de'
     currency: str = 'MATIC'
