@@ -56,7 +56,8 @@ def update_task_is_active_balance(
     w3_provider: web3_providers.Web3Provider = web3_providers.web3_storage[task.chain]
     if wait_for_tx:
         logger.info(f'Waiting for TX: {wait_for_tx}')
-        w3_provider.web3.eth.waitForTransactionReceipt(wait_for_tx)
+        provider, *_ = w3_provider.web3
+        provider.eth.wait_for_transaction_receipt(wait_for_tx)
     is_active, balance = w3_provider.check_balance(task)
     logger.info(f'Got Web3 response; Task: {task}, is_active: {is_active}, remaining_balance: {balance}')
     if should_be_active is not None and should_be_active != is_active:

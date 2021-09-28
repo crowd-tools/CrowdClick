@@ -7,7 +7,10 @@ from django.conf import settings
 from django.contrib.auth import login, logout
 from django.contrib.auth.models import User
 from django.db import transaction
+from django.http import Http404
 from django.shortcuts import get_object_or_404
+from django.utils.decorators import method_decorator
+from django.views.decorators.csrf import csrf_exempt
 from djmoney.contrib.exchange.models import Rate
 from rest_framework import (
     exceptions,
@@ -43,9 +46,31 @@ class TaskViewSet(mixins.CreateModelMixin,
     permission_classes = [permissions.IsAuthenticatedOrReadOnly]
     serializer_class = serializers.TaskSerializer
     filterset_class = filters.TaskFilter
+    lookup_field = 'sku'
+
+    def get_object(self):
+        try:
+            return super(TaskViewSet, self).get_object()
+        except Http404:
+            # Retry with ID fallback on public task
+            queryset = self.filter_queryset(self.get_queryset())
+            lookup_url_kwarg = self.lookup_url_kwarg or self.lookup_field
+            filter_kwargs = {
+                'pk': self.kwargs[lookup_url_kwarg],
+                'is_private': False,
+            }
+            obj = get_object_or_404(queryset, **filter_kwargs)
+            # May raise a permission denied
+            self.check_object_permissions(self.request, obj)
+            return obj
 
     def get_queryset(self):
-        return models.Task.objects.active_for_user(self.request.user)
+        if self.action == 'retrieve':  # Return all tasks on detail
+            return models.Task.objects.all()
+        qs = models.Task.objects.active_for_user(self.request.user)
+        if self.action == 'list':  # Don't show private tasks on list
+            qs = qs.filter(is_private=False)
+        return qs
 
     def create(self, request, *args, **kwargs):
         serializer = serializers.TaskSerializer(data=request.data, context={'request': request})
@@ -67,22 +92,18 @@ class TaskViewSet(mixins.CreateModelMixin,
 
     @action(methods=['post'], detail=True, url_path='answer',
             url_name='task_answer', serializer_class=serializers.AnswerSerializer)
-    def answer(self, request, pk=None):
+    def answer(self, request, sku=None):
         try:
-            task_id = int(pk)
-        except ValueError:
-            raise exceptions.ValidationError(f"Task id {pk} is not a number")
-        try:
-            task = models.Task.objects.get(pk=task_id)
+            task = models.Task.objects.get(sku=sku)
         except models.Task.DoesNotExist:
-            raise exceptions.NotFound(f"Task id {task_id} wasn't found")
+            raise exceptions.NotFound(f"Task sku {sku} wasn't found")
         for question in request.data['questions']:
             if question['id'] not in task.questions.values_list('id', flat=True):
-                raise exceptions.NotFound(f"Question id {question['id']} wasn't found in task {task_id}")
+                raise exceptions.NotFound(f"Question id {question['id']} wasn't found in task {sku}")
             for option in question['options']:
                 if option['id'] not in task.questions.filter(id=question['id']).values_list('options', flat=True):
                     raise exceptions.NotFound(
-                        f"Option id {option['id']} wasn't found for question {option['id']} in task {task_id}"
+                        f"Option id {option['id']} wasn't found for question {option['id']} in task {sku}"
                     )
         request.data.update({"task": task, "user": request.user})
         serializer = serializers.AnswerSerializer(data=request.data, context={'request': request})
@@ -146,6 +167,7 @@ class AnswerViewSet(mixins.CreateModelMixin,
     serializer_class = serializers.AnswerSerializer
 
 
+@method_decorator(csrf_exempt, name='dispatch')
 class SubscribeViewSet(mixins.CreateModelMixin, viewsets.GenericViewSet):
     queryset = models.Subscribe.objects.all()
     serializer_class = serializers.SubscribeSerializer
@@ -257,8 +279,8 @@ class RewardViewSet(mixins.CreateModelMixin, mixins.ListModelMixin, viewsets.Gen
     queryset = models.Reward.objects.all()
 
     def create(self, request, *args, **kwargs):
-        task_id = kwargs['task_id']
-        task = get_object_or_404(models.Task, pk=task_id)
+        task_sku = kwargs['task_sku']
+        task = get_object_or_404(models.Task, sku=task_sku)
         with transaction.atomic():
             if request.user.id not in task.answers.values_list('user_id', flat=True):
                 data = {"error": "User didn't answer the task"}

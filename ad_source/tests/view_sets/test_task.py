@@ -43,7 +43,7 @@ class TestTaskView(mixins.DataTestMixin, APITestCase):
     def setUp(self):
         self.url = reverse('task_view-list')
         self.published_task = models.Task.objects.get(pk=1)
-        self.detail_url = reverse('task_view-detail', kwargs={'pk': self.published_task.id})
+        self.detail_url = reverse('task_view-detail', kwargs={'sku': self.published_task.sku})
 
     @responses.activate
     def test_list_task(self):
@@ -177,6 +177,21 @@ class TestTaskView(mixins.DataTestMixin, APITestCase):
                 self.assertEqual('Website has strict X-Frame-Options: deny', data['warning_message'])
                 mock_task.assert_called_once_with(task_id=4, wait_for_tx='0xdeadc0dedeadc0de')
                 mock_screenshot_task.assert_called_once_with(4)
+
+    def test_get_task_detail_anon(self):
+        response = self.client.get(self.detail_url)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+
+    def test_get_task_detail_id_fallback(self):
+        response = self.client.get(
+            reverse('task_view-detail', kwargs={'sku': self.published_task.id})
+        )
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+
+    def test_get_task_detail_user(self):
+        self.client.login(username='0xa1f765189805e0e51ac9753a9bc7d99e2b90c705', password='admin')
+        response = self.client.get(self.detail_url)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
 
     def test_delete_task_admin(self):
         self.client.login(username='admin', password='admin')

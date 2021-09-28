@@ -1,5 +1,6 @@
 import datetime
 import typing
+import uuid
 
 from django.conf import settings
 from django.contrib.auth.models import User
@@ -14,6 +15,14 @@ from . import fields, managers
 
 if typing.TYPE_CHECKING:
     from crowdclick.settings import Web3Config
+
+
+def generate_task_sku() -> str:
+    while True:
+        sku = uuid.uuid4().hex[:6].upper()
+        if not Task.objects.filter(sku=sku).exists():
+            break
+    return sku
 
 
 class Task(models.Model):
@@ -34,6 +43,7 @@ class Task(models.Model):
     description = models.TextField("Description", max_length=100)
     chain = models.CharField("Chain", max_length=15, choices=CHAIN_CHOICES, default=GOERLI)
     uuid = models.UUIDField('Web3 Task Identifier', unique=True, null=True)
+    sku = models.CharField('SKU', max_length=6, blank=True, unique=True, default=generate_task_sku)
     website_link = models.CharField("Website Link", max_length=200, validators=[validators.URLValidator])
     website_image = models.ImageField("Website Image", upload_to="task_website_image", null=True)
     contract_address = models.CharField("Contract address", max_length=42)
@@ -43,6 +53,7 @@ class Task(models.Model):
     modified = models.DateTimeField("Modified", auto_now=True)  # No show
     # XXX: rename `is_active` to `is_enabled`
     is_active = models.BooleanField("Is active", default=True)  # Read-only on API, manageable by admin
+    is_private = models.BooleanField("Is private", default=False)
     is_active_web3 = models.BooleanField("Is active on Web3", default=True)  # Is active on Web 3
     initial_tx_hash = models.CharField("Initial transaction hash", max_length=66, blank=True, default='')
     user = models.ForeignKey(User, related_name='tasks', on_delete=models.DO_NOTHING)
