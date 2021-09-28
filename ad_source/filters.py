@@ -48,8 +48,9 @@ class TaskDashboardFilter(TaskFilter):
         help_text=f"Options: {', '.join([k for k, v in TASK_STATUS_CHOICES])}"
     )
 
-    class Meta(TaskFilter.Meta):
-        pass
+    class Meta:
+        model = models.Task
+        fields = ('chain', 'is_private')
 
     def filter_status(self, queryset, name, value):
         if value == TASK_STATUS_ACTIVE:

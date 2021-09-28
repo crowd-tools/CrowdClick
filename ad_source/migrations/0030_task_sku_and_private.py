@@ -4,8 +4,6 @@ import uuid
 
 from django.db import migrations, models
 
-import ad_source.models
-
 
 def generate_task_sku(apps, schema_editor):
     Task = apps.get_model('ad_source', 'Task')
@@ -37,12 +35,7 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='task',
             name='sku',
-            field=models.CharField(blank=True, null=True, max_length=6, unique=True, verbose_name='SKU'),
+            field=models.CharField(blank=True, null=True, max_length=6, verbose_name='SKU'),
         ),
         migrations.RunPython(code=generate_task_sku, reverse_code=migrations.RunPython.noop),
-        migrations.AlterField(
-            model_name='task',
-            name='sku',
-            field=models.CharField(blank=True, default=ad_source.models.generate_task_sku, max_length=6, unique=True, verbose_name='SKU'),
-        ),
     ]

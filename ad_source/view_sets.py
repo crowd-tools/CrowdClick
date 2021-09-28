@@ -7,6 +7,7 @@ from django.conf import settings
 from django.contrib.auth import login, logout
 from django.contrib.auth.models import User
 from django.db import transaction
+from django.http import Http404
 from django.shortcuts import get_object_or_404
 from djmoney.contrib.exchange.models import Rate
 from rest_framework import (
@@ -45,7 +46,25 @@ class TaskViewSet(mixins.CreateModelMixin,
     filterset_class = filters.TaskFilter
     lookup_field = 'sku'
 
+    def get_object(self):
+        try:
+            return super(TaskViewSet, self).get_object()
+        except Http404:
+            # Retry with ID fallback on public task
+            queryset = self.filter_queryset(self.get_queryset())
+            lookup_url_kwarg = self.lookup_url_kwarg or self.lookup_field
+            filter_kwargs = {
+                'pk': self.kwargs[lookup_url_kwarg],
+                'is_private': False,
+            }
+            obj = get_object_or_404(queryset, **filter_kwargs)
+            # May raise a permission denied
+            self.check_object_permissions(self.request, obj)
+            return obj
+
     def get_queryset(self):
+        if self.action == 'retrieve':  # Return all tasks on detail
+            return models.Task.objects.all()
         qs = models.Task.objects.active_for_user(self.request.user)
         if self.action == 'list':  # Don't show private tasks on list
             qs = qs.filter(is_private=False)
@@ -257,8 +276,8 @@ class RewardViewSet(mixins.CreateModelMixin, mixins.ListModelMixin, viewsets.Gen
     queryset = models.Reward.objects.all()
 
     def create(self, request, *args, **kwargs):
-        task_id = kwargs['task_id']
-        task = get_object_or_404(models.Task, pk=task_id)
+        task_sku = kwargs['task_sku']
+        task = get_object_or_404(models.Task, sku=task_sku)
         with transaction.atomic():
             if request.user.id not in task.answers.values_list('user_id', flat=True):
                 data = {"error": "User didn't answer the task"}
