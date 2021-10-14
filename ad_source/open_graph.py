@@ -23,7 +23,11 @@ class OpenGraph(object):
         :param url: URL to fetch
         :return: 'Response body' and 'X-Frame-Options' header
         """
-        self.response = requests.get(url, allow_redirects=True)
+        headers = {
+            "User-Agent": "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36"
+            " (KHTML, like Gecko) Chrome/93.0.4577.82 Safari/537.36",
+        }
+        self.response = requests.get(url, allow_redirects=True, headers=headers)
         self.RESOLVED_URL = self.response.url
         x_frame_options = self.response.headers.get('X-Frame-Options', '').lower()
         if x_frame_options in self.ILEGAL_FRAME_OPTIONS or x_frame_options.startswith('allow-from'):
