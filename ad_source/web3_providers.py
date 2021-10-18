@@ -2,19 +2,52 @@ import decimal
 import json
 import typing
 from dataclasses import dataclass
+from typing import (
+    Any,
+    Dict,
+    Optional,
+    Sequence,
+    cast,
+)
 
 from django.conf import settings
 from django.core.exceptions import ImproperlyConfigured
 from djmoney.contrib.exchange.models import get_rate
+from ens import ENS
 from eth_typing import Address, ChecksumAddress
 from web3 import Web3
+from web3._utils.empty import (
+    empty,
+)
 from web3.contract import Contract
-from web3.types import ENS
+from web3.providers import (
+    BaseProvider,
+)
+from web3.types import (  # noqa: F401
+    Middleware,
+    MiddlewareOnion,
+    Wei,
+)
 
 from . import contracts, models
 
 if typing.TYPE_CHECKING:  # pragma: no cover
     from crowdclick.settings import Web3Config
+
+
+class Web3Client(Web3):
+    def __init__(
+        self,
+        provider: Optional[BaseProvider] = None,
+        middlewares: Optional[Sequence[Any]] = None,
+        modules: Optional[Dict[str, Sequence[Any]]] = None,
+        ens: ENS = cast(ENS, empty)
+    ) -> None:
+        super(Web3Client, self).__init__(provider, middlewares, modules, ens)
+        self.host_url = getattr(self.provider, 'endpoint_uri', self.__class__.__name__)
+
+    def __str__(self):
+        return f'Web3 (host={self.host_url})'
 
 
 @dataclass
@@ -98,9 +131,9 @@ class Web3ProviderStorage(dict):
             raise ImproperlyConfigured(f"Requested Web3 provider {key} but \
             is missing in settings.WEB3_CONFIG")
         if settings.TEST:
-            providers = {Web3(Web3.EthereumTesterProvider()), }
+            providers = {Web3Client(Web3.EthereumTesterProvider()), }
         else:  # pragma: no cover
-            providers = {Web3(Web3.HTTPProvider(endpoint)) for endpoint in config.endpoints}
+            providers = {Web3Client(Web3.HTTPProvider(endpoint)) for endpoint in config.endpoints}
 
         if not providers:
             raise ImproperlyConfigured(f"No providers for config {key}")
