@@ -40,7 +40,7 @@ async def async_create_task_screenshot(task_id: int):
 def update_task_is_active_balance(
         self,
         task_id: int,
-        wait_for_tx: str = '',
+        wait_for_tx: bytes = b'',
         should_be_active: bool = None,
 ) -> dict:
     """
