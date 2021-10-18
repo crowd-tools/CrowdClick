@@ -107,5 +107,5 @@ def _wait_for_transaction_receipt(providers, wait_for_tx: bytes):
             provider.eth.wait_for_transaction_receipt(wait_for_tx)
             return
         except (HTTPError, TimeExhausted, TypeError):
-            logger.error(f'ERROR in `wait_for_transaction_receipt` - {provider}')
+            logger.exception(f'ERROR in `wait_for_transaction_receipt` - {provider}')
     raise StopIteration()

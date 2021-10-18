@@ -93,7 +93,7 @@ class Web3Provider:
                 tx_hash = tx_hash_hex.hex()
                 return tx_hash
             except (TypeError, ValueError, ReadTimeout):
-                logger.error(f'ERROR in `create_reward` - {web3}')
+                logger.exception(f'ERROR in `create_reward` - {web3}')
         raise StopIteration()
 
     def check_balance(self, task: models.Task) -> typing.Tuple[bool, typing.Union[int, decimal.Decimal]]:
@@ -109,7 +109,7 @@ class Web3Provider:
                 current_budget_usd = get_rate(source=self.currency, target='USD') * current_budget_eth
                 return is_active, current_budget_usd
             except (TypeError, ValueError, ReadTimeout):
-                logger.error(f'ERROR in `check_balance` - {web3}')
+                logger.exception(f'ERROR in `check_balance` - {web3}')
         raise StopIteration()
 
     def push_underlying_usd_price(self):
@@ -131,7 +131,7 @@ class Web3Provider:
                 result = admin_contract.functions.getUnderlyingUsdPriceFeed().call()
                 return value_uint, result, tx_hash
             except TypeError:
-                logger.error(f'ERROR in `check_balance` - {web3}')
+                logger.exception(f'ERROR in `check_balance` - {web3}')
         raise StopIteration()
 
 
