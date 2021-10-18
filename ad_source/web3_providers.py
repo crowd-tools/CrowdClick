@@ -54,6 +54,9 @@ class Web3Client(Web3):
     def __str__(self):
         return f'Web3 (host={self.host_url})'
 
+    def __repr__(self):
+        return self.__str__()
+
 
 @dataclass
 class Web3Provider:
