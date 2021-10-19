@@ -72,18 +72,18 @@ class Web3Provider:
     def create_reward(self, task: models.Task, reward: models.Reward) -> str:
         checksum_sender = Web3.toChecksumAddress(reward.sender.username)
         checksum_receiver = Web3.toChecksumAddress(reward.receiver.username)
-        for web3, contract in zip(self.web3, self.contracts):
+        for index, (web3, contract) in enumerate(zip(self.web3, self.contracts), start=1):
             try:
-                estimated_gas = contract.functions.forwardRewards(
+                forward_rewards = contract.functions.forwardRewards(
                     checksum_receiver,  # To
                     checksum_sender,  # From
-                    str(task.uuid or '')  # task's uuid
-                ).estimateGas({'from': self.public_key})
-                w3_transaction = contract.functions.forwardRewards(
-                    checksum_receiver,  # To
-                    checksum_sender,  # From
-                    str(task.uuid or '')  # task's uuid
-                ).buildTransaction({
+                    str(task.uuid)  # task's uuid
+                )
+                estimated_gas = forward_rewards.estimateGas({'from': self.public_key})
+                # Increase gas limit on every iteration
+                # 1 = 100%, 2 = 150%, 3 = 200%,  ...
+                estimated_gas = round((estimated_gas + index * estimated_gas) / 2)
+                w3_transaction = forward_rewards.buildTransaction({
                     'chainId': self.chain_id,
                     'gas': estimated_gas,
                     'nonce': web3.eth.get_transaction_count(self.public_key)
