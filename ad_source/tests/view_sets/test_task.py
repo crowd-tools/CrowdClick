@@ -102,7 +102,7 @@ class TestTaskView(mixins.DataTestMixin, APITestCase):
                 self.assertEqual(data['website_link'], 'http://does_not_exist.com/')
                 self.assertEqual(data['id'], 4)
                 self.assertEqual(data['uuid'], 'd8f01220-4c85-4b35-a3e2-9ff33858a6e7')
-                mock_update_task.assert_called_once_with(task_id=4, wait_for_tx='0xdeadc0dedeadc0de')
+                mock_update_task.assert_called_once_with(task_id=4, wait_for_tx=b'0xdeadc0dedeadc0de')
                 mock_screenshot_task.assert_called_once_with(4)
 
     @responses.activate
@@ -138,7 +138,7 @@ class TestTaskView(mixins.DataTestMixin, APITestCase):
                 self.assertEqual(data['website_link'], 'http://does_not_exist.com/')
                 self.assertEqual(data['id'], 4)
                 self.assertEqual(data['uuid'], 'd8f01220-4c85-4b35-a3e2-9ff33858a6e7')
-                mock_update_task.assert_called_once_with(task_id=4, wait_for_tx='0xdeadc0dedeadc0de')
+                mock_update_task.assert_called_once_with(task_id=4, wait_for_tx=b'0xdeadc0dedeadc0de')
                 mock_screenshot_task.assert_called_once_with(4)
 
     @responses.activate
@@ -154,7 +154,7 @@ class TestTaskView(mixins.DataTestMixin, APITestCase):
                 self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
                 self.assertIn('uuid', response.json())
 
-                mock_task.assert_called_once_with(task_id=4, wait_for_tx='0xdeadc0dedeadc0de')
+                mock_task.assert_called_once_with(task_id=4, wait_for_tx=b'0xdeadc0dedeadc0de')
                 mock_screenshot_task.assert_called_once_with(4)
 
     def test_create_task_admin_with_connection_error(self):
@@ -175,7 +175,7 @@ class TestTaskView(mixins.DataTestMixin, APITestCase):
                 data = response.json()
                 self.assertEqual(response.status_code, 201)
                 self.assertEqual('Website has strict X-Frame-Options: deny', data['warning_message'])
-                mock_task.assert_called_once_with(task_id=4, wait_for_tx='0xdeadc0dedeadc0de')
+                mock_task.assert_called_once_with(task_id=4, wait_for_tx=b'0xdeadc0dedeadc0de')
                 mock_screenshot_task.assert_called_once_with(4)
 
     def test_get_task_detail_anon(self):
@@ -191,7 +191,9 @@ class TestTaskView(mixins.DataTestMixin, APITestCase):
     def test_get_task_detail_user(self):
         self.client.login(username='0xa1f765189805e0e51ac9753a9bc7d99e2b90c705', password='admin')
         response = self.client.get(self.detail_url)
+        data = response.json()
         self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertIn('is_private', data)
 
     def test_delete_task_admin(self):
         self.client.login(username='admin', password='admin')

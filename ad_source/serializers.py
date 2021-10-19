@@ -80,7 +80,7 @@ class TaskSerializer(serializers.HyperlinkedModelSerializer):
     reward_usd_per_click = MoneyField(max_digits=11, decimal_places=5, read_only=True)
     remaining_balance = MoneyField(max_digits=9, decimal_places=3, read_only=True)
     initial_budget = MoneyField(max_digits=9, decimal_places=3, required=False)
-    is_private = serializers.BooleanField(default=False, write_only=True)
+    is_private = serializers.BooleanField(default=False)
 
     class Meta:
         model = models.Task
@@ -131,7 +131,7 @@ class TaskSerializer(serializers.HyperlinkedModelSerializer):
                     is_correct=option.get('is_correct', False)
                 )
         if task.initial_tx_hash:
-            tasks.update_task_is_active_balance.delay(task_id=task.id, wait_for_tx=str(task.initial_tx_hash))
+            tasks.update_task_is_active_balance.delay(task_id=task.id, wait_for_tx=str.encode(task.initial_tx_hash))
         else:
             tasks.update_task_is_active_balance.delay(
                 task_id=task.id, should_be_active=True,

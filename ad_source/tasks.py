@@ -8,6 +8,8 @@ from django.conf import settings
 from django.core.files.images import ImageFile
 from django.utils.module_loading import import_string
 from django.utils.text import slugify
+from requests import HTTPError
+from web3.exceptions import TimeExhausted
 
 from crowdclick import celery
 from . import models, web3_providers
@@ -40,7 +42,7 @@ async def async_create_task_screenshot(task_id: int):
 def update_task_is_active_balance(
         self,
         task_id: int,
-        wait_for_tx: str = '',
+        wait_for_tx: bytes = b'',
         should_be_active: bool = None,
 ) -> dict:
     """
@@ -56,8 +58,7 @@ def update_task_is_active_balance(
     w3_provider: web3_providers.Web3Provider = web3_providers.web3_storage[task.chain]
     if wait_for_tx:
         logger.info(f'Waiting for TX: {wait_for_tx}')
-        provider, *_ = w3_provider.web3
-        provider.eth.wait_for_transaction_receipt(wait_for_tx)
+        _wait_for_transaction_receipt(w3_provider.web3, wait_for_tx)
     is_active, balance = w3_provider.check_balance(task)
     logger.info(f'Got Web3 response; Task: {task}, is_active: {is_active}, remaining_balance: {balance}')
     if should_be_active is not None and should_be_active != is_active:
@@ -98,3 +99,13 @@ def update_rates(backend=settings.EXCHANGE_BACKEND, **kwargs):
     #                 f" result {result} to {chain}, tx: {tx_hash}")
     #     results.append((value, result, tx_hash))
     # return results
+
+
+def _wait_for_transaction_receipt(providers, wait_for_tx: bytes):
+    for provider in providers:
+        try:
+            provider.eth.wait_for_transaction_receipt(wait_for_tx)
+            return
+        except (HTTPError, TimeExhausted, TypeError):
+            logger.exception(f'ERROR in `wait_for_transaction_receipt` - {provider}')
+    raise StopIteration()

@@ -97,7 +97,7 @@ class Task(models.Model):
 
     def __str__(self):  # pragma: no cover
         if self.title:
-            return f"Task({self.title})"
+            return f"Task({self.title}; id={self.pk})"
         return "Task"
 
     def save(self, *args, **kwargs):
