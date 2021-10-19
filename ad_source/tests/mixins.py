@@ -35,6 +35,7 @@ class TaskMixin(unittest.TestCase):
             og_image_link="https://via.placeholder.com/300x200.png",
             reward_per_click=Money(1, 'USD'),
             sku='GOEASK',  # Goerli task
+            uuid='ada12a54-f21b-4d22-b598-89481f407c8c',
             # remaining_balance=Money(10, 'ETH'),
             time_duration=datetime.timedelta(seconds=30),
             created="2013-01-01 00:00:00+00:00",
@@ -51,6 +52,7 @@ class TaskMixin(unittest.TestCase):
             reward_per_click=Money(1, 'MATIC'),
             # remaining_balance=Money(10, 'MATIC'),
             sku='MUMASK',  # Mumbai task
+            uuid='7fa8d8d4-3e79-4427-9547-eea84a9af699',
             time_duration=datetime.timedelta(seconds=30),
             created="2013-01-01 00:00:00+00:00",
             modified="2013-01-01 00:00:00+00:00",
@@ -64,6 +66,7 @@ class TaskMixin(unittest.TestCase):
             description="Survey task. Guess the correct answer",
             reward_per_click=Money(1, 'ETH'),
             sku='SURASK',  # Survey task
+            uuid='f7098ff8-18b5-43f2-9123-83a815b250be',
             # remaining_balance=Money(10, 'ETH'),
             time_duration=datetime.timedelta(seconds=30),
             created="2013-01-01 00:00:00+00:00",
