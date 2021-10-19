@@ -80,7 +80,7 @@ class TaskSerializer(serializers.HyperlinkedModelSerializer):
     reward_usd_per_click = MoneyField(max_digits=11, decimal_places=5, read_only=True)
     remaining_balance = MoneyField(max_digits=9, decimal_places=3, read_only=True)
     initial_budget = MoneyField(max_digits=9, decimal_places=3, required=False)
-    is_private = serializers.BooleanField(default=False, write_only=True)
+    is_private = serializers.BooleanField(default=False)
 
     class Meta:
         model = models.Task
