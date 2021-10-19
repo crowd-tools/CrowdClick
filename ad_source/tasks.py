@@ -58,8 +58,8 @@ def update_task_is_active_balance(
     w3_provider: web3_providers.Web3Provider = web3_providers.web3_storage[task.chain]
     if wait_for_tx:
 
-        if isinstance(wait_for_tx, str):
-            wait_for_tx = str.encode(wait_for_tx)
+        if isinstance(wait_for_tx, bytes):
+            wait_for_tx = bytes.decode(wait_for_tx)
 
         logger.info(f'Waiting for TX: {wait_for_tx}')
         _wait_for_transaction_receipt(w3_provider.web3, wait_for_tx)
@@ -105,7 +105,7 @@ def update_rates(backend=settings.EXCHANGE_BACKEND, **kwargs):
     # return results
 
 
-def _wait_for_transaction_receipt(providers, wait_for_tx: bytes):
+def _wait_for_transaction_receipt(providers, wait_for_tx: str):
     for provider in providers:
         try:
             provider.eth.wait_for_transaction_receipt(wait_for_tx)
