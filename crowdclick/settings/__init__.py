@@ -41,7 +41,7 @@ env = environ.Env(
     }),
     # Task `update_task_is_active_balance` will run up-to 30 times with 30sec delay (15 minutes) by default
     WEB3_RETRY_COUNTDOWN=(int, 30),
-    WEB3_RETRY=(int, 30),
+    WEB3_MAX_RETRIES=(int, 30),
     ETH2USD_URL=(str, 'https://min-api.cryptocompare.com/data/pricemulti?fsyms={from_symbol}&tsyms={to_symbol}'),
     CRYPTOCOMPARE_URL=(str, 'https://min-api.cryptocompare.com/data/pricemulti?tsyms={symbols}&fsyms={base_currency}'),
     ETH2USD_CACHE_KEY=(str, 'ETH-PRICES'),
