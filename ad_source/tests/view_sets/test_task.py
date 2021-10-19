@@ -191,7 +191,9 @@ class TestTaskView(mixins.DataTestMixin, APITestCase):
     def test_get_task_detail_user(self):
         self.client.login(username='0xa1f765189805e0e51ac9753a9bc7d99e2b90c705', password='admin')
         response = self.client.get(self.detail_url)
+        data = response.json()
         self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertIn('is_private', data)
 
     def test_delete_task_admin(self):
         self.client.login(username='admin', password='admin')
