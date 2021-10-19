@@ -50,7 +50,7 @@ class RewardViewSetTestCase(mixins.DataTestMixin, APITestCase):
             self.assertEqual(w3_checksum_mock.call_count, 2)
             self.assertEqual(w3_send_transaction_mock.call_count, 1)
 
-            mock_task.assert_called_once_with(task_id=self.task.id, wait_for_tx=b'6161616161')
+            mock_task.assert_called_once_with(task_id=self.task.id, wait_for_tx='6161616161')
 
             response = self.client.get(self.detail_url)
             self.assertEqual(response.status_code, status.HTTP_200_OK)
@@ -106,7 +106,7 @@ class RewardQuizViewSetTestCase(mixins.DataTestMixin, APITestCase):
             self.assertEqual(w3_checksum_mock.call_count, 2)
             self.assertEqual(w3_send_transaction_mock.call_count, 1)
 
-            mock_task.assert_called_once_with(task_id=self.task.id, wait_for_tx=b'6161616161')
+            mock_task.assert_called_once_with(task_id=self.task.id, wait_for_tx='6161616161')
 
     def test_create_reward_wrong_answer(self):
         answer = models.Answer.objects.create(

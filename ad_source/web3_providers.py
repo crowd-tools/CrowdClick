@@ -73,6 +73,7 @@ class Web3Provider:
     def create_reward(self, task: models.Task, reward: models.Reward) -> str:
         checksum_sender = Web3.toChecksumAddress(reward.sender.username)
         checksum_receiver = Web3.toChecksumAddress(reward.receiver.username)
+        exception = None
         for index, (web3, contract) in enumerate(zip(self.web3, self.contracts), start=1):
             try:
                 forward_rewards = contract.functions.forwardRewards(
@@ -96,12 +97,14 @@ class Web3Provider:
             except ContractLogicError:
                 self.check_balance(task)
                 raise
-            except (TypeError, ValueError, ReadTimeout, HTTPError):
-                logger.exception(f'ERROR in `create_reward` - {web3}')
-        raise StopIteration()
+            except (TypeError, ValueError, ReadTimeout, HTTPError) as e:
+                exception = e
+                logger.exception(f'ERROR in `create_reward` - {web3}: {e}')
+        raise StopIteration() from exception
 
     def check_balance(self, task: models.Task) -> typing.Tuple[bool, typing.Union[int, decimal.Decimal]]:
         checksum_address = Web3.toChecksumAddress(task.user.username)
+        exception = None
         for web3, contract in zip(self.web3, self.contracts):
             try:
                 response = contract.functions.lookupTask(
@@ -112,12 +115,14 @@ class Web3Provider:
                 current_budget_eth = web3.fromWei(current_budget, 'ether')
                 current_budget_usd = get_rate(source=self.currency, target='USD') * current_budget_eth
                 return is_active, current_budget_usd
-            except (TypeError, ValueError, ReadTimeout):
-                logger.exception(f'ERROR in `check_balance` - {web3}')
-        raise StopIteration()
+            except (TypeError, ValueError, ReadTimeout) as e:
+                exception = e
+                logger.exception(f'ERROR in `check_balance` - {web3}: {e}')
+        raise StopIteration() from exception
 
     def push_underlying_usd_price(self):
         rate = get_rate(source=self.currency, target='USD')
+        exception = None
         for web3, admin_contract in zip(self.web3, self.admin_contracts):
             try:
                 value_uint = web3.toWei(rate, 'ether')
@@ -134,9 +139,10 @@ class Web3Provider:
                 tx_hash = tx_hash_hex.hex()
                 result = admin_contract.functions.getUnderlyingUsdPriceFeed().call()
                 return value_uint, result, tx_hash
-            except TypeError:
-                logger.exception(f'ERROR in `check_balance` - {web3}')
-        raise StopIteration()
+            except TypeError as e:
+                exception = e
+                logger.exception(f'ERROR in `check_balance` - {web3}: {e}')
+        raise StopIteration() from exception
 
 
 class Web3ProviderStorage(dict):
