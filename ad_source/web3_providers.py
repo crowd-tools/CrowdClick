@@ -16,12 +16,13 @@ from django.core.exceptions import ImproperlyConfigured
 from djmoney.contrib.exchange.models import get_rate
 from ens import ENS
 from eth_typing import Address, ChecksumAddress
-from requests import ReadTimeout
+from requests import ReadTimeout, HTTPError
 from web3 import Web3
 from web3._utils.empty import (
     empty,
 )
 from web3.contract import Contract
+from web3.exceptions import ContractLogicError
 from web3.providers import (
     BaseProvider,
 )
@@ -92,7 +93,10 @@ class Web3Provider:
                 tx_hash_hex = web3.eth.sendRawTransaction(txn_signed.rawTransaction)  # tx_hash
                 tx_hash = tx_hash_hex.hex()
                 return tx_hash
-            except (TypeError, ValueError, ReadTimeout):
+            except ContractLogicError:
+                self.check_balance(task)
+                raise
+            except (TypeError, ValueError, ReadTimeout, HTTPError):
                 logger.exception(f'ERROR in `create_reward` - {web3}')
         raise StopIteration()
 

@@ -64,7 +64,7 @@ def update_task_is_active_balance(
     if should_be_active is not None and should_be_active != is_active:
         self.retry(
             countdown=settings.WEB3_RETRY_COUNTDOWN,
-            max_retries=settings.WEB3_RETRY_COUNTDOWN,
+            max_retries=settings.WEB3_MAX_RETRIES,
         )
 
     task.is_active_web3 = is_active
