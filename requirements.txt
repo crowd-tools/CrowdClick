@@ -1,6 +1,6 @@
 aiohttp==3.7.4.post0
 beautifulsoup4==4.9.3
-celery==5.2.2
+celery==5.2.3
 django-celery-results==2.4.0
 django-celery-beat==2.2.1
 django-environ==0.4.5
